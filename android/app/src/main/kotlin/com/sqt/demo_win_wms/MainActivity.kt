@@ -1,0 +1,6 @@
+package com.sqt.demo_win_wms
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
