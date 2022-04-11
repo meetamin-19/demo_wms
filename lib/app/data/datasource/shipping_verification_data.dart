@@ -17,7 +17,7 @@ abstract class ShippingVerificationData {
   Future<ResShippingVerificationList> getShippingVerificationList(
       {required ReqShippingVerificationListGet req});
 
-  Future<ResPath> getASNPath({String? invoiceNo, int? invoiceID, String? pdf});
+  Future<ResPath> getPDFPath({String? invoiceNo, int? invoiceID, String? pdf});
 
   Future<ResCheckForOpenCreditOrder> checkForVerification({int? salesOrderId});
 
@@ -29,6 +29,8 @@ abstract class ShippingVerificationData {
           PickOrderPalletList>? list, String? filePath});
 
   Future<EmptyRes> editVerifiedOrder( {int? pickOrderID, int? salesOrderId, String? bolNumber, String? filePath});
+
+  Future<ResPath> getBolPAth({int? salesOrderID});
 // Future<>
 
 // Future<Res>
@@ -51,18 +53,17 @@ class ShippingVerificationDataImpl extends ShippingVerificationData {
   }
 
   @override
-  Future<ResPath> getASNPath(
+  Future<ResPath> getPDFPath(
       {String? invoiceNo, int? invoiceID, String? pdf}) async {
     final user = await UserPrefs.shared.getUser;
     String urlforPDF;
-
     final urlForASNPDF = "shippingverification/GetPackagingASNData";
     final urlForInvoicePDf = "shippingverification/GetInvoicePDF";
     if (pdf == "ASN") {
       urlforPDF = urlForASNPDF;
     } else if (pdf == "INVOICE") {
       urlforPDF = urlForInvoicePDf;
-    } else {
+    } else{
       urlforPDF = "shippingverification/GetCreditMemoPDF";
     }
     final res = await WebService.shared.postApiDIO(
@@ -167,6 +168,19 @@ class ShippingVerificationDataImpl extends ShippingVerificationData {
     } catch (e) {
       throw kErrorWithRes;
     }
+  }
+
+  @override
+  Future<ResPath> getBolPAth({int? salesOrderID}) async {
+    final res = await WebService.shared.postApiDIO(
+        url: kBaseURL + "shippingverification/GetBOLAttachment",data: {
+          "salesOrderID" : salesOrderID ?? 0
+    });
+    // try{
+      return ResPath.fromJson(res!);
+    // } catch (e) {
+      throw kErrorWithRes;
+    // }
   }
 
 }

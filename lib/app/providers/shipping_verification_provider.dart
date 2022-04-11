@@ -12,24 +12,27 @@ import 'base_notifier.dart';
 class ShippingVerificationProvider extends BaseNotifier {
   final ShippingVerificationRepository repo;
 
+  String? imagePath = "";
   ApiResponse<ResShippingVerificationList>? _shippingVerificationList;
+
+  var imageName;
 
   ApiResponse<ResShippingVerificationList>? get shippingVerificationList =>
       _shippingVerificationList;
 
   List<ShippingVerificationListData>? shippingList;
 
-  ApiResponse<ResPath>? _getASN_PdfPath;
+  ApiResponse<ResPath>? _getBolPDF ;
+  ApiResponse<ResPath>? get getBolPDF => _getBolPDF;
 
+  ApiResponse<ResPath>? _getASN_PdfPath;
   ApiResponse<ResPath>? get getASN_PdfPath => _getASN_PdfPath;
 
   ApiResponse<ResCheckForOpenCreditOrder>? _checkForVerification;
-
   ApiResponse<ResCheckForOpenCreditOrder>? get checkForVrf =>
       _checkForVerification;
 
   ApiResponse<ResShoppingVerificationEditScreen>? _editScreen;
-
   ApiResponse<ResShoppingVerificationEditScreen>? get editScreen => _editScreen;
 
   ApiResponse<EmptyRes>? _submitUnverifiedData;
@@ -45,6 +48,7 @@ class ShippingVerificationProvider extends BaseNotifier {
     _editScreen = ApiResponse();
     _submitUnverifiedData = ApiResponse();
     _editVerifiedOrder = ApiResponse();
+    _getBolPDF = ApiResponse();
     shippingList = [];
   }
 
@@ -89,7 +93,7 @@ class ShippingVerificationProvider extends BaseNotifier {
   }
 
   Future getPdfPath({int? invoiceID, String? invoiceNo, String? msg}) async {
-    final res = await repo.getASNPath(
+    final res = await repo.getPDFPath(
         invoiceNo: invoiceNo, invoiceID: invoiceID, pdf: msg);
 
     try {
@@ -193,4 +197,33 @@ class ShippingVerificationProvider extends BaseNotifier {
     }
 
   }
+  Future getBolPath({int? salesOrderID}) async {
+    final res = await repo.getBolPath(
+       salesOrderID: salesOrderID);
+    try {
+      apiResIsLoading(_getBolPDF!);
+      if (res.success == true) {
+        apiResIsSuccess<ResPath>(
+            _getBolPDF!, res);
+      } else {
+        throw res.message ?? "Something Went Wrong";
+      }
+    } catch (e) {
+      apiResIsFailed(_getBolPDF!, e);
+      rethrow;
+    }
+  }
+
+  setCameraImagePath(String? path, String? name) {
+    imagePath = path;
+    imageName = name;
+    notifyListeners();
+  }
+
+  removeCameraImagePath(){
+    imagePath = "";
+    notifyListeners();
+  }
 }
+
+

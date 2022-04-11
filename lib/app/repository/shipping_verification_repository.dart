@@ -19,9 +19,9 @@ class ShippingVerificationRepository {
     return await dataSource.getShippingVerificationList(req: req);
   }
 
-  Future<ResPath> getASNPath(
+  Future<ResPath> getPDFPath(
       {String? invoiceNo, int? invoiceID, String? pdf}) async {
-    return await dataSource.getASNPath(
+    return await dataSource.getPDFPath(
         invoiceID: invoiceID, invoiceNo: invoiceNo, pdf: pdf);
   }
 
@@ -54,4 +54,10 @@ class ShippingVerificationRepository {
         bolNumber: bolNumber,
         filePath: filePath);
   }
+  Future<ResPath> getBolPath(
+      {int? salesOrderID}) async {
+    return await dataSource.getBolPAth(
+        salesOrderID: salesOrderID);
+  }
+
 }
