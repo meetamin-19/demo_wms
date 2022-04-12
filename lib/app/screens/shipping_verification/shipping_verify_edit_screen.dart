@@ -804,7 +804,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
               child: TextButton(
                   style: TextButton.styleFrom(
                       backgroundColor: Colors.deepOrangeAccent),
-                  onPressed: () {},
+                  onPressed: () { },
                   child: childText(
                       '${data?.data?.pickOrderPalletList?[i].palletNo}',
                       Colors.black)),

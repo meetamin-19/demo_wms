@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pdfx/pdfx.dart';
 import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.dart';
 import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
@@ -52,7 +51,8 @@ class _ShippingVerificationScreenState
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
       _scrollController = ScrollController();
@@ -76,9 +76,13 @@ class _ShippingVerificationScreenState
             : (totalCount! / 100).ceil();
       });
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
-    print('totalCount inside getTotalCount :$totalCount ');
+    if (kDebugMode) {
+      print('totalCount inside getTotalCount :$totalCount ');
+    }
   }
 
   void nextPage() async {
@@ -102,7 +106,7 @@ class _ShippingVerificationScreenState
         await fetchList();
       } else {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("No more data to show")));
+            .showSnackBar(const SnackBar(content: Text("No more data to show")));
       }
     }
 
@@ -159,15 +163,16 @@ class _ShippingVerificationScreenState
           listStartAt: selectedStartPoint,
           numOfResults: selectedRange);
       getTotalCount();
+      final res = list.shippingVerificationList?.data?.data?.length;
     } on UnAuthorised catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('${e.toString()}')));
+          .showSnackBar(const SnackBar(content: Text('Something went wrong')));
       final auth = context.read<AuthProviderImpl>();
       Navigator.of(context).popUntil((route) => route.isFirst);
       auth.unAuthorizeUser();
     } catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('${e.toString()}')));
+          .showSnackBar(const SnackBar(content: Text('Something went wrong')));
     }
   }
 
@@ -189,7 +194,7 @@ class _ShippingVerificationScreenState
             controller: _scrollController,
           child :Container(
               child: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -201,7 +206,7 @@ class _ShippingVerificationScreenState
                       children: [
                         filters(context),
                         pages(context),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         if (!isLoading) dataTable(context)
                       ],
                     ),
@@ -226,7 +231,7 @@ class _ShippingVerificationScreenState
       msg = "Unverified";
     }
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -247,7 +252,7 @@ class _ShippingVerificationScreenState
             child: Container(
               padding: EdgeInsets.all(kFlexibleSize(10)),
               decoration: BoxDecoration(
-                  color: Color(0xff26C281),
+                  color: const Color(0xff26C281),
                   borderRadius: BorderRadius.circular(5)),
               child: Icon(
                 Icons.check_rounded,
@@ -259,7 +264,7 @@ class _ShippingVerificationScreenState
               : Container(
             padding: EdgeInsets.all(kFlexibleSize(10)),
             decoration: BoxDecoration(
-                color: Color(0xff26C281),
+                color: const Color(0xff26C281),
                 borderRadius: BorderRadius.circular(5)),
             child: Icon(
               Icons.check_rounded,
@@ -267,7 +272,7 @@ class _ShippingVerificationScreenState
               size: kFlexibleSize(20),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
             height: 10,
           ),
@@ -287,7 +292,7 @@ class _ShippingVerificationScreenState
             child: Container(
               padding: EdgeInsets.all(kFlexibleSize(10)),
               decoration: BoxDecoration(
-                  color: Color(0xff337AB7),
+                  color: const Color(0xff337AB7),
                   borderRadius: BorderRadius.circular(5)),
               child: SizedBox(
                 child: kShippingEditIcon,
@@ -298,7 +303,7 @@ class _ShippingVerificationScreenState
               : Container(
             padding: EdgeInsets.all(kFlexibleSize(10)),
             decoration: BoxDecoration(
-                color: Color(0xff337AB7),
+                color: const Color(0xff337AB7),
                 borderRadius: BorderRadius.circular(5)),
             child: SizedBox(
               child: kShippingEditIcon,
@@ -319,7 +324,7 @@ class _ShippingVerificationScreenState
     final hasError = home.shippingVerificationList?.state == Status.ERROR;
     if (isLoading) {
       return Container(
-          margin: EdgeInsets.symmetric(vertical: 20),
+          margin: const EdgeInsets.symmetric(vertical: 20),
           height: 50,
           color: Colors.white,
           child: Center(child: LoadingSmall()));
@@ -335,11 +340,12 @@ class _ShippingVerificationScreenState
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: SizedBox(
         child: Wrap(
           runSpacing: 3.0,
           spacing: 3.0,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             InkWell(
               onTap: () {
@@ -352,7 +358,7 @@ class _ShippingVerificationScreenState
               child: Container(
                 padding: EdgeInsets.all(kFlexibleSize(10)),
                 decoration: BoxDecoration(
-                    color: Color(0xff67809F),
+                    color: const Color(0xff67809F),
                     borderRadius: BorderRadius.circular(5)),
                 child: Icon(
                   Icons.remove_red_eye,
@@ -408,7 +414,7 @@ class _ShippingVerificationScreenState
                     width: kFlexibleSize(20),
                   ),
                 )
-            ) : SizedBox()
+            ) : const SizedBox()
           ],
         ),
       ),
@@ -427,10 +433,10 @@ class _ShippingVerificationScreenState
     Widget headerWidget(String text) {
       return Expanded(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
             text,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
         ),
@@ -447,17 +453,14 @@ class _ShippingVerificationScreenState
     if (filtersloaded) {
       if (!listloading) {
         return Container(
-            margin: EdgeInsets.symmetric(vertical: 20),
+            margin: const EdgeInsets.symmetric(vertical: 20),
             height: 50,
             color: Colors.white,
             child: Center(child: LoadingSmall()));
       } else {
         return Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.95,
-            padding: EdgeInsets.all(5),
+            width: MediaQuery.of(context).size.width * 0.95,
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 border: Border.all(color: Colors.black.withOpacity(0.1))),
@@ -465,7 +468,7 @@ class _ShippingVerificationScreenState
       }
     } else {
       return Container(
-          margin: EdgeInsets.symmetric(vertical: 20),
+          margin: const EdgeInsets.symmetric(vertical: 20),
           height: 50,
           color: Colors.white,
           child: Center(child: LoadingSmall()));
@@ -475,25 +478,32 @@ class _ShippingVerificationScreenState
   Widget table() {
     Widget headerWidget(String text) {
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Text(
           text,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
       );
     }
 
     final home = context.watch<ShippingVerificationProvider>();
-
-    final isLoading = home.shippingVerificationList?.state == Status.LOADING;
-
+    final emptylist = home.shippingVerificationList?.data?.data?.length;
     final hasError = home.shippingVerificationList?.state == Status.ERROR;
 
     if (hasError) {
       return NoDataFoundView(
         retryCall: () {
-          // context.read<PalletProviderImpl>().pickOrderViewLineItem();
+          context.read<ShippingVerificationProvider>().getShippingVerificationList();
+        },
+      );
+    }
+
+    if(emptylist == 0){
+      return NoDataFoundView(
+        title: "No Data Found ",
+        retryCall: () {
+          context.read<ShippingVerificationProvider>().getShippingVerificationList();
         },
       );
     }
@@ -501,15 +511,15 @@ class _ShippingVerificationScreenState
     final list = home.shippingList;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 7),
       child: Table(
         columnWidths: {
-          0: FlexColumnWidth(5),
-          1: FlexColumnWidth(5),
-          2: FlexColumnWidth(7),
-          3: FlexColumnWidth(7),
-          4: FlexColumnWidth(6),
-          5: FlexColumnWidth(6),
+          0: const FlexColumnWidth(5),
+          1: const FlexColumnWidth(5),
+          2: const FlexColumnWidth(7),
+          3: const FlexColumnWidth(7),
+          4: const FlexColumnWidth(6),
+          5: const FlexColumnWidth(6),
         },
         // border: TableBorder.all(color: kBorderColor),
         children: List.generate((list?.length ?? 0) + 1, (index) {
@@ -538,7 +548,7 @@ class _ShippingVerificationScreenState
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: SONButton(
+                child: sonButton(
                     data!,
                     childText,
                     data.isAllPalletsVerifiedOrNot,
@@ -637,17 +647,18 @@ class _ShippingVerificationScreenState
   //       );
   // }
 
-  Widget SONButton(ShippingVerificationListData e,
+  Widget sonButton(ShippingVerificationListData e,
       Widget Function(String text, Color? col) childText,
       bool? isAllPalletsVerifiedOrNot,
       bool? isInvoiceCreatedOrNot,) {
     Color btnColor;
     if (isAllPalletsVerifiedOrNot == true) {
-      btnColor = Color(0xff26C281);
+      btnColor = const Color(0xff26C281);
     } else if (isInvoiceCreatedOrNot == true) {
-      btnColor = Color(0xff8E44AD);
-    } else
+      btnColor = const Color(0xff8E44AD);
+    } else {
       btnColor = Colors.white;
+    }
 
     return Wrap(
       spacing: 5,
@@ -666,7 +677,7 @@ class _ShippingVerificationScreenState
                     decoration: BoxDecoration(
                         color: btnColor,
                         borderRadius: BorderRadius.circular(5)),
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     child: childText('${e.soNumber}', Colors.white)))),
         e.isAllPalletsVerifiedOrNot!
             ? InkWell(
@@ -684,16 +695,16 @@ class _ShippingVerificationScreenState
               decoration: BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.circular(5)),
-              padding: EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.edit,
                     color: Colors.white,
                     size: 15,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 3,
                   ),
                   childText('Edit', Colors.white),
@@ -701,8 +712,7 @@ class _ShippingVerificationScreenState
               ),
             ),
           ),
-        )
-            : Container()
+        ) : Container()
       ],
     );
   }
@@ -717,7 +727,7 @@ class _ShippingVerificationScreenState
 
     if (isLoading) {
       return Container(
-          margin: EdgeInsets.symmetric(vertical: 20),
+          margin: const EdgeInsets.symmetric(vertical: 20),
           height: 50,
           color: Colors.white,
           child: Center(child: LoadingSmall()));
@@ -798,7 +808,7 @@ class _ShippingVerificationScreenState
                       });
                     }),
                 Container(
-                  padding: EdgeInsets.only(
+                  padding: const EdgeInsets.only(
                       top: 5, bottom: 5, left: 10, right: 10),
                   height: 44,
                   width: kFlexibleSize(290),
@@ -812,7 +822,7 @@ class _ShippingVerificationScreenState
                             value: dropdownValue,
                             elevation: 16,
                             iconSize: 30,
-                            underline: SizedBox(),
+                            underline: const SizedBox(),
                             onChanged: (String? newValue) {
                               setState(() {
                                 if (dropdownValue != newValue) {
@@ -852,7 +862,7 @@ class _ShippingVerificationScreenState
             )),
         Flex(
           direction:
-          Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
+              Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
           children: [
             PickOrderFilterButton(
               text: 'Apply',
@@ -863,6 +873,8 @@ class _ShippingVerificationScreenState
                     selectedCustomerLocation != null ||
                     selectedStartDate != null ||
                     selectedEndDate != null) {
+
+
                   setState(() {
                     selectedStartPoint = "0";
                     pageController?.jumpToPage(0);
@@ -889,6 +901,8 @@ class _ShippingVerificationScreenState
                     selectedCustomerLocation = null;
                     selectedShipVia = null;
                     selectedCarrier = null;
+                    selectedStartDate = null;
+                    selectedEndDate = null;
                     selectedStartPoint = "0";
                     pageController?.jumpToPage(0);
                     fetchList();
@@ -904,8 +918,9 @@ class _ShippingVerificationScreenState
 
   _callPathToVerify({int? salesOrderID, int? pickOrderId, String? msg}) async {
     final home = context.read<ShippingVerificationProvider>();
-    if (dropdownValue == "Unverified")
+    if (dropdownValue == "Unverified") {
       await home.checkForVerification(salesOrderID: salesOrderID);
+    }
     final verificationVar = home.checkForVrf;
     if (verificationVar?.data?.data?.first.errorMessage
         ?.toUpperCase()
@@ -947,7 +962,8 @@ class _ShippingVerificationScreenState
     final home = context.read<ShippingVerificationProvider>();
     await home.getPdfPath(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: msg);
     final path =  home.getASN_PdfPath?.data?.data;
-    print("http://wmsqa.softcube.in" + path!);
+      print("http://wmsqa.softcube.in" + path!);
+
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
             PdfViewScreen(path: "http://wmsqa.softcube.in" + path)));
@@ -982,10 +998,10 @@ class _ShippingVerificationScreenState
               width: 40,
               height: 40,
               color: kPrimaryColor,
-              child: Icon(Icons.chevron_left),
+              child: const Icon(Icons.chevron_left),
             ),
           ),
-          Container(
+          SizedBox(
               width: 60,
               height: 40,
               // color: Colors.red,
@@ -1014,7 +1030,7 @@ class _ShippingVerificationScreenState
               width: 40,
               height: 40,
               color: kPrimaryColor,
-              child: Icon(Icons.chevron_right),
+              child: const Icon(Icons.chevron_right),
             ),
           ),
         ],

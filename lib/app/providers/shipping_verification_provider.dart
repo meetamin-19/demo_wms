@@ -6,6 +6,7 @@ import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list_filter.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shopping_verification_edit_screen.dart';
 import 'package:demo_win_wms/app/repository/shipping_verification_repository.dart';
+import 'package:demo_win_wms/app/utils/extension.dart';
 import '../utils/api_response.dart';
 import 'base_notifier.dart';
 
@@ -72,8 +73,8 @@ class ShippingVerificationProvider extends BaseNotifier {
               customerLocationId: customerLocation?.value ?? '0',
               carrierId: carrierId?.value ?? '0',
               shipViaId: shipVia?.value ?? '0',
-              fromShipDateStr: startDate?.toIso8601String() ?? '',
-              toShipDateStr: endDate?.toIso8601String() ?? '',
+              fromShipDateStr: startDate?.toStrSlashFormat() ?? '',
+              toShipDateStr: endDate?.toStrSlashFormat() ?? '',
               statusTermStr: statusTerm ?? ''));
       if (res.success == true) {
         if (res.data != null) {

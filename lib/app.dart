@@ -5,11 +5,11 @@ import 'package:demo_win_wms/app/screens/pick_order/picked_line_items.dart';
 import 'package:demo_win_wms/app/screens/pallet_screen_edit/pallet_screen_edit.dart';
 import 'package:demo_win_wms/app/screens/pallet_screen_view//pallet_screen.dart';
 import 'package:demo_win_wms/app/screens/pick_order_list/pick_order_list_screen.dart';
-import 'package:demo_win_wms/app/screens/shipping_verification/components/camera_pop_up.dart';
 import 'package:demo_win_wms/app/screens/shipping_verification/shipping_verification_screen.dart';
 import 'package:demo_win_wms/app/screens/shipping_verification/shipping_verify_edit_screen.dart';
 import 'app/screens/login/login_screen.dart';
 import 'app/screens/lending_page.dart';
+import 'app/screens/shipping_verification/components/camera_pop_up.dart';
 import 'app/utils/constants.dart';
 
 Widget app(){
@@ -19,12 +19,12 @@ Widget app(){
     debugShowMaterialGrid: false,
     theme: ThemeData(
       fontFamily: 'kRegularFonts',
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           elevation: 0,
           foregroundColor: Colors.black,
           // centerTitle: true,
-          titleTextStyle: const TextStyle(
+          titleTextStyle: TextStyle(
             // fontFamily: kRegularFonts,
               fontSize: 16,
               fontWeight: FontWeight.bold,
