@@ -502,9 +502,6 @@ class _ShippingVerificationScreenState
     if(emptylist == 0){
       return NoDataFoundView(
         title: "No Data Found ",
-        retryCall: () {
-          context.read<ShippingVerificationProvider>().getShippingVerificationList();
-        },
       );
     }
 
@@ -873,8 +870,21 @@ class _ShippingVerificationScreenState
                     selectedCustomerLocation != null ||
                     selectedStartDate != null ||
                     selectedEndDate != null) {
-
-
+                    if(selectedStartDate != null && selectedEndDate != null) {
+                      if (selectedStartDate!.isBefore(selectedEndDate!)) {
+                        setState(() {
+                          selectedStartPoint = "0";
+                          pageController?.jumpToPage(0);
+                          fetchList();
+                          return;
+                        });
+                      }
+                      else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(content: Text('Please select valid date duration')));
+                        return;
+                      }
+                    }
                   setState(() {
                     selectedStartPoint = "0";
                     pageController?.jumpToPage(0);

@@ -373,7 +373,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Scan Part',
+                              'Scan Pallet',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
