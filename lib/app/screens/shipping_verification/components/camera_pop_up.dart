@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
-import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';

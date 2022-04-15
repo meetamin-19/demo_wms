@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
 import 'package:demo_win_wms/providers_list.dart';
 
 import 'app.dart';

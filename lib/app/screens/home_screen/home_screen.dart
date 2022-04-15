@@ -10,15 +10,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   final itemNames = [
     'Dashboard',
-    'Pick order line items',
+    'Pick order ',
     'Shipping Verification',
-    'Tote order with label generation',
-    'Container and Air receiving',
-    'Move',
-    'inventory Audit',
-    'quality orders'
+    // 'Tote order with label generation',
+    // 'Container and Air receiving',
+    // 'Move',
+    // 'inventory Audit',
+    // 'quality orders'
   ];
 
   final itemIcons = [
@@ -34,26 +35,26 @@ class _HomeScreenState extends State<HomeScreen> {
       Icons.verified,
       color: Colors.white,
     ),
-    Icon(
-      Icons.label,
-      color: Colors.white,
-    ),
-    Icon(
-      Icons.add_shopping_cart,
-      color: Colors.white,
-    ),
-    Icon(
-      Icons.drive_file_move,
-      color: Colors.white,
-    ),
-    Icon(
-      Icons.description,
-      color: Colors.white,
-    ),
-    Icon(
-      Icons.high_quality,
-      color: Colors.white,
-    ),
+    // Icon(
+    //   Icons.label,
+    //   color: Colors.white,
+    // ),
+    // Icon(
+    //   Icons.add_shopping_cart,
+    //   color: Colors.white,
+    // ),
+    // Icon(
+    //   Icons.drive_file_move,
+    //   color: Colors.white,
+    // ),
+    // Icon(
+    //   Icons.description,
+    //   color: Colors.white,
+    // ),
+    // Icon(
+    //   Icons.high_quality,
+    //   color: Colors.white,
+    // ),
   ];
 
   @override
@@ -77,10 +78,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 return Container(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(
+                      // TODO add Center Widget
+                      Container(
+                        padding: EdgeInsets.only(left: 10),
                         child: Wrap(
+                          // crossAxisAlignment: WrapCrossAlignment.start,
                           spacing: 10.0,
                           runSpacing: 10.0,
                           children: List.generate(Menu.items().length, (index) {

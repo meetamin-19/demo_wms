@@ -28,7 +28,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 
     return AppBar(
-
       toolbarHeight: 80,
       leading: hasLeading == true || hasBackButton == true ? Container(
         child: Row(
@@ -48,7 +47,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                 context.read<HomeProvider>().getPickerList();
 
               Navigator.of(context).popUntil((route) => route.isFirst);
-            },)  : SizedBox(),
+            },)  : const SizedBox(),
           ],
         ),
       ) : null,

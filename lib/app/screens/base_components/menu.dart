@@ -17,7 +17,7 @@ class Menu extends StatelessWidget {
       )
     },
     {
-      'title': 'Pick order line items',
+      'title': 'Pick order',
       'icon': Icon(
         Icons.palette,
         color: color ?? Colors.white,
@@ -32,30 +32,30 @@ class Menu extends StatelessWidget {
         size: size ?? 15,
       )
     },
-    {
-      'title': 'Tote order with label generation',
-      'icon': Icon(
-        Icons.label,
-        color: color ?? Colors.white,
-        size: size ?? 15,
-      )
-    },
-    {
-      'title': 'Container and Air receiving',
-      'icon': Icon(
-        Icons.add_shopping_cart,
-        color: color ?? Colors.white,
-        size: size ?? 15,
-      )
-    },
-    {
-      'title': 'Move',
-      'icon': Icon(
-        Icons.drive_file_move,
-        color: color ?? Colors.white,
-        size: size ?? 15,
-      )
-    },
+    // {
+    //   'title': 'Tote order with label generation',
+    //   'icon': Icon(
+    //     Icons.label,
+    //     color: color ?? Colors.white,
+    //     size: size ?? 15,
+    //   )
+    // },
+    // {
+    //   'title': 'Container and Air receiving',
+    //   'icon': Icon(
+    //     Icons.add_shopping_cart,
+    //     color: color ?? Colors.white,
+    //     size: size ?? 15,
+    //   )
+    // },
+    // {
+    //   'title': 'Move',
+    //   'icon': Icon(
+    //     Icons.drive_file_move,
+    //     color: color ?? Colors.white,
+    //     size: size ?? 15,
+    //   )
+    // },
     {
       'title': 'inventory Audit',
       'icon': Icon(
@@ -64,14 +64,14 @@ class Menu extends StatelessWidget {
         size: size ?? 15,
       )
     },
-    {
-      'title': 'quality orders',
-      'icon': Icon(
-        Icons.high_quality,
-        color: color ?? Colors.white,
-        size: size ?? 15,
-      )
-    },
+    // {
+    //   'title': 'quality orders',
+    //   'icon': Icon(
+    //     Icons.high_quality,
+    //     color: color ?? Colors.white,
+    //     size: size ?? 15,
+    //   )
+    // },
   ];
 
   @override
@@ -93,7 +93,7 @@ class Menu extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 5),
                 child: Row(
-                  children: [
+                  children: const [
                     SizedBox(width: 10),
                     Icon(Icons.logout,color: Colors.white,),
                     SizedBox(width: 10),
@@ -110,13 +110,14 @@ class Menu extends StatelessWidget {
                 Navigator.of(context).pushNamed(kPickOrderHomeRoute);
               }else if (index == 2){
                 Navigator.of(context).pushNamed(KVerifyShippingHomeScreen);
-              }else if(index == 6) {
+              }else if(index == 3) {
                 Navigator.pushNamed(context, kInventoryAudit);
               }
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 5),
               child: Row(
+                // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(width: 10),
                   Menu.items(size: 20)[index]['icon'],
