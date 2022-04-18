@@ -51,8 +51,9 @@ final Image kImgPopupDelete = Image.asset(kImagePath + 'delete-popup-icon.png',f
 final Image kImgPopupPickWhite = Image.asset(kImagePath + 'pick-popup-icon.png.png',fit: BoxFit.contain,color: Colors.white,);
 final Image kImgPopupViewIconWhite = Image.asset(kImagePath + 'view-popup-icon.png',fit: BoxFit.contain,color: Colors.white,);
 
-final Image kShippingEditIcon = Image.asset(kImagePath + 'edit-shiping-verificaiton-icon.png',fit: BoxFit.contain,color: Colors.white,);
+final Image kShippingEditIcon = Image.asset(kImagePath + 'edit-shiping-verificaiton-icon.png',fit: BoxFit.contain);
 final Image kShippingInvoiceIcon = Image.asset(kImagePath + 'invoice-shiping-verificaiton-icon.png',fit: BoxFit.contain,color: Colors.white,);
+
 
 
 final Image kImgAddIcon = Image.asset(kImagePath + 'add-icon.png',fit: BoxFit.contain);

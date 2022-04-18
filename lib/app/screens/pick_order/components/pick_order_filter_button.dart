@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 
 class PickOrderFilterButton extends StatelessWidget {
-  const PickOrderFilterButton({Key? key,required this.text, this.onTap}) : super(key: key);
+  PickOrderFilterButton({Key? key,required this.text, this.onTap , this.bgColor}) : super(key: key);
 
   final String text;
+  Color? bgColor = Colors.white;
   final Function? onTap;
 
   @override
@@ -17,11 +18,11 @@ class PickOrderFilterButton extends StatelessWidget {
         },
         child: Container(
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(5)),
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                color: bgColor , borderRadius: BorderRadius.circular(2)),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             child: Text(
               text,
-              style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w500),
+              style: const TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w500),
             )));
   }
 }

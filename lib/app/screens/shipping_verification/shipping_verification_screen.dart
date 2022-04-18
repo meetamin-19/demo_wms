@@ -1,5 +1,4 @@
 import 'package:demo_win_wms/app/screens/base_components/sidemenu_column.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +32,7 @@ class ShippingVerificationScreen extends StatefulWidget {
 class _ShippingVerificationScreenState
     extends State<ShippingVerificationScreen> {
   int currentIndex = 0;
-  final int pageLimit = 100;
+  int pageLimit = 100;
   String? selectedRange = "100";
   String? selectedStartPoint = "0";
   CarrierlistElement? selectedCustomer;
@@ -50,6 +49,7 @@ class _ShippingVerificationScreenState
   int? totalCount;
   int? itemCount = 1;
   bool? loading = false;
+  String? searchText = "";
 
   @override
   void initState() {
@@ -62,6 +62,12 @@ class _ShippingVerificationScreenState
       // _scrollController?.addListener(pagination);
       await fetchList();
     });
+  }
+
+  filterData(BuildContext context, String str) {
+    context
+        .read<ShippingVerificationProvider>()
+        .searchFromShippingVerificationList(str: str);
   }
 
   void getTotalCount() async {
@@ -163,8 +169,9 @@ class _ShippingVerificationScreenState
           startDate: selectedStartDate,
           statusTerm: dropdownValue == "All" ? "" : dropdownValue,
           listStartAt: selectedStartPoint,
-          numOfResults: selectedRange);
+          numOfResults: pageLimit.toString());
       getTotalCount();
+      filterData(context, searchText!);
       final res = list.shippingVerificationList?.data?.data?.length;
     } on UnAuthorised catch (e) {
       ScaffoldMessenger.of(context)
@@ -187,47 +194,76 @@ class _ShippingVerificationScreenState
         listProvider.shippingVerificationList?.state == Status.COMPLETED;
     return Scaffold(
         appBar: CommonAppBar(
-          hasLeading: false,
-          title: 'Shipping Verification',
+          hasLeading: true,
         ),
         body: Scaffold(
           body: Stack(
             children: [
               Row(
+                mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SideMenuColumnWidget(context),
                   Expanded(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * .85,
-                      child: Container(
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            // crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              filters(context),
-                              // pages(context),
-                              const SizedBox(height: 10),
-                              if (!isLoading) dataTable(context)
-                            ],
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 10, top: 5),
+                              child: Text(
+                                "SHIPPING VERIFICATION",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w700),
+                              ),
+                            )),
+                        // SizedBox(
+                        // height: MediaQuery.of(context).size.height * .8,
+                        // child:
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                top: 10, bottom: 20, left: 20, right: 20),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                // crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: filters(context)),
+                                  pages(context),
+                                  const SizedBox(height: 10),
+                                  if (!isLoading)
+                                    Expanded(child: dataTable(context)),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        // ),
+                      ],
                     ),
                   ),
                 ],
               ),
-
-              if(!isListLoaded) Center(child: LoadingSmall(color: Colors.blue,size: 50,),)
+              // if (!isListLoaded)
+              //   Center(
+              //     child: LoadingSmall(
+              //       color: Colors.blue,
+              //       size: 50,
+              //     ),
+              //   )
             ],
           ),
           drawerScrimColor: Colors.transparent,
-          drawer: DrawerWidget(),
+          drawer: const DrawerWidget(),
         ));
   }
 
@@ -261,7 +297,7 @@ class _ShippingVerificationScreenState
                     padding: EdgeInsets.all(kFlexibleSize(10)),
                     decoration: BoxDecoration(
                         color: const Color(0xff26C281),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(2)),
                     child: Icon(
                       Icons.check_rounded,
                       color: Colors.white,
@@ -273,7 +309,7 @@ class _ShippingVerificationScreenState
                   padding: EdgeInsets.all(kFlexibleSize(10)),
                   decoration: BoxDecoration(
                       color: const Color(0xff26C281),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(2)),
                   child: Icon(
                     Icons.check_rounded,
                     color: Colors.white,
@@ -301,7 +337,7 @@ class _ShippingVerificationScreenState
                     padding: EdgeInsets.all(kFlexibleSize(10)),
                     decoration: BoxDecoration(
                         color: const Color(0xff337AB7),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(2)),
                     child: SizedBox(
                       child: kShippingEditIcon,
                       width: kFlexibleSize(20),
@@ -369,7 +405,7 @@ class _ShippingVerificationScreenState
                 padding: EdgeInsets.all(kFlexibleSize(10)),
                 decoration: BoxDecoration(
                     color: const Color(0xff67809F),
-                    borderRadius: BorderRadius.circular(5)),
+                    borderRadius: BorderRadius.circular(2)),
                 child: Icon(
                   Icons.remove_red_eye,
                   color: Colors.white,
@@ -396,7 +432,7 @@ class _ShippingVerificationScreenState
                         : isCreditMemoGen
                             ? Colors.deepOrange
                             : Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(5)),
+                    borderRadius: BorderRadius.circular(2)),
                 child: SizedBox(
                   child: kShippingInvoiceIcon,
                   width: kFlexibleSize(20),
@@ -415,7 +451,7 @@ class _ShippingVerificationScreenState
                       padding: EdgeInsets.all(kFlexibleSize(10)),
                       decoration: BoxDecoration(
                           color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(2)),
                       child: SizedBox(
                         child: kShippingInvoiceIcon,
                         width: kFlexibleSize(20),
@@ -437,7 +473,6 @@ class _ShippingVerificationScreenState
   }
 
   Widget dataTable(BuildContext context) {
-
     final home = context.watch<ShippingVerificationProvider>();
     final filters = context.watch<ServiceProviderImpl>();
     final filtersLoaded =
@@ -457,8 +492,9 @@ class _ShippingVerificationScreenState
             width: MediaQuery.of(context).size.width * 0.95,
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                /*border: Border.all(color: Colors.black.withOpacity(0.1))*/),
+              borderRadius: BorderRadius.circular(
+                  5), /*border: Border.all(color: Colors.black.withOpacity(0.1))*/
+            ),
             child: table());
       }
     } else {
@@ -483,7 +519,7 @@ class _ShippingVerificationScreenState
     }
 
     final home = context.watch<ShippingVerificationProvider>();
-    final emptylist = home.shippingVerificationList?.data?.data?.length;
+    final emptyList = home.shippingVerificationList?.data?.data?.length;
     final hasError = home.shippingVerificationList?.state == Status.ERROR;
 
     if (hasError) {
@@ -496,21 +532,25 @@ class _ShippingVerificationScreenState
       );
     }
 
-    if (emptylist == 0) {
-      return NoDataFoundView(
+    if (emptyList == 0) {
+      return const NoDataFoundView(
         title: "No Data Found ",
       );
     }
 
-    final list = home.shippingList;
+    final list = home.filteredShippingVerificationData;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 7),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(vertical: 5),
-            decoration: BoxDecoration( border: Border.all(style: BorderStyle.solid,color: Colors.black.withOpacity(0.1))),
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            decoration: BoxDecoration(
+                border: Border.all(
+                    style: BorderStyle.solid,
+                    color: Colors.black.withOpacity(0.1))),
             child: Table(
               // border: TableBorder.all(),
               columnWidths: const {
@@ -533,76 +573,67 @@ class _ShippingVerificationScreenState
               ],
             ),
           ),
-          SingleChildScrollView(
-            child: Table(
-              columnWidths: const {
-                0: FlexColumnWidth(5),
-                1: FlexColumnWidth(5),
-                2: FlexColumnWidth(7),
-                3: FlexColumnWidth(7),
-                4: FlexColumnWidth(6),
-                5: FlexColumnWidth(6),
-              },
-              // border: TableBorder.all(color: kBorderColor),
-              children: List.generate((list?.length ?? 0) , (index) {
-                Color? colorForRow = Colors.white;
-                // if (index == 0) {
-                //   return TableRow(
-                //       children: [
-                //     headerWidget('Documents'),
-                //     headerWidget('SON'),
-                //     headerWidget('Customer'),
-                //     headerWidget('Customer Location'),
-                //     headerWidget('Ship Via (Carrier)'),
-                //     headerWidget('Ship Date'),
-                //   ]);
-                // }
+          Expanded(
+            child: SingleChildScrollView(
+              child: Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(5),
+                  1: FlexColumnWidth(5),
+                  2: FlexColumnWidth(7),
+                  3: FlexColumnWidth(7),
+                  4: FlexColumnWidth(6),
+                  5: FlexColumnWidth(6),
+                },
+                // border: TableBorder.all(color: kBorderColor),
+                children: List.generate((list?.length ?? 0), (index) {
+                  Color? colorForRow = Colors.white;
 
-                if (index % 2 == 0) {
-                  colorForRow = Color(0xffF9F9F9);
-                }
+                  if (index % 2 == 0) {
+                    colorForRow = const Color(0xffF9F9F9);
+                  }
 
-                final data = list?[index ];
+                  final data = list?[index];
 
-                return TableRow(
-                    decoration: BoxDecoration(color: colorForRow),
-
-                    children: [
-                      Center(
-                        child: secondActionBTNs(
-                            isCreditMemoGen: data?.isCreditMemoGenerated,
-                            invoiceNo: data?.invoiceNo,
-                            invoiceID: data?.invoiceId,
-                            isBolAttachment: data?.isBolAttachmentUploadedOrNot,
-                            salesOrderID: data?.salesOrderID),
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: sonButton(
-                              data!,
-                              data.isAllPalletsVerifiedOrNot,
-                              data.isInvoiceIsCreatedOrNot),
+                  return TableRow(
+                      decoration: BoxDecoration(color: colorForRow),
+                      children: [
+                        Center(
+                          child: secondActionBTNs(
+                              isCreditMemoGen: data?.isCreditMemoGenerated,
+                              invoiceNo: data?.invoiceNo,
+                              invoiceID: data?.invoiceId,
+                              isBolAttachment:
+                                  data?.isBolAttachmentUploadedOrNot,
+                              salesOrderID: data?.salesOrderID),
                         ),
-                      ),
-
-                      Center(child: childText('${data.customerName} ', Colors.black)),
-
-                      Center(
-                        child: childText(
-                            '${data.customerLocation}', Colors.black),
-                      ),
-                      Center(
-                        child: childText(
-                            '${data.shipperName} (${data.carrierName})',
-                            Colors.black),
-                      ),
-                      Center(
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: sonButton(
+                                data!,
+                                data.isAllPalletsVerifiedOrNot,
+                                data.isInvoiceIsCreatedOrNot),
+                          ),
+                        ),
+                        Center(
+                            child: childText(
+                                '${data.customerName} ', Colors.black)),
+                        Center(
                           child: childText(
-                              '${data.shipDate?.day}/${data.shipDate?.month}/${data.shipDate?.year}',
-                              Colors.black)),
-                    ]);
-              }),
+                              '${data.customerLocation}', Colors.black),
+                        ),
+                        Center(
+                          child: childText(
+                              '${data.shipperName} (${data.carrierName})',
+                              Colors.black),
+                        ),
+                        Center(
+                            child: childText(
+                                '${data.shipDate?.day}/${data.shipDate?.month}/${data.shipDate?.year}',
+                                Colors.black)),
+                      ]);
+                }),
+              ),
             ),
           ),
         ],
@@ -720,7 +751,7 @@ class _ShippingVerificationScreenState
                 child: Container(
                     decoration: BoxDecoration(
                         color: btnColor,
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(2)),
                     padding: const EdgeInsets.all(5),
                     child: childText('${e.soNumber}', Colors.white)))),
         e.isAllPalletsVerifiedOrNot!
@@ -738,7 +769,7 @@ class _ShippingVerificationScreenState
                   child: Container(
                     decoration: BoxDecoration(
                         color: Colors.blue,
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(2)),
                     padding: const EdgeInsets.all(5),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -797,38 +828,45 @@ class _ShippingVerificationScreenState
             if (service.shippingverificationfilters?.data?.data?.customerlist !=
                 null)
               ShippingVerificationFilterDropDown(
-                  data: service
-                      .shippingverificationfilters!.data!.data!.customerlist!,
-                  selectedValue: selectedCustomer,
-                  hint: 'Customer',
-                  onChange: (customer) {
-                    selectedCustomer = customer;
-                  },
-                  icon: kImgCustomerIcon),
+                width: 250,
+                data: service
+                    .shippingverificationfilters!.data!.data!.customerlist!,
+                selectedValue: selectedCustomer,
+                hint: 'Customer',
+                onChange: (customer) {
+                  selectedCustomer = customer;
+                },
+                // icon: kImgCustomerIcon
+              ),
             if (service.shippingverificationfilters?.data?.data
                     ?.customerlocationlist !=
                 null)
               ShippingVerificationFilterDropDown(
-                  data: service.shippingverificationfilters!.data!.data!
-                      .customerlocationlist!,
-                  selectedValue: selectedCustomerLocation,
-                  hint: 'Customer Location',
-                  onChange: (location) {
-                    selectedCustomerLocation = location;
-                  },
-                  icon: kImgCustomerLocationIcon),
+                width: 300,
+                data: service.shippingverificationfilters!.data!.data!
+                    .customerlocationlist!,
+                selectedValue: selectedCustomerLocation,
+                hint: 'Customer Location',
+                onChange: (location) {
+                  selectedCustomerLocation = location;
+                },
+                // icon: kImgCustomerLocationIcon
+              ),
             if (service.shippingverificationfilters?.data?.data?.shipvialist !=
                 null)
               ShippingVerificationFilterDropDown(
-                  data: service
-                      .shippingverificationfilters!.data!.data!.shipvialist!,
-                  selectedValue: selectedShipVia,
-                  hint: 'Ship Via',
-                  onChange: (ship) {
-                    selectedShipVia = ship;
-                  },
-                  icon: kShippingEditIcon),
+                width: 200,
+                data: service
+                    .shippingverificationfilters!.data!.data!.shipvialist!,
+                selectedValue: selectedShipVia,
+                hint: 'Ship Via',
+                onChange: (ship) {
+                  selectedShipVia = ship;
+                },
+                // icon: kShippingEditIcon
+              ),
             DatePickView(
+                showBorder: true,
                 passedDate: selectedStartDate,
                 title: selectedStartDate != null
                     ? (selectedStartDate?.toStrCommonFormat() ?? '')
@@ -839,6 +877,7 @@ class _ShippingVerificationScreenState
                   });
                 }),
             DatePickView(
+                showBorder: true,
                 passedDate: selectedEndDate,
                 title: selectedEndDate != null
                     ? (selectedEndDate?.toStrCommonFormat() ?? '')
@@ -848,55 +887,38 @@ class _ShippingVerificationScreenState
                     selectedEndDate = date;
                   });
                 }),
-            Container(
-              padding:
-                  const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
-              height: 44,
-              width: kFlexibleSize(290),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: DropdownButton<String>(
-                        isExpanded: true,
-                        value: dropdownValue,
-                        elevation: 16,
-                        iconSize: 30,
-                        underline: const SizedBox(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            if (dropdownValue != newValue) {
-                              dropdownValue = newValue!;
-                              selectedStartPoint = "0";
-                              pageController?.jumpToPage(0);
-                              fetchList();
-                            }
-                            // dropdownValue = newValue!;
-                          });
-                        },
-                        items: <String>['Unverified', 'Verified', 'All']
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList()),
-                  ),
-                ],
-              ),
-            ),
+            dropDownContainer(),
             if (service.shippingverificationfilters?.data?.data?.carrierlist !=
                 null)
               ShippingVerificationFilterDropDown(
-                  data: service
-                      .shippingverificationfilters!.data!.data!.carrierlist!,
-                  selectedValue: selectedCarrier,
-                  hint: 'Carrier ',
-                  onChange: (carrier) {
-                    selectedCarrier = carrier;
-                  },
-                  icon: kImgDateIcon),
+                width: 190,
+                data: service
+                    .shippingverificationfilters!.data!.data!.carrierlist!,
+                selectedValue: selectedCarrier,
+                hint: 'Carrier ',
+                onChange: (carrier) {
+                  selectedCarrier = carrier;
+                },
+                // icon: kImgDateIcon
+              ),
+            Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(2)),
+              height: 44,
+              width: kFlexibleSize(290),
+              child: TextField(
+                onChanged: (str) {
+                  filterData(context, str);
+                  searchText = str;
+                },
+                decoration: const InputDecoration(
+                    hintText: "Search",
+                    contentPadding: EdgeInsets.only(top: 2),
+                    prefixIcon: Icon(Icons.search_sharp),
+                    border: OutlineInputBorder(borderSide: BorderSide.none)),
+              ),
+            )
           ],
         )),
         Flex(
@@ -904,6 +926,7 @@ class _ShippingVerificationScreenState
               Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
           children: [
             PickOrderFilterButton(
+              bgColor: kPrimaryColor,
               text: 'Apply',
               onTap: () {
                 if (selectedCustomer != null ||
@@ -916,7 +939,7 @@ class _ShippingVerificationScreenState
                     if (selectedStartDate!.isBefore(selectedEndDate!)) {
                       setState(() {
                         selectedStartPoint = "0";
-                        pageController?.jumpToPage(0);
+                        // pageController?.jumpToPage(0);
                         fetchList();
                         return;
                       });
@@ -928,7 +951,7 @@ class _ShippingVerificationScreenState
                   }
                   setState(() {
                     selectedStartPoint = "0";
-                    pageController?.jumpToPage(0);
+                    // pageController?.jumpToPage(0);
                     fetchList();
                   });
                 }
@@ -955,7 +978,7 @@ class _ShippingVerificationScreenState
                     selectedStartDate = null;
                     selectedEndDate = null;
                     selectedStartPoint = "0";
-                    pageController?.jumpToPage(0);
+                    // pageController?.jumpToPage(0);
                     fetchList();
                   });
                 }
@@ -964,6 +987,52 @@ class _ShippingVerificationScreenState
           ],
         )
       ],
+    );
+  }
+
+  Container dropDownContainer() {
+    final home = context.read<ShippingVerificationProvider>();
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.black.withOpacity(0.1)),
+          borderRadius: const BorderRadius.all(Radius.circular(2))),
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+      height: 44,
+      width: kFlexibleSize(190),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: DropdownButton<String>(
+                isExpanded: true,
+                value: dropdownValue,
+                elevation: 16,
+                iconSize: 30,
+                underline: const SizedBox(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    if (dropdownValue != newValue) {
+                      dropdownValue = newValue!;
+                      selectedStartPoint = "0";
+
+                      // pageController?.jumpToPage(0);
+                      fetchList();
+                    }
+                    // dropdownValue = newValue!;
+                  });
+                },
+                items: <String>['Unverified', 'Verified', 'All']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList()),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1013,6 +1082,7 @@ class _ShippingVerificationScreenState
     final home = context.read<ShippingVerificationProvider>();
     await home.getPdfPath(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: msg);
     final path = home.getASN_PdfPath?.data?.data;
+
     print("http://wmsqa.softcube.in" + path!);
 
     Navigator.of(context).push(MaterialPageRoute(
@@ -1028,8 +1098,10 @@ class _ShippingVerificationScreenState
     await home.getBolPath(salesOrderID: salesOrderID);
     final path = home.getBolPDF?.data?.data;
     final message = home.getBolPDF?.data?.message;
+
     print(message);
-    print("http://wmsqa.softcube.in" + path!);
+
+      print("http://wmsqa.softcube.in" + path!);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
             PdfViewScreen(path: "http://wmsqa.softcube.in" + path)));
@@ -1040,52 +1112,97 @@ class _ShippingVerificationScreenState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        // mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          InkWell(
-            onTap: () {
-              previousPage();
-              pageController?.jumpToPage(currentIndex - 1);
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              color: kPrimaryColor,
-              child: const Icon(Icons.chevron_left),
-            ),
+          const Text("Showing :", style: TextStyle(fontSize: 12)),
+          const SizedBox(
+            width: 10,
           ),
-          SizedBox(
-              width: 60,
-              height: 40,
-              // color: Colors.red,
-              child: PageView.builder(
-                scrollDirection: Axis.horizontal,
-                controller: pageController,
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration:
-                        BoxDecoration(border: Border.all(color: Colors.grey)),
-                    width: 50,
-                    child: Center(child: Text('${index + 1}')),
-                  );
-                },
-                onPageChanged: (ind) {
-                  currentIndex = ind;
-                },
-                itemCount: itemCount,
-              )),
-          InkWell(
-            onTap: () {
-              pageController?.jumpToPage(currentIndex + 1);
-              nextPage();
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              color: kPrimaryColor,
-              child: const Icon(Icons.chevron_right),
-            ),
-          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            height: 30,
+            decoration:
+                BoxDecoration(border: Border.all(color: Color(0xffCACACA))),
+            child: DropdownButton(
+                iconSize: 12,
+                underline: const SizedBox(),
+                value: pageLimit,
+                elevation: 4,
+                style: const TextStyle(fontWeight: FontWeight.w600,color: Colors.black),
+
+                items: const [
+                  DropdownMenuItem(
+                    child: Text(
+                      "100 Rows",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: 100,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("50 Rows", style: TextStyle(fontSize: 12)),
+                    value: 50,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("25 Rows", style: TextStyle(fontSize: 12)),
+                    value: 25,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("10 Rows", style: TextStyle(fontSize: 12)),
+                    value: 10,
+                  )
+                ],
+                onChanged: (int? val) {
+                  setState(() {
+                    pageLimit = val!;
+                    fetchList();
+                  });
+                }),
+          )
+
+          // InkWell(
+          //   onTap: () {
+          //     previousPage();
+          //     pageController?.jumpToPage(currentIndex - 1);
+          //   },
+          //   child: Container(
+          //     width: 40,
+          //     height: 40,
+          //     color: kPrimaryColor,
+          //     child: const Icon(Icons.chevron_left),
+          //   ),
+          // ),
+          // SizedBox(
+          //     width: 60,
+          //     height: 40,
+          //     // color: Colors.red,
+          //     child: PageView.builder(
+          //       scrollDirection: Axis.horizontal,
+          //       controller: pageController,
+          //       itemBuilder: (context, index) {
+          //         return Container(
+          //           decoration:
+          //               BoxDecoration(border: Border.all(color: Colors.grey)),
+          //           width: 50,
+          //           child: Center(child: Text('${index + 1}')),
+          //         );
+          //       },
+          //       onPageChanged: (ind) {
+          //         currentIndex = ind;
+          //       },
+          //       itemCount: itemCount,
+          //     )),
+          // InkWell(
+          //   onTap: () {
+          //     pageController?.jumpToPage(currentIndex + 1);
+          //     nextPage();
+          //   },
+          //   child: Container(
+          //     width: 40,
+          //     height: 40,
+          //     color: kPrimaryColor,
+          //     child: const Icon(Icons.chevron_right),
+          //   ),
+          // ),
         ],
       ),
     );

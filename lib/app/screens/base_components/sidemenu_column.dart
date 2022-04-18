@@ -105,7 +105,7 @@ class SideMenuColumnWidget extends StatelessWidget {
               ),
               for(int i = 1; i< items().length; i++) {
                 Container(
-                  padding: const EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(top: 21),
                   child: items(size: 24)[i]["icon"],
                 )
               }.first,

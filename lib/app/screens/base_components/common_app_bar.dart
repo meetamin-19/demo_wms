@@ -31,6 +31,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: 80,
       leading: hasLeading == true || hasBackButton == true ? Container(
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             hasBackButton == true ? Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -40,7 +41,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
                 child: Icon(Icons.arrow_back,size: 30,),
               ),
-            ) : SizedBox(),
+            ) : const SizedBox(),
             hasLeading == true ? InkWell(
               child: Center(child: SizedBox(width: 48, child: kImgAppIconSmall)),onTap: (){
 

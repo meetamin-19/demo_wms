@@ -51,6 +51,33 @@ class ShippingVerificationProvider extends BaseNotifier {
     _editVerifiedOrder = ApiResponse();
     _getBolPDF = ApiResponse();
     shippingList = [];
+    // filteredShippingVerificationData = [];
+  }
+
+  List<ShippingVerificationListData>? filteredShippingVerificationData;
+
+  searchFromShippingVerificationList({required String str}){
+
+    filteredShippingVerificationData =[];
+
+    final searchString = str.toLowerCase();
+
+    if(searchString.replaceAll(' ', '').isEmpty){
+      filteredShippingVerificationData = _shippingVerificationList?.data?.data;
+      notifyListeners();
+    }else{
+      filteredShippingVerificationData = _shippingVerificationList?.data?.data?.where((element) {
+        final doesContains = (element.soNumber ?? '').toLowerCase().contains(searchString)
+            || (element.customerName ?? '').toLowerCase().contains(searchString)
+            || (element.customerLocation ?? '').toLowerCase().contains(searchString)
+            || (element.shipperName ?? 0).toString().toLowerCase().contains(searchString)
+            || (element.carrierName ?? 0).toString().toLowerCase().contains(searchString)
+            || (element.shipDate ?? 0).toString().toLowerCase().contains(searchString);
+        return doesContains;
+      }).toList();
+      notifyListeners();
+    }
+
   }
 
   Future getShippingVerificationList({String? listStartAt,
