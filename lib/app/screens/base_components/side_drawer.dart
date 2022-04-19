@@ -79,7 +79,7 @@ class DrawerWidget extends StatelessWidget {
     final _width = MediaQuery.of(context).size.width;
     return DrawerTheme(
       data: const DrawerThemeData(
-          width: 250,
+          // width: 250,
           backgroundColor: Color(0xff5E6672),
           scrimColor: Colors.transparent,
           elevation: 0.5),

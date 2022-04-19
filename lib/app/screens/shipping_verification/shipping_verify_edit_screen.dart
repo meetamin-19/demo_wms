@@ -138,8 +138,8 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                           .spaceBetween,
                                       children: [
                                         const Text("Order Details"),
-                                        isContainerVisible == true ? Icon(
-                                            Icons.arrow_drop_up_sharp) : Icon(
+                                        isContainerVisible == true ? const Icon(
+                                            Icons.arrow_drop_up_sharp) : const Icon(
                                             Icons.arrow_drop_down_sharp),
                                       ],
                                     ),

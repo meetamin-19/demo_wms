@@ -43,7 +43,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
     // TODO: implement initState
     super.initState();
 
-    WidgetsBinding?.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
       fetchPickList();
