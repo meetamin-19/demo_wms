@@ -39,7 +39,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Icon(Icons.arrow_back,size: 30,),
+                child: const Icon(Icons.arrow_back,size: 30,),
               ),
             ) : const SizedBox(),
             hasLeading == true ? InkWell(

@@ -54,7 +54,7 @@ class _ShippingVerificationScreenState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding?.instance?.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
       _scrollController = ScrollController();
@@ -211,7 +211,7 @@ class _ShippingVerificationScreenState
                         const Align(
                             alignment: Alignment.topLeft,
                             child: Padding(
-                              padding: EdgeInsets.only(left: 10, top: 5),
+                              padding: EdgeInsets.only(left: 20, top: 5),
                               child: Text(
                                 "SHIPPING VERIFICATION",
                                 textAlign: TextAlign.start,
@@ -1158,7 +1158,7 @@ class _ShippingVerificationScreenState
                   });
                 }),
           )
-
+          //
           // InkWell(
           //   onTap: () {
           //     previousPage();

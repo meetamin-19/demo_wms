@@ -95,7 +95,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
       appBar: CommonAppBar(
         // title: 'Verify Order',
         hasLeading: true,
-
+        hasBackButton : true
       ),
       body: Stack(
         children: [
@@ -105,7 +105,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Padding(
+                const Padding(
                     padding: EdgeInsets.only(left: 5, top: 5, bottom: 10),
                     child: Text("VERIFY ORDER", style: TextStyle(
                         fontSize: 24, fontWeight: FontWeight.w700))),
@@ -139,13 +139,12 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                       children: [
                                         const Text("Order Details"),
                                         isContainerVisible == true ? Icon(
-                                            Icons.arrow_upward) : Icon(
-                                            Icons.arrow_downward),
+                                            Icons.arrow_drop_up_sharp) : Icon(
+                                            Icons.arrow_drop_down_sharp),
                                       ],
                                     ),
                                   ),
                                 ),
-
                                 isContainerVisible!
                                     ? Container(
                                   margin: const EdgeInsets.all(20),
@@ -156,43 +155,43 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                     direction: Axis.horizontal,
                                     children: [
                                       keyValueBox(
-                                          width: width / 4.3,
+                                          width: width / 4.2,
                                           key: 'Order Date :',
                                           value:
                                           '${data?.data?.salesOrder
                                               ?.dateOfSoStr}'),
                                       keyValueBox(
-                                          width: width / 4.3,
+                                          width: width / 4.2,
                                           key: 'SO Number :',
                                           value:
                                           '${data?.data?.salesOrder
                                               ?.soNumber}'),
                                       keyValueBox(
-                                          width: width / 4.3,
+                                          width: width / 4.2,
                                           key: 'Customer Name :',
                                           value:
                                           '${data?.data?.salesOrder
                                               ?.customerName}'),
                                       keyValueBox(
-                                          width: width / 4.3,
+                                          width: width / 4.2,
                                           key: 'Account No :',
                                           value:
                                           '${data?.data?.salesOrder
                                               ?.accountNumber ?? ""}'),
                                       keyValueBox(
-                                          width: width / 4.3,
+                                          width: width / 4.2,
                                           key: 'Ship Date :',
                                           value:
                                           '${data?.data?.salesOrder
                                               ?.shipDateStr}'),
                                       keyValueBox(
-                                          width: width / 4.3,
+                                          width: width / 4.2,
                                           key: 'Ship Via :',
                                           value:
                                           '${data?.data?.salesOrder
                                               ?.shipperName}'),
                                       keyValueBoxForWidget(
-                                          width: width / 2.15,
+                                          width: width / 2.1,
                                           key: 'Pallet Location :',
                                           value: Wrap(
                                             runSpacing: 5.0,
@@ -208,7 +207,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                                         ?.first
                                                         .palletLocationStr}'),
                                               ),
-                                              SizedBox(width: 5),
+                                              const SizedBox(width: 5),
                                               ColoredBGText(
                                                   text:
                                                   '${data?.data
@@ -227,19 +226,19 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                                   text:
                                                   'C :${data?.data
                                                       ?.pickOrderPalletList
-                                                      ?.first?.companyName}',
+                                                      ?.first.companyName}',
                                                   color:
                                                   Color(0xffB981FF)),
                                             ],
                                           )),
                                       keyValueBoxWithHtml(
-                                          width: width / 2.15,
+                                          width: width / 2.1,
                                           key: 'Billing Address :',
                                           value: HtmlWidget(
                                               "${data?.data?.salesOrder
                                                   ?.billingAddress}")),
                                       keyValueBoxWithHtml(
-                                          width: width / 2.15,
+                                          width: width / 2.1,
                                           key: 'Ship To Address :',
                                           value: HtmlWidget(
                                               "${data?.data?.salesOrder
@@ -254,7 +253,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                         ),
                         const SizedBox(height: 10),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                          padding: const EdgeInsets.only(left: 20.0),
                           child: Wrap(
                             // crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -461,7 +460,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(
-                                left: 10, top: 10, right: 10),
+                                left: 20, top: 10, right: 10),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -743,7 +742,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                         ? LoadingSmall(
                       color: Colors.white,
                     )
-                        : Text(
+                        : const Text(
                       "SUBMIT",
                       style: TextStyle(color: Colors.white),
                     ),
@@ -772,7 +771,6 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
 
   Widget dataTable(BuildContext context, List<DataRow> dataRowList) {
     final home = context.read<ShippingVerificationProvider>();
-    final list = home.editScreen?.data?.data?.pickOrderPalletList;
     Widget headerWidget(String text, {Widget? leading}) {
       return Expanded(
         child: Padding(
@@ -823,159 +821,6 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     );
   }
 
-  Widget dataTable1(BuildContext context, List<DataRow> dataRowList) {
-    final home = context.read<ShippingVerificationProvider>();
-    final list = home.editScreen?.data?.data?.pickOrderPalletList;
-    Widget headerWidget(String text, {Widget? leading}) {
-      return Expanded(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                child: leading,
-                padding: EdgeInsets.only(right: 2),
-              ),
-              Text(
-                text,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Widget firstActionBTNs() {
-    //   return Padding(
-    //     padding: EdgeInsets.symmetric(vertical: 8),
-    //     child: Row(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: [
-    //         InkWell(
-    //           onTap: () {
-    //             Navigator.of(context).pushNamed(KVerifyEditRoute);
-    //           },
-    //           child: Container(
-    //             padding: EdgeInsets.all(kFlexibleSize(10)),
-    //             decoration: BoxDecoration(
-    //                 color: Color(0xff26C281),
-    //                 borderRadius: BorderRadius.circular(5)),
-    //             child: Icon(
-    //               Icons.check_rounded,
-    //               color: Colors.white,
-    //               size: kFlexibleSize(20),
-    //             ),
-    //           ),
-    //         ),
-    //         SizedBox(
-    //           width: 10,
-    //           height: 10,
-    //         ),
-    //         InkWell(
-    //           onTap: () {
-    //             Navigator.of(context).pushNamed(KVerifyEditRoute);
-    //           },
-    //           child: Container(
-    //             padding: EdgeInsets.all(kFlexibleSize(10)),
-    //             decoration: BoxDecoration(
-    //                 color: Color(0xff337AB7),
-    //                 borderRadius: BorderRadius.circular(5)),
-    //             child: SizedBox(
-    //               child: kShippingEditIcon,
-    //               width: kFlexibleSize(20),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   );
-    // }
-    //
-    // Widget secondActionBTNs() {
-    //   return Padding(
-    //     padding: EdgeInsets.symmetric(vertical: 8),
-    //     child: Row(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: [
-    //         InkWell(
-    //           onTap: () {},
-    //           child: Container(
-    //             padding: EdgeInsets.all(kFlexibleSize(10)),
-    //             decoration: BoxDecoration(
-    //                 color: Color(0xff67809F),
-    //                 borderRadius: BorderRadius.circular(5)),
-    //             child: Icon(
-    //               Icons.remove_red_eye,
-    //               color: Colors.white,
-    //               size: kFlexibleSize(20),
-    //             ),
-    //           ),
-    //         ),
-    //         SizedBox(
-    //           width: 10,
-    //           height: 10,
-    //         ),
-    //         InkWell(
-    //           child: Container(
-    //             padding: EdgeInsets.all(kFlexibleSize(10)),
-    //             decoration: BoxDecoration(
-    //                 color: Color(0xff67809F),
-    //                 borderRadius: BorderRadius.circular(5)),
-    //             child: SizedBox(
-    //               child: kShippingInvoiceIcon,
-    //               width: kFlexibleSize(20),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   );
-    // }
-
-    Widget childText(String text, Color col) {
-      return ConstrainedBox(
-        child: Center(
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style:
-              TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: col),
-            )),
-        constraints: BoxConstraints(minHeight: kFlexibleSize(50)),
-      );
-    }
-
-
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.black.withOpacity(0.1))),
-        child: DataTable(columns: [
-          DataColumn(label: headerWidget('Pallet')),
-          DataColumn(
-            label: headerWidget('Scan Status',
-                leading: const Icon(
-                  Icons.check_circle_outline_outlined,
-                  size: 20,
-                )),
-          ),
-          DataColumn(
-            label: headerWidget('Scan Date-Time',
-                leading: Icon(
-                  Icons.date_range_sharp,
-                  size: 20,
-                )),
-          ),
-          // DataColumn(label: headerWidget('Pallet Location')),
-        ], rows: dataRow2(list)),
-      ),
-    );
-  }
 
   List<DataRow> dataRow1(List<PickOrderPalletList>? list) {
     int len = list?.length ?? 0;
@@ -1087,7 +932,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     //             ]);
   }
 
-  dataRow2(List<PickOrderPalletList>? list) {
+  List<DataRow> dataRow2(List<PickOrderPalletList>? list) {
     int len = list?.length ?? 0;
     int lenByHalf = (len / 2).round();
     List<DataRow> d = [];

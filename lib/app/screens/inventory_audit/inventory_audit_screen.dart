@@ -42,9 +42,9 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CommonAppBar(
-          hasLeading: true,
-          isTitleSearch: true,
-          hasBackButton: true
+            hasLeading: true,
+            isTitleSearch: true,
+            hasBackButton: true
         ),
         body: Padding(
           padding: EdgeInsets.all(10),
@@ -63,7 +63,7 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                       elevation: 4,
                       child: Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 26, vertical: 20),
+                        EdgeInsets.symmetric(horizontal: 26, vertical: 20),
                         color: Colors.white,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -76,9 +76,9 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                                     width: 550,
                                     child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           "Part Number",
@@ -87,15 +87,15 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                                         Container(
                                             height: 40,
                                             padding:
-                                                EdgeInsets.only(right: 100),
+                                            EdgeInsets.only(right: 100),
                                             child: TextField(
                                               decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.all(10),
+                                                  EdgeInsets.all(10),
                                                   border: OutlineInputBorder(
                                                       borderSide: BorderSide(
-                                                    color: Colors.black,
-                                                  ))),
+                                                        color: Colors.black,
+                                                      ))),
                                             ))
                                       ],
                                     ),
@@ -107,9 +107,9 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                                     width: 550,
                                     child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           "Location",
@@ -120,11 +120,11 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                                           child: TextField(
                                             decoration: InputDecoration(
                                                 contentPadding:
-                                                    EdgeInsets.all(10),
+                                                EdgeInsets.all(10),
                                                 border: OutlineInputBorder(
                                                     borderSide: BorderSide(
-                                                  color: Colors.black,
-                                                ))),
+                                                      color: Colors.black,
+                                                    ))),
                                           ),
                                         )
                                       ],
@@ -151,7 +151,10 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
 
   Container buildContainer(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * .63,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height * .63,
       width: double.infinity,
       child: CustomScrollView(
         slivers: [
@@ -161,79 +164,79 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                 headingRowHeight: 70,
                 dataRowHeight: 60,
                 showBottomBorder: true,
-                columns: [
+                columns: const [
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Part No",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Part No",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Company",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Company",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Location",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Location",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Location Type",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Location Type",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Month",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Month",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Year",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Year",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Displayed Quantity",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Displayed Quantity",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Actual Quantity",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Actual Quantity",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Last Verified Date / Comment",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Last Verified Date / Comment",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                   DataColumn(
                       label: Expanded(
                           flex: 2,
@@ -247,26 +250,26 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Action",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ))),
+                            "Action",
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ))),
                 ],
                 rows: List<DataRow>.generate(11, (index) {
                   return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        // Even rows will have a grey color.
-                        if (index % 2 == 0) return Color(0xffF9F9F9);
-                        return Colors.white;
-                      }),
+                              (Set<MaterialState> states) {
+                            // Even rows will have a grey color.
+                            if (index % 2 == 0) return Color(0xffF9F9F9);
+                            return Colors.white;
+                          }),
                       cells: [
                         DataCell(Center(
                             child: Text(
-                          "100812",
-                          softWrap: true,
-                        ))),
+                              "100812",
+                              softWrap: true,
+                            ))),
                         DataCell(Center(
                           child: Text(
                             "Imperial AutoIndustries Ltd",
@@ -280,37 +283,37 @@ class _InventoryAuditScreenState extends State<InventoryAuditScreen> {
                         DataCell(Center(child: Text("0"))),
                         DataCell(Center(
                             child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: actualQuantityController,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 14),
-                                decoration: InputDecoration(
-                                    // border: OutlineInputBorder(
-                                    //     borderSide: BorderSide(color: Colors.black))
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: actualQuantityController,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 14),
+                                    decoration: InputDecoration(
+                                      // border: OutlineInputBorder(
+                                      //     borderSide: BorderSide(color: Colors.black))
                                     ),
-                              ),
-                            ),
-                          ],
-                        ))),
+                                  ),
+                                ),
+                              ],
+                            ))),
                         DataCell(Center(child: Text("10/08/2021"))),
                         DataCell(Center(
                           child: Container(
                               child: TextField(
-                            maxLines: 2,
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 14),
-                            controller: commentsController,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 5, top: 5),
-                              // border:
-                              // OutlineInputBorder(
-                              //     borderSide:
-                              //         BorderSide(color: Colors.black))
-                            ),
-                          )),
+                                maxLines: 2,
+                                textAlignVertical: TextAlignVertical.center,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 14),
+                                controller: commentsController,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 5, top: 5),
+                                  // border:
+                                  // OutlineInputBorder(
+                                  //     borderSide:
+                                  //         BorderSide(color: Colors.black))
+                                ),
+                              )),
                         )),
                         DataCell(Row(
                           children: [
