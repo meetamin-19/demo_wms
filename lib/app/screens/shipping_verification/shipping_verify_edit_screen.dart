@@ -17,8 +17,7 @@ class ShippingVerifyEditScreen extends StatefulWidget {
   const ShippingVerifyEditScreen({Key? key}) : super(key: key);
 
   @override
-  State<ShippingVerifyEditScreen> createState() =>
-      _ShippingVerifyEditScreenState();
+  State<ShippingVerifyEditScreen> createState() => _ShippingVerifyEditScreenState();
 }
 
 class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
@@ -74,46 +73,36 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     return ConstrainedBox(
       child: Center(
           child: Text(
-            text,
-            style: TextStyle(
-                fontWeight: FontWeight.w400, fontSize: 14, color: col),
-          )),
+        text,
+        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: col),
+      )),
       constraints: BoxConstraints(minHeight: kFlexibleSize(50)),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
     final home = context.read<ShippingVerificationProvider>();
     final list = home.editScreen?.data?.data?.pickOrderPalletList;
-    message = (ModalRoute
-        .of(context)
-        ?.settings
-        .arguments ?? "") as String?;
+    message = (ModalRoute.of(context)?.settings.arguments ?? "") as String?;
     return Scaffold(
-      appBar: CommonAppBar(
-        // title: 'Verify Order',
-        hasLeading: true,
-        hasBackButton : true
-      ),
+      appBar: CommonAppBar(hasLeading: true, hasBackButton: true),
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30,),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Padding(
                     padding: EdgeInsets.only(left: 5, top: 5, bottom: 10),
-                    child: Text("VERIFY ORDER", style: TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.w700))),
+                    child: Text("VERIFY ORDER", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700))),
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -123,129 +112,98 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    toggleContainerVisibility();
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    height: 40,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xff5E6672),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween,
-                                      children: [
-                                        const Text("Order Details"),
-                                        isContainerVisible == true ? const Icon(
-                                            Icons.arrow_drop_up_sharp) : const Icon(
-                                            Icons.arrow_drop_down_sharp),
-                                      ],
-                                    ),
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xff5E6672),
+                                  ),
+                                  child: Row(
+                                    // mainAxisAlignment: MainAxisAlignment,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Icon(
+                                          Icons.arrow_back_outlined,
+                                          size: 24,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      Expanded(
+                                          child: InkWell(
+                                        onTap: () {
+                                          toggleContainerVisibility();
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Text(
+                                              "Order Details",
+                                              style: TextStyle(color: Colors.white, fontSize: 20),
+                                            ),
+                                            isContainerVisible == true
+                                                ? const Icon(Icons.arrow_drop_up_sharp)
+                                                : const Icon(Icons.arrow_drop_down_sharp),
+                                          ],
+                                        ),
+                                      )),
+                                    ],
                                   ),
                                 ),
                                 isContainerVisible!
                                     ? Container(
-                                  margin: const EdgeInsets.all(20),
-                                  width: width,
-                                  child: Wrap(
-                                    spacing: 10.0,
-                                    runSpacing: 10.0,
-                                    direction: Axis.horizontal,
-                                    children: [
-                                      keyValueBox(
-                                          width: width / 4.2,
-                                          key: 'Order Date :',
-                                          value:
-                                          '${data?.data?.salesOrder
-                                              ?.dateOfSoStr}'),
-                                      keyValueBox(
-                                          width: width / 4.2,
-                                          key: 'SO Number :',
-                                          value:
-                                          '${data?.data?.salesOrder
-                                              ?.soNumber}'),
-                                      keyValueBox(
-                                          width: width / 4.2,
-                                          key: 'Customer Name :',
-                                          value:
-                                          '${data?.data?.salesOrder
-                                              ?.customerName}'),
-                                      keyValueBox(
-                                          width: width / 4.2,
-                                          key: 'Account No :',
-                                          value:
-                                          '${data?.data?.salesOrder
-                                              ?.accountNumber ?? ""}'),
-                                      keyValueBox(
-                                          width: width / 4.2,
-                                          key: 'Ship Date :',
-                                          value:
-                                          '${data?.data?.salesOrder
-                                              ?.shipDateStr}'),
-                                      keyValueBox(
-                                          width: width / 4.2,
-                                          key: 'Ship Via :',
-                                          value:
-                                          '${data?.data?.salesOrder
-                                              ?.shipperName}'),
-                                      keyValueBoxForWidget(
-                                          width: width / 2.1,
-                                          key: 'Pallet Location :',
-                                          value: Wrap(
-                                            runSpacing: 5.0,
-                                            spacing: 5.0,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets
-                                                    .symmetric(
-                                                    vertical: 5),
-                                                child: Text(
-                                                    '${data?.data
-                                                        ?.pickOrderPalletList
-                                                        ?.first
-                                                        .palletLocationStr}'),
-                                              ),
-                                              const SizedBox(width: 5),
-                                              ColoredBGText(
-                                                  text:
-                                                  '${data?.data
-                                                      ?.pickOrderPalletList
-                                                      ?.first.warehouseName}',
-                                                  color:
-                                                  Color(0xffFF5555)),
-                                              ColoredBGText(
-                                                  text:
-                                                  '${data?.data
-                                                      ?.pickOrderPalletList
-                                                      ?.first.sectionName}',
-                                                  color:
-                                                  Color(0xffB981FF)),
-                                              ColoredBGText(
-                                                  text:
-                                                  'C :${data?.data
-                                                      ?.pickOrderPalletList
-                                                      ?.first.companyName}',
-                                                  color:
-                                                  Color(0xffB981FF)),
-                                            ],
-                                          )),
-                                      keyValueBoxWithHtml(
-                                          width: width / 2.1,
-                                          key: 'Billing Address :',
-                                          value: HtmlWidget(
-                                              "${data?.data?.salesOrder
-                                                  ?.billingAddress}")),
-                                      keyValueBoxWithHtml(
-                                          width: width / 2.1,
-                                          key: 'Ship To Address :',
-                                          value: HtmlWidget(
-                                              "${data?.data?.salesOrder
-                                                  ?.shippingOrToteAddress}")),
-                                    ],
-                                  ),
-                                )
+                                        margin: const EdgeInsets.all(20),
+                                        width: width,
+                                        child: Wrap(
+                                          spacing: 10.0,
+                                          runSpacing: 10.0,
+                                          direction: Axis.horizontal,
+                                          children: [
+                                            keyValueBox(width: width / 4.2, key: 'Order Date :', value: '${data?.data?.salesOrder?.dateOfSoStr}'),
+                                            keyValueBox(width: width / 4.2, key: 'SO Number :', value: '${data?.data?.salesOrder?.soNumber}'),
+                                            keyValueBox(width: width / 4.2, key: 'Customer Name :', value: '${data?.data?.salesOrder?.customerName}'),
+                                            keyValueBox(
+                                                width: width / 4.2, key: 'Account No :', value: '${data?.data?.salesOrder?.accountNumber ?? ""}'),
+                                            keyValueBox(width: width / 4.2, key: 'Ship Date :', value: '${data?.data?.salesOrder?.shipDateStr}'),
+                                            keyValueBox(width: width / 4.2, key: 'Ship Via :', value: '${data?.data?.salesOrder?.shipperName}'),
+                                            keyValueBoxForWidget(
+                                                width: width / 2.1,
+                                                key: 'Pallet Location :',
+                                                value: Wrap(
+                                                  runSpacing: 5.0,
+                                                  spacing: 5.0,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                                      child: Text('${data?.data?.pickOrderPalletList?.first.palletLocationStr}'),
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    ColoredBGText(
+                                                        text: '${data?.data?.pickOrderPalletList?.first.warehouseName}',
+                                                        color: const Color(0xffFF5555)),
+                                                    ColoredBGText(
+                                                        text: '${data?.data?.pickOrderPalletList?.first.sectionName}',
+                                                        color: const Color(0xffB981FF)),
+                                                    ColoredBGText(
+                                                        text: 'C :${data?.data?.pickOrderPalletList?.first.companyName}',
+                                                        color: const Color(0xffB981FF)),
+                                                  ],
+                                                )),
+                                            keyValueBoxWithHtml(
+                                                width: width / 2.1,
+                                                key: 'Billing Address :',
+                                                value: HtmlWidget("${data?.data?.salesOrder?.billingAddress}")),
+                                            keyValueBoxWithHtml(
+                                                width: width / 2.1,
+                                                key: 'Ship To Address :',
+                                                value: HtmlWidget("${data?.data?.salesOrder?.shippingOrToteAddress}")),
+                                          ],
+                                        ),
+                                      )
                                     : Container()
                               ],
                             );
@@ -260,185 +218,129 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Scan BOL Number',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Container(
                                     width: 350,
                                     height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: kBorderColor),
-                                        borderRadius: BorderRadius.circular(5)),
+                                    decoration: BoxDecoration(border: Border.all(color: kBorderColor), borderRadius: BorderRadius.circular(5)),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Expanded(
                                           child: Container(
-                                            color: firstCompleted == true
-                                                ? Color(0xffeef1f5)
-                                                : Colors.transparent,
-                                            child: data?.data?.salesOrder
-                                                ?.isAllPalletsVerifiedOrNot ==
-                                                false
+                                            color: firstCompleted == true ? const Color(0xffeef1f5) : Colors.transparent,
+                                            child: data?.data?.salesOrder?.isAllPalletsVerifiedOrNot == false
                                                 ? TextField(
-                                              enabled:
-                                              firstCompleted == true
-                                                  ? false
-                                                  : true,
-                                              onEditingComplete: () {
-                                                setState(() {
-                                                  Future.delayed(
-                                                      const Duration(
-                                                          milliseconds:
-                                                          10), () {
-                                                    FocusScope.of(context)
-                                                        .requestFocus(
-                                                        _focusNode1);
-                                                  });
-                                                  firstCompleted = true;
-                                                  secondDisabled = false;
-                                                });
-                                              },
-                                              focusNode: _focusNode,
-                                              style:
-                                              TextStyle(fontSize: 15),
-                                              decoration:
-                                              const InputDecoration(
-                                                  border: InputBorder
-                                                      .none,
-                                                  hintText:
-                                                  'Scan BOL Number',
-                                                  contentPadding:
-                                                  EdgeInsets.only(
-                                                      left: 10,
-                                                      bottom:
-                                                      10)),
-                                            )
-                                                : DisabledTextField(data
-                                                ?.data
-                                                ?.salesOrder
-                                                ?.bolNumber ??
-                                                "1234"),
+                                                    enabled: firstCompleted == true ? false : true,
+                                                    onEditingComplete: () {
+                                                      setState(() {
+                                                        Future.delayed(const Duration(milliseconds: 10), () {
+                                                          FocusScope.of(context).requestFocus(_focusNode1);
+                                                        });
+                                                        firstCompleted = true;
+                                                        secondDisabled = false;
+                                                      });
+                                                    },
+                                                    focusNode: _focusNode,
+                                                    style: const TextStyle(fontSize: 15),
+                                                    decoration: const InputDecoration(
+                                                        border: InputBorder.none,
+                                                        hintText: 'Scan BOL Number',
+                                                        contentPadding: EdgeInsets.only(left: 10, bottom: 10)),
+                                                  )
+                                                : DisabledTextField(data?.data?.salesOrder?.bolNumber ?? "1234"),
                                           ),
                                         ),
-                                        (data?.data?.salesOrder
-                                            ?.isAllPalletsVerifiedOrNot ??
-                                            false)
+                                        (data?.data?.salesOrder?.isAllPalletsVerifiedOrNot ?? false)
                                             ? InkWell(
-                                          child: message == "Edit"
-                                              ? Container(
-                                            child: const Center(
-                                                child: Text(
-                                                  'Reset BOL Number',
-                                                  style: TextStyle(
-                                                      color:
-                                                      Colors.white,
-                                                      fontWeight:
-                                                      FontWeight
-                                                          .w500,
-                                                      fontSize: 16),
-                                                )),
-                                            color: Color(0xff32C5D2),
-                                            height: double.infinity,
-                                            padding:
-                                            EdgeInsets.all(5),
-                                          )
-                                              : Container(),
-                                          onTap: () {
-                                            setState(() {
-                                              enableBolNumberField = true;
-                                            });
-                                          },
-                                        )
+                                                child: message == "Edit"
+                                                    ? Container(
+                                                        child: const Center(
+                                                            child: Text(
+                                                          'Reset BOL Number',
+                                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16),
+                                                        )),
+                                                        color: const Color(0xff32C5D2),
+                                                        height: double.infinity,
+                                                        padding: const EdgeInsets.all(5),
+                                                      )
+                                                    : Container(),
+                                                onTap: () {
+                                                  setState(() {
+                                                    enableBolNumberField = true;
+                                                  });
+                                                },
+                                              )
                                             : Container()
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Scan Location',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Container(
                                     width: 300,
                                     height: 40,
                                     decoration: BoxDecoration(
                                         border: Border.all(color: kBorderColor),
-                                        color: secondDisabled == true
-                                            ? Color(0xffeef1f5)
-                                            : Colors.transparent,
+                                        color: secondDisabled == true ? const Color(0xffeef1f5) : Colors.transparent,
                                         borderRadius: BorderRadius.circular(5)),
                                     child: TextField(
-                                      enabled:
-                                      secondDisabled == true ? false : true,
+                                      enabled: secondDisabled == true ? false : true,
                                       focusNode: _focusNode1,
                                       controller: _scanLocationController,
                                       onEditingComplete: () {
-                                        if (_scanLocationController?.text !=
-                                            data?.data?.pickOrderPalletList
-                                                ?.first.palletLocation) {
+                                        if (_scanLocationController?.text != data?.data?.pickOrderPalletList?.first.palletLocation) {
                                           setState(() {
                                             _scanLocationController?.text = "";
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Incorrect Pallet Location"),
+                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                              content: Text("Incorrect Pallet Location"),
                                             ));
                                             return;
                                           });
                                         } else {
                                           setState(() {
-                                            Future.delayed(
-                                                const Duration(
-                                                    milliseconds: 10), () {
-                                              FocusScope.of(context)
-                                                  .requestFocus(_focusNode2);
+                                            Future.delayed(const Duration(milliseconds: 10), () {
+                                              FocusScope.of(context).requestFocus(_focusNode2);
                                               // print(FocusScope.of(context)
                                               //     .focusedChild
                                               //     .toString());
                                             });
                                             secondCompleted = true;
-                                            if ((firstCompleted == true &&
-                                                secondCompleted == true) ||
-                                                firstCompleted == true) {
+                                            if ((firstCompleted == true && secondCompleted == true) || firstCompleted == true) {
                                               secondDisabled = true;
                                             }
                                           });
                                         }
                                       },
-                                      style: TextStyle(fontSize: 15),
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'Scan Location',
-                                          contentPadding: EdgeInsets.only(
-                                              left: 10, bottom: 10)),
+                                      style: const TextStyle(fontSize: 15),
+                                      decoration: const InputDecoration(
+                                          border: InputBorder.none, hintText: 'Scan Location', contentPadding: EdgeInsets.only(left: 10, bottom: 10)),
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Attachment',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 5,
                                   ),
                                   attachmentContainer(context),
@@ -447,7 +349,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         Container(
                           padding: const EdgeInsets.all(10),
                           height: 40,
@@ -456,11 +358,10 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                           ),
                           child: const Text("Pallet Verification"),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, top: 10, right: 10),
+                            padding: const EdgeInsets.only(left: 20, top: 10, right: 10),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -468,97 +369,58 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Scan Pallet',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
                                     Container(
                                       width: 300,
                                       height: 40,
                                       decoration: BoxDecoration(
-                                          border:
-                                          Border.all(color: kBorderColor),
-                                          color: (secondDisabled == true &&
-                                              secondCompleted == true)
-                                              ? Colors.transparent
-                                              : Color(0xffeef1f5),
-                                          borderRadius:
-                                          BorderRadius.circular(5)),
+                                          border: Border.all(color: kBorderColor),
+                                          color: (secondDisabled == true && secondCompleted == true) ? Colors.transparent : const Color(0xffeef1f5),
+                                          borderRadius: BorderRadius.circular(5)),
                                       child: TextField(
-                                        enabled: (secondDisabled == true &&
-                                            secondCompleted == true)
-                                            ? true
-                                            : false,
+                                        enabled: (secondDisabled == true && secondCompleted == true) ? true : false,
                                         focusNode: _focusNode2,
                                         controller: _scanPartController,
                                         onEditingComplete: () {
                                           // print(data?.data?.pickOrderPalletList?.first
                                           //     .poPalletId);
-                                          String? txt =
-                                              _scanPartController?.text;
-                                          if (txt != null
-                                              ? txt.contains(
-                                              '${data?.data?.salesOrder
-                                                  ?.soNumber}')
-                                              : false) {
-                                            txt = txt.replaceAll(
-                                                '${data?.data?.salesOrder
-                                                    ?.soNumber}',
-                                                "");
+                                          String? txt = _scanPartController?.text;
+                                          if (txt != null ? txt.contains('${data?.data?.salesOrder?.soNumber}') : false) {
+                                            txt = txt.replaceAll('${data?.data?.salesOrder?.soNumber}', "");
                                             if (txt == "") {
                                               _scanPartController?.text = "";
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(SnackBar(
-                                                  content: Text(
-                                                      "Please Scan Valid Pallet")));
+                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please Scan Valid Pallet")));
                                             } else {
-                                              if (data?.data
-                                                  ?.pickOrderPalletList
-                                                  ?.any((element) =>
-                                              element.palletNo ==
-                                                  txt) ==
-                                                  true) {
-                                                PickOrderPalletList?
-                                                verifiedPallet = data?.data
-                                                    ?.pickOrderPalletList
-                                                    ?.firstWhere(
-                                                        (element) =>
-                                                    element
-                                                        .palletNo ==
-                                                        txt);
+                                              if (data?.data?.pickOrderPalletList?.any((element) => element.palletNo == txt) == true) {
+                                                PickOrderPalletList? verifiedPallet =
+                                                    data?.data?.pickOrderPalletList?.firstWhere((element) => element.palletNo == txt);
                                                 setState(() {
-                                                  verifiedPallet
-                                                      ?.isPalletVerified = true;
-                                                  verifiedPallet
-                                                      ?.timeOfVerification =
-                                                      DateTime.now()
-                                                          .toStrCommonFormat();
-                                                  verifiedPallet?.statusTerm =
-                                                  "Verified";
-                                                  verifiedPallet
-                                                      ?.scanDateTimeStr =
-                                                      DateTime.now()
-                                                          .toStrCommonFormat();
+                                                  verifiedPallet?.isPalletVerified = true;
+                                                  verifiedPallet?.timeOfVerification = DateTime.now().toStrCommonFormat();
+                                                  verifiedPallet?.statusTerm = "Verified";
+                                                  verifiedPallet?.scanDateTimeStr = DateTime.now().toStrCommonFormat();
+                                                  final ele = list?.where((element) => element.statusTerm == "Verified");
+                                                  list?.removeWhere((element) => element.statusTerm == "Verified");
+                                                  list?.addAll(ele!);
                                                 });
+
+                                                print(list);
                                               } else {
                                                 _scanPartController?.text = "";
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(SnackBar(
-                                                  content: Text(
-                                                      "Please Scan Valid Pallet"),
+                                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                  content: Text("Please Scan Valid Pallet"),
                                                 ));
                                               }
                                             }
                                             // print(txt);
                                           } else {
                                             _scanPartController?.text = "";
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Please Scan Valid Pallet"),
+                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                              content: Text("Please Scan Valid Pallet"),
                                             ));
                                           }
                                           // print(txt);
@@ -569,10 +431,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                         },
                                         style: const TextStyle(fontSize: 15),
                                         decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            hintText: 'Scan Part',
-                                            contentPadding: EdgeInsets.only(
-                                                left: 10, bottom: 10)),
+                                            border: InputBorder.none, hintText: 'Scan Part', contentPadding: EdgeInsets.only(left: 10, bottom: 10)),
                                       ),
                                     ),
                                   ],
@@ -580,17 +439,33 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                Expanded(
-                                    child: dataTable(context, dataRow1(list))),
-                                const SizedBox(width: 10,),
-                                Expanded(
-                                    child: dataTable(context, dataRow2(list)))
+                                if (list!.length < 10)
+                                  {
+                                    Expanded(
+                                      child: dataTable(context, dataRow(list)),
+                                    ),
+                                  }.first
+                                else
+                                  Expanded(
+                                    child: {
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(child: dataTable(context, dataRow1(list))),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(child: dataTable(context, dataRow2(list))),
+                                        ],
+                                      ),
+                                    }.first,
+                                  )
                               ],
                             ),
                           ),
                         ),
                         const SizedBox(height: 10),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         buildSubmitSection()
@@ -604,8 +479,8 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
           if (loading)
             Center(
                 child: LoadingSmall(
-                  color: kPrimaryColor,
-                ))
+              color: kPrimaryColor,
+            ))
         ],
       ),
     );
@@ -619,74 +494,65 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
       height: 40,
       child: Wrap(
         children: [
-          (message == "Edit" ||
-              data?.data?.salesOrder?.isAllPalletsVerifiedOrNot == false)
+          (message == "Edit" || data?.data?.salesOrder?.isAllPalletsVerifiedOrNot == false)
               ? TextButton(
-              style: ButtonStyle(
-                backgroundColor:
-                MaterialStateProperty.all<Color>(Color(0xff32C5D2)),
-                overlayColor: MaterialStateProperty.all<Color>(
-                    Colors.white.withOpacity(0.3)),
-                foregroundColor:
-                MaterialStateProperty.all<Color>(Colors.white),
-              ),
-              onPressed: () {
-                CustomPopupWith3Fields(context,
-                    title: 'Hi There',
-                    message: 'Choose how you want to upload photo',
-                    primaryBtnTxt: 'close',
-                    secondaryBtnTxt: 'Files',
-                    thirdBtnTxt: 'Camera',
-                    thirdBtnAction: () {
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff32C5D2)),
+                    overlayColor: MaterialStateProperty.all<Color>(Colors.white.withOpacity(0.3)),
+                    foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                  ),
+                  onPressed: () {
+                    CustomPopupWith3Fields(context,
+                        title: 'Hi There',
+                        message: 'Choose how you want to upload photo',
+                        primaryBtnTxt: 'close',
+                        secondaryBtnTxt: 'Files',
+                        thirdBtnTxt: 'Camera', thirdBtnAction: () {
                       Navigator.pushNamed(context, kCamera);
-                    },
-                    secondaryAction: _getPhotoFromGallery);
-              },
-              child: Padding(
-                  padding: const EdgeInsets.all(9.0),
-                  child: (data?.data?.salesOrder?.attachment != null)
-                      ? Text("${data?.data?.salesOrder?.attachmentStr}")
-                      : const Icon(Icons.insert_drive_file_outlined)))
+                    }, secondaryAction: _getPhotoFromGallery);
+                  },
+                  child: Padding(
+                      padding: const EdgeInsets.all(9.0),
+                      child: (data?.data?.salesOrder?.attachment != null)
+                          ? Text("${data?.data?.salesOrder?.attachmentStr}")
+                          : const Icon(Icons.insert_drive_file_outlined)))
               : Container(),
           isPath
               ? Container(
-            margin: EdgeInsets.only(left: 5),
-            height: 40,
-            width: 200,
-            color: Colors.white,
-            child: ListTile(
-              title: Text(
-                home.imageName ?? " No name found",
-                style: const TextStyle(fontSize: 12),
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: InkWell(
-                child: Icon(
-                  Icons.cancel,
-                  color: kPrimaryColor,
-                ),
-                onTap: () {
-                  setState(() {
-                    file = null;
-                    home.removeCameraImagePath();
-                  });
-                },
-              ),
-            ),
-          )
+                  margin: const EdgeInsets.only(left: 5),
+                  height: 40,
+                  width: 200,
+                  color: Colors.white,
+                  child: ListTile(
+                    title: Text(
+                      home.imageName ?? " No name found",
+                      style: const TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: InkWell(
+                      child: Icon(
+                        Icons.cancel,
+                        color: kPrimaryColor,
+                      ),
+                      onTap: () {
+                        setState(() {
+                          file = null;
+                          home.removeCameraImagePath();
+                        });
+                      },
+                    ),
+                  ),
+                )
               : Container(),
           (data?.data?.salesOrder?.attachmentStr != null && isPath == false)
               ? Container(
-            margin: const EdgeInsets.only(left: 5),
-            color: Colors.white,
-            child: Text(
-              "${data?.data?.salesOrder?.attachmentStr}",
-              style: TextStyle(
-                  fontSize: 12,
-                  color: kPrimaryColor,
-                  overflow: TextOverflow.ellipsis),
-            ),
-          )
+                  margin: const EdgeInsets.only(left: 5),
+                  color: Colors.white,
+                  child: Text(
+                    "${data?.data?.salesOrder?.attachmentStr}",
+                    style: TextStyle(fontSize: 12, color: kPrimaryColor, overflow: TextOverflow.ellipsis),
+                  ),
+                )
               : Container()
         ],
       ),
@@ -695,28 +561,21 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
 
   Container DisabledTextField(String? txt) {
     return Container(
-      color: Color(0xffeef1f5),
+      color: const Color(0xffeef1f5),
       child: TextField(
         controller: _bolNumberController,
         enabled: enableBolNumberField,
-        style: TextStyle(fontSize: 15),
-        decoration: InputDecoration(
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.only(left: 10, bottom: 10)),
+        style: const TextStyle(fontSize: 15),
+        decoration: const InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.only(left: 10, bottom: 10)),
       ),
     );
   }
 
   Widget buildSubmitSection() {
-    var d = data?.data?.pickOrderPalletList
-        ?.map((e) => e.isPalletVerified)
-        .toList();
+    var d = data?.data?.pickOrderPalletList?.map((e) => e.isPalletVerified).toList();
     showSubmitButton = (d?.contains(false) == false || message == "Edit");
 
-    final submitData =
-        context
-            .watch<ShippingVerificationProvider>()
-            .submitUnverifiedDataGet;
+    final submitData = context.watch<ShippingVerificationProvider>().submitUnverifiedDataGet;
 
     final isLoading = submitData?.state == Status.LOADING;
 
@@ -728,28 +587,27 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
           children: [
             showSubmitButton
                 ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  height: kFlexibleSize(40),
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        loading = true;
-                      });
-                      _submitUnverifiedData();
-                    },
-                    child: isLoading
-                        ? LoadingSmall(
-                      color: Colors.white,
-                    )
-                        : const Text(
-                      "SUBMIT",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: TextButton.styleFrom(
-                        backgroundColor: Colors.green),
-                  )),
-            )
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                        height: kFlexibleSize(40),
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              loading = true;
+                            });
+                            _submitUnverifiedData();
+                          },
+                          child: isLoading
+                              ? LoadingSmall(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "SUBMIT",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                          style: TextButton.styleFrom(backgroundColor: Colors.green),
+                        )),
+                  )
                 : Container(),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -759,7 +617,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text("Cancel"),
+                  child: const Text("Cancel"),
                 ),
               ),
             )
@@ -773,60 +631,64 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     final home = context.read<ShippingVerificationProvider>();
     Widget headerWidget(String text, {Widget? leading}) {
       return Expanded(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                child: leading,
-                padding: EdgeInsets.only(right: 2),
-              ),
-              Text(
-                text,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: leading,
+              padding: const EdgeInsets.only(right: 2),
+            ),
+            Text(
+              text,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       );
     }
 
     return SingleChildScrollView(
       child: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.black.withOpacity(0.1))),
-        child: DataTable(columns: [
-          DataColumn(label: headerWidget('Pallet')),
-          DataColumn(
-            label: headerWidget('Scan Status',
-                leading: const Icon(
-                  Icons.check_circle_outline_outlined,
-                  size: 20,
-                )),
-          ),
-          DataColumn(
-            label: headerWidget('Scan Date-Time',
-                leading: Icon(
-                  Icons.date_range_sharp,
-                  size: 20,
-                )),
-          ),
-          // DataColumn(label: headerWidget('Pallet Location')),
-        ], rows: dataRowList),
+        padding: const EdgeInsets.all(0),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.black.withOpacity(0.1))),
+        child: DataTable(
+            border: TableBorder.all(color: Colors.transparent),
+            columnSpacing: 5,
+            // showBottomBorder: false,
+            headingRowHeight: 50,
+            headingRowColor: MaterialStateProperty.all<Color>(Colors.grey.withOpacity(0.1)),
+            columns: [
+              DataColumn(label: headerWidget('Pallet')),
+              DataColumn(
+                label: headerWidget('Scan Status',
+                    leading: const Icon(
+                      Icons.check_circle_outline_outlined,
+                      size: 20,
+                    )),
+              ),
+              DataColumn(
+                label: headerWidget('Scan Date-Time',
+                    leading: const Icon(
+                      Icons.date_range_sharp,
+                      size: 20,
+                    )),
+              ),
+              // DataColumn(label: headerWidget('Pallet Location')),
+            ],
+            rows: dataRowList),
       ),
     );
   }
 
-
-  List<DataRow> dataRow1(List<PickOrderPalletList>? list) {
+  List<DataRow> dataRow(List<PickOrderPalletList>? list) {
     int len = list?.length ?? 0;
-    int lenByHalf = (len / 2).round();
+    // int lenByHalf = (len / 2).round();
     List<DataRow> d = [];
-    for (int i = 0; i < (lenByHalf); i++) {
+    for (int i = 0; i < len; i++) {
       d.add(DataRow(cells: [
         DataCell(Center(
           child: SizedBox(
@@ -834,37 +696,36 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
               child: TextButton(
-                  style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xff67809F)),
+                  style: TextButton.styleFrom(backgroundColor: const Color(0xff67809F)),
                   onPressed: () {},
-                  child: childText(
-                      '${data?.data?.pickOrderPalletList?[i].palletNo}',
-                      Colors.black)),
+                  child: childText('${data?.data?.pickOrderPalletList?[i].palletNo}', Colors.black)),
             ),
           ),
         )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
             ? DataCell(Center(
-          child: Container(
-            width: kFlexibleSize(120),
+          child: SizedBox(
+            width: kFlexibleSize(100),
             child: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
               child: TextButton(
-                  style:
-                  TextButton.styleFrom(backgroundColor: Colors.green),
-                  onPressed: () {},
-                  child: childText('verified', Colors.white)),
+                  style: TextButton.styleFrom(backgroundColor: Colors.green), onPressed: () {}, child: childText('verified', Colors.white)),
             ),
           ),
         ))
-            : DataCell(Container()),
+            : DataCell(Center(
+          child: SizedBox(
+            width: kFlexibleSize(100),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+              child: TextButton(
+                  style: TextButton.styleFrom(backgroundColor: Colors.white), onPressed: () {}, child: childText('verified', Colors.white)),
+            ),
+          ),
+        )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
-            ? DataCell(childText(
-            '${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ??
-                'Right Now'} ',
-            Colors.black))
-            : DataCell(Container()),
+            ? DataCell(childText('${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ?? 'Right Now'} ', Colors.black))
+            : DataCell(childText('${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ?? 'Right Now'} ', Colors.white)),
         // DataCell(Center(
         //   child: Container(
         //     width: kFlexibleSize(150),
@@ -932,6 +793,53 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     //             ]);
   }
 
+  List<DataRow> dataRow1(List<PickOrderPalletList>? list) {
+    int len = list?.length ?? 0;
+    int lenByHalf = (len / 2).round();
+    List<DataRow> d = [];
+    for (int i = 0; i < (lenByHalf); i++) {
+      d.add(DataRow(cells: [
+        DataCell(Center(
+          child: SizedBox(
+            width: kFlexibleSize(50),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+              child: TextButton(
+                  style: TextButton.styleFrom(backgroundColor: const Color(0xff67809F)),
+                  onPressed: () {},
+                  child: childText('${data?.data?.pickOrderPalletList?[i].palletNo}', Colors.black)),
+            ),
+          ),
+        )),
+        data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
+            ? DataCell(Center(
+                child: SizedBox(
+                  width: kFlexibleSize(100),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                    child: TextButton(
+                        style: TextButton.styleFrom(backgroundColor: Colors.green), onPressed: () {}, child: childText('verified', Colors.white)),
+                  ),
+                ),
+              ))
+            : DataCell(Center(
+                child: SizedBox(
+                  width: kFlexibleSize(100),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                    child: TextButton(
+                        style: TextButton.styleFrom(backgroundColor: Colors.white), onPressed: () {}, child: childText('verified', Colors.white)),
+                  ),
+                ),
+              )),
+        data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
+            ? DataCell(childText('${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ?? 'Right Now'} ', Colors.black))
+            : DataCell(childText('${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ?? 'Right Now'} ', Colors.white)),
+      ]));
+    }
+    return d;
+  }
+
   List<DataRow> dataRow2(List<PickOrderPalletList>? list) {
     int len = list?.length ?? 0;
     int lenByHalf = (len / 2).round();
@@ -945,37 +853,36 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
               child: TextButton(
-                  style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xff67809F)),
+                  style: TextButton.styleFrom(backgroundColor: const Color(0xff67809F)),
                   onPressed: () {},
-                  child: childText(
-                      '${data?.data?.pickOrderPalletList?[i].palletNo}',
-                      Colors.black)),
+                  child: childText('${data?.data?.pickOrderPalletList?[i].palletNo}', Colors.black)),
             ),
           ),
         )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
             ? DataCell(Center(
-          child: Container(
-            width: kFlexibleSize(120),
-            child: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-              child: TextButton(
-                  style:
-                  TextButton.styleFrom(backgroundColor: Colors.green),
-                  onPressed: () {},
-                  child: childText('verified', Colors.white)),
-            ),
-          ),
-        ))
-            : DataCell(Container()),
+                child: Container(
+                  width: kFlexibleSize(120),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                    child: TextButton(
+                        style: TextButton.styleFrom(backgroundColor: Colors.green), onPressed: () {}, child: childText('verified', Colors.white)),
+                  ),
+                ),
+              ))
+            : DataCell(Center(
+                child: SizedBox(
+                  width: kFlexibleSize(100),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                    child: TextButton(
+                        style: TextButton.styleFrom(backgroundColor: Colors.white), onPressed: () {}, child: childText('verified', Colors.white)),
+                  ),
+                ),
+              )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
-            ? DataCell(childText(
-            '${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ??
-                'Right Now'} ',
-            Colors.black))
-            : DataCell(Container()),
+            ? DataCell(childText('${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ?? 'Right Now'} ', Colors.black))
+            : DataCell(childText('${(data?.data?.pickOrderPalletList?[i].scanDateTimeStr) ?? 'Right Now'} ', Colors.white)),
         // DataCell(Center(
         //   child: Container(
         //     width: kFlexibleSize(150),
@@ -1056,8 +963,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     }
   }
 
-  Widget keyValueBox(
-      {required double width, required String key, required String value}) {
+  Widget keyValueBox({required double width, required String key, required String value}) {
     return Container(
       width: (width - 10),
       child: Column(
@@ -1066,18 +972,16 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
         children: [
           Text(
             key,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           Container(
-            margin: EdgeInsets.only(top: 5),
+            margin: const EdgeInsets.only(top: 5),
             child: Text(
               value,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             ),
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.black.withOpacity(0.1))),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.black.withOpacity(0.1))),
             width: double.infinity,
           )
         ],
@@ -1085,8 +989,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     );
   }
 
-  Widget keyValueBoxWithHtml(
-      {required double width, required String key, required HtmlWidget value}) {
+  Widget keyValueBoxWithHtml({required double width, required String key, required HtmlWidget value}) {
     return Container(
       width: (width - 10),
       child: Column(
@@ -1095,15 +998,13 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
         children: [
           Text(
             key,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           Container(
-            margin: EdgeInsets.only(top: 5),
+            margin: const EdgeInsets.only(top: 5),
             child: value,
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.black.withOpacity(0.1))),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.black.withOpacity(0.1))),
             width: double.infinity,
           )
         ],
@@ -1111,8 +1012,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     );
   }
 
-  Widget keyValueBoxForWidget(
-      {required double width, required String key, required Widget value}) {
+  Widget keyValueBoxForWidget({required double width, required String key, required Widget value}) {
     return Container(
       width: (width - 10),
       child: Column(
@@ -1121,15 +1021,13 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
         children: [
           Text(
             key,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           Container(
-            margin: EdgeInsets.only(top: 5),
+            margin: const EdgeInsets.only(top: 5),
             child: value,
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.black.withOpacity(0.1))),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.black.withOpacity(0.1))),
             width: double.infinity,
           )
         ],

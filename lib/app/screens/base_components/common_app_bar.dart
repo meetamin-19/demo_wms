@@ -29,30 +29,31 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       toolbarHeight: 80,
-      leading: hasLeading == true || hasBackButton == true ? Container(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            hasBackButton == true ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
+      leading: hasLeading == true || hasBackButton == true ? Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          hasBackButton == true ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: const Icon(Icons.arrow_back,size: 30,),
               ),
-            ) : const SizedBox(),
-            hasLeading == true ? InkWell(
-              child: Center(child: SizedBox(width: 48, child: kImgAppIconSmall)),onTap: (){
+            ),
+          ) : const SizedBox(),
+          hasLeading == true ? InkWell(
+            child: Center(child: SizedBox(width: 48, child: kImgAppIconSmall)),onTap: (){
 
-                context.read<HomeProvider>().getPickerList();
+              context.read<HomeProvider>().getPickerList();
 
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },)  : const SizedBox(),
-          ],
-        ),
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },)  : const SizedBox(),
+        ],
       ) : null,
-      leadingWidth: hasLeading == false ? null : 120,
+      leadingWidth: hasLeading == false ? null : 150,
       backgroundColor: Colors.white,
       elevation: 0.0,
       centerTitle: false,
