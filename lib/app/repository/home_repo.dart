@@ -20,15 +20,15 @@ class HomeRepository {
 
   Future<ResPickorderLinkUserList> pickorderLinkPickOrder(
       {required int id}) async {
-    return await dataSource.pickorderLinkPickOrder(id: id);
+    return await dataSource.pickOrderLinkPickOrder(id: id);
   }
 
   Future<EmptyRes> pickorderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog}) async {
-    return await dataSource.pickorderInsertUpdateLinkPickOrder(pickOrderID: pickOrderID, pickOrderLinkedTo: pickOrderLinkedTo, updatelog: updatelog);
+    return await dataSource.pickOrderInsertUpdateLinkPickOrder(pickOrderID: pickOrderID, pickOrderLinkedTo: pickOrderLinkedTo, updatelog: updatelog);
   }
 
   Future<EmptyRes> pickorderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog}) async {
-    return await dataSource.pickorderInsertUpdateUnlinkPickOrder(pickOrderID: pickOrderID, updatelog: updatelog);
+    return await dataSource.pickOrderInsertUpdateUnlinkPickOrder(pickOrderID: pickOrderID, updatelog: updatelog);
   }
 
 }

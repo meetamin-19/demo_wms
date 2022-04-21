@@ -1,9 +1,9 @@
+import 'package:demo_win_wms/app/screens/base_components/common_data_showing_component.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_view.dart';
 import 'package:demo_win_wms/app/providers/pallet_provider.dart';
 import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
-import 'package:demo_win_wms/app/screens/base_components/action_button.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_theme_container.dart';
 import 'package:demo_win_wms/app/screens/pick_order/leading_text_field.dart';
@@ -13,8 +13,6 @@ import 'package:demo_win_wms/app/utils/enums.dart';
 import 'package:demo_win_wms/app/utils/responsive.dart';
 import 'package:demo_win_wms/app/views/loading_small.dart';
 import 'package:demo_win_wms/app/views/no_data_found.dart';
-
-import 'components/pick_order_key_value.dart';
 
 class PickOrderListScreen extends StatelessWidget {
   PickOrderListScreen({Key? key}) : super(key: key);
@@ -33,20 +31,19 @@ class PickOrderListScreen extends StatelessWidget {
     // controller.animateTo(400, duration: Duration(milliseconds: 400),curve: Curves.easeIn);
   }
 
-  viewItem(int id,BuildContext context){
+  viewItem(int id, BuildContext context) {
     final pallet = context.read<PalletProviderImpl>();
     final pickOrder = context.read<PickOrderProviderImpl>();
-
     pallet.selectedPickOrderID = pickOrder.pickOrderID;
     pallet.selectedPickOrderSODetailID = id;
 
     pallet.pickOrderViewLineItem();
     pallet.getPallets();
 
-    Navigator.of(context).pushNamed(kPalletViewScreenRoute);
+    Navigator.of(context).pushNamed(kPalletScreenEditRoute);
   }
 
-  pickItem(int id,BuildContext context){
+  pickItem(int id, BuildContext context) {
     final pallet = context.read<PalletProviderImpl>();
     final pickOrder = context.read<PickOrderProviderImpl>();
 
@@ -68,13 +65,15 @@ class PickOrderListScreen extends StatelessWidget {
     final provider = context.watch<PickOrderProviderImpl>();
 
     return Scaffold(
-      appBar: CommonAppBar(),
+      appBar: CommonAppBar(
+        hasLeading: true,
+        isTitleScan: true,
+      ),
       body: body(context, provider, _size, isMobile),
     );
   }
 
-  Widget body(
-      context, PickOrderProviderImpl provider, Size _size, bool isMobile) {
+  Widget body(context, PickOrderProviderImpl provider, Size _size, bool isMobile) {
     final isLoading = provider.getPickOrder?.state == Status.LOADING;
 
     if (isLoading) {
@@ -84,9 +83,8 @@ class PickOrderListScreen extends StatelessWidget {
           child: Container(
               height: 50,
               width: 50,
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
               child: LoadingSmall()),
         ),
       );
@@ -118,9 +116,7 @@ class PickOrderListScreen extends StatelessWidget {
         child: Column(
           children: [
             headerView(isMobile, sales: sales),
-
             kFlexibleSizedBox(height: 10),
-
             ClipRRect(
               borderRadius: BorderRadius.circular(5.0),
               child: Container(
@@ -132,9 +128,7 @@ class PickOrderListScreen extends StatelessWidget {
                 child: addresses(sales),
               ),
             ),
-
             kFlexibleSizedBox(height: 10),
-
             ClipRRect(
               borderRadius: BorderRadius.circular(5.0),
               child: Container(
@@ -170,54 +164,52 @@ class PickOrderListScreen extends StatelessWidget {
                             hint: 'Search',
                           ),
                         ),
-                        Visibility(
-                          visible: false,
-                          child: Container(
-                            height: 35,
-                            width: _size.width * 0.2,
-                            padding: EdgeInsets.only(left: kFlexibleSize(15)),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
-                              border: Border.all(
-                                  color: Colors.black.withOpacity(0.25)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Records',
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: kFlexibleSize(14),
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ),
-                                    ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          height: 30,
+                          decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA))),
+                          child: DropdownButton(
+                              iconSize: 12,
+                              underline: const SizedBox(),
+                              value: 10,
+                              elevation: 4,
+                              style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+                              items: const [
+                                DropdownMenuItem(
+                                  child: Text(
+                                    "100 Rows",
+                                    style: TextStyle(fontSize: 12),
                                   ),
+                                  value: 100,
                                 ),
-                                Icon(
-                                  Icons.arrow_drop_down_rounded,
-                                  color: Colors.black,
-                                  size: kFlexibleSize(30),
+                                DropdownMenuItem(
+                                  child: Text("50 Rows", style: TextStyle(fontSize: 12)),
+                                  value: 50,
                                 ),
-                              ],
-                            ),
-                          ),
+                                DropdownMenuItem(
+                                  child: Text("25 Rows", style: TextStyle(fontSize: 12)),
+                                  value: 25,
+                                ),
+                                DropdownMenuItem(
+                                  child: Text("10 Rows", style: TextStyle(fontSize: 12)),
+                                  value: 10,
+                                )
+                              ], onChanged: (int? value) {  },
+                              ),
                         )
                       ],
                     ),
                     kFlexibleSizedBox(height: 15),
-                    PickOrderList(list: salesList,viewOnClick: (int id){
-                      viewItem(id, context);
-                    },pickItemOnClick: (int id){
-                      pickItem(id, context);
-                    },isEditing: provider.isInEditingMode,)
+                    PickOrderList(
+                      list: salesList,
+                      viewOnClick: (int id) {
+                        viewItem(id, context);
+                      },
+                      pickItemOnClick: (int id) {
+                        pickItem(id, context);
+                      },
+                      isEditing: provider.isInEditingMode,
+                    )
                   ],
                 ),
               ),
@@ -229,52 +221,65 @@ class PickOrderListScreen extends StatelessWidget {
   }
 
   Widget addresses(SalesOrder? sales) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final width = constraints.maxWidth;
 
-    return Container(
-      child: Row(
+      return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Shipping Address :'),
-                SizedBox(height: 10),
-                Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(5.0),
-                        border: Border.all(
-                            color: Colors.black.withOpacity(0.25))),
-                    child: Text('${sales?.shippingOrToteAddress ?? '-'}')),
-              ],
+            child: CommonDataViewComponent(
+              width: width / 2.1,
+              title: 'Shipping Address :',
+              value: sales?.shippingOrToteAddress ?? '-',
+              isHtml: true,
             ),
+            // child: Column(
+            //   mainAxisAlignment: MainAxisAlignment.start,
+            //   crossAxisAlignment: CrossAxisAlignment.stretch,
+            //   children: [
+            //     Text('Shipping Address :'),
+            //     SizedBox(height: 10),
+            //     Container(
+            //         padding: EdgeInsets.all(10),
+            //         decoration: BoxDecoration(
+            //             color: Colors.grey.withOpacity(0.1),
+            //             borderRadius: BorderRadius.circular(5.0),
+            //             border: Border.all(color: Colors.black.withOpacity(0.25))),
+            //         child: Text('${sales?.shippingOrToteAddress ?? '-'}')),
+            //   ],
+            // ),
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Billing Address :'),
-                SizedBox(height: 10),
-                Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(5.0),
-                        border: Border.all(
-                            color: Colors.black.withOpacity(0.25))),
-                    child: Text('${sales?.billingAddress ?? '-'}')),
-              ],
+            child: CommonDataViewComponent(
+              width: width / 2.1,
+              title: 'Billing Address :',
+              value: sales?.billingAddress ?? '-',
+              isHtml: true,
             ),
+            // child: Column(
+            //   mainAxisAlignment: MainAxisAlignment.start,
+            //   crossAxisAlignment: CrossAxisAlignment.stretch,
+            //   children: [
+            //
+            //     // Text('Billing Address :'),
+            //     // SizedBox(height: 10),
+            //     // Container(
+            //     //     padding: EdgeInsets.all(10),
+            //     //     decoration: BoxDecoration(
+            //     //         color: Colors.grey.withOpacity(0.1),
+            //     //         borderRadius: BorderRadius.circular(5.0),
+            //     //         border: Border.all(
+            //     //             color: Colors.black.withOpacity(0.25))),
+            //     //     child: Text('${sales?.billingAddress ?? '-'}')),
+            //   ],
+            // ),
           ),
         ],
-      ),
-    );
+      );
+    });
   }
 
   Widget headerView(bool isMobile, {SalesOrder? sales}) {
@@ -292,42 +297,34 @@ class PickOrderListScreen extends StatelessWidget {
 
           final difference = isMobile ? 40 : 80;
 
-          final componentWidth = isMobile
-              ? (width - difference) / ratio
-              : (width - difference) / ratio;
+          final componentWidth = isMobile ? (width - difference) / ratio : (width - difference) / ratio;
 
           return Wrap(
             direction: Axis.horizontal,
             spacing: 20,
             runSpacing: 15,
             children: [
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Order Date :', value: '${sales.dateOfSoStr ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Customer :', value: '${sales.customerName ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Customer Location :',
-                  value: '${sales.customerLocation ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Account :', value: '${sales.accountNumber ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Terms :', value: '${sales.soTerm ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Ship Date :', value: '${sales.shipDateStr ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Ship Via :', value: '${sales.shipperName ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Carrier :', value: '${sales.carrierName ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'FOB :', value: 'Shipping Point'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Proto/PPAP :',
-                  value: '${sales.isAttachedProtoPpapStr ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
+              CommonDataViewComponent(
+                  width: componentWidth, title: 'Order Date :', value: '${sales.dateOfSoStr ?? '-'}'),
+              CommonDataViewComponent(
+                  width: componentWidth, title: 'Customer :', value: '${sales.customerName ?? '-'}'),
+              CommonDataViewComponent(
+                  width: componentWidth, title: 'Customer Location :', value: '${sales.customerLocation ?? '-'}'),
+              CommonDataViewComponent(
+                  width: componentWidth, title: 'Account :', value: '${sales.accountNumber ?? '-'}'),
+              CommonDataViewComponent(width: componentWidth, title: 'Terms :', value: '${sales.soTerm ?? '-'}'),
+              CommonDataViewComponent(
+                  width: componentWidth, title: 'Ship Date :', value: '${sales.shipDateStr ?? '-'}'),
+              CommonDataViewComponent(width: componentWidth, title: 'Ship Via :', value: '${sales.shipperName ?? '-'}'),
+              CommonDataViewComponent(width: componentWidth, title: 'Carrier :', value: '${sales.carrierName ?? '-'}'),
+              CommonDataViewComponent(width: componentWidth, title: 'FOB :', value: 'Shipping Point'),
+              CommonDataViewComponent(
+                  width: componentWidth, title: 'Proto/PPAP :', value: '${sales.isAttachedProtoPpapStr ?? '-'}'),
+              CommonDataViewComponent(
+                  width: componentWidth,
                   title: 'Additional Quantity :',
                   value: '${sales.isAllowAdditionalQtyStr ?? '-'}'),
-              PickOrderKeyValue(width: componentWidth,
-                  title: 'Sales Note :', value: '${sales.soNotes ?? '-'}'),
+              CommonDataViewComponent(width: componentWidth, title: 'Sales Note :', value: '${sales.soNotes ?? '-'}'),
             ],
           );
         },

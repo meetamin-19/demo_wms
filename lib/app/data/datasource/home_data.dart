@@ -11,9 +11,9 @@ abstract class HomeData{
 
   Future<ResPickOrderListGet> getPickOrderList({required ReqPickOrderListGet req});
   Future<EmptyRes> changePickOrderStatus({required int id});
-  Future<ResPickorderLinkUserList> pickorderLinkPickOrder({required int id});
-  Future<EmptyRes> pickorderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog});
-  Future<EmptyRes> pickorderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog});
+  Future<ResPickorderLinkUserList> pickOrderLinkPickOrder({required int id});
+  Future<EmptyRes> pickOrderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog});
+  Future<EmptyRes> pickOrderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog});
 
 }
 
@@ -31,6 +31,7 @@ class HomeDataImpl implements HomeData{
       throw kErrorWithRes;
     }
   }
+
 
   @override
   Future<EmptyRes> changePickOrderStatus({required int id}) async{
@@ -50,7 +51,7 @@ class HomeDataImpl implements HomeData{
   }
 
   @override
-  Future<ResPickorderLinkUserList> pickorderLinkPickOrder({required int id}) async {
+  Future<ResPickorderLinkUserList> pickOrderLinkPickOrder({required int id}) async {
     final user = await UserPrefs.shared.getUser;
 
     final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/pickorderLinkPickOrder',data: {
@@ -66,7 +67,7 @@ class HomeDataImpl implements HomeData{
   }
 
   @override
-  Future<EmptyRes> pickorderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog}) async {
+  Future<EmptyRes> pickOrderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog}) async {
     final user = await UserPrefs.shared.getUser;
 
     final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/pickorderInsertUpdateLinkPickOrder',data: {
@@ -84,7 +85,7 @@ class HomeDataImpl implements HomeData{
   }
 
   @override
-  Future<EmptyRes> pickorderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog}) async {
+  Future<EmptyRes> pickOrderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog}) async {
     final user = await UserPrefs.shared.getUser;
 
     final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/pickorderInsertUpdateUnlinkPickOrder',data: {

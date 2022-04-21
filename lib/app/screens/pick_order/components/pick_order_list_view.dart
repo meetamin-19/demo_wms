@@ -1,16 +1,21 @@
+import 'package:demo_win_wms/app/utils/user_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_list_get.dart';
-import 'package:demo_win_wms/app/providers/home_provider.dart';
-import 'package:demo_win_wms/app/screens/base_components/search_selection_screen.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
-import 'package:demo_win_wms/app/utils/enums.dart';
 import 'package:demo_win_wms/app/utils/responsive.dart';
 import 'package:demo_win_wms/app/views/custom_popup_view.dart';
-import 'package:provider/provider.dart';
-import 'package:demo_win_wms/app/views/loading_small.dart';
 
 class PickOrderListView extends StatelessWidget {
-  const PickOrderListView({Key? key, this.data, required this.changeStatus, this.linkOrder, this.unLinkOrder, this.deleteOrder, this.addNote, this.view, this.pick})
+  PickOrderListView(
+      {Key? key,
+      this.data,
+      required this.changeStatus,
+      this.linkOrder,
+      this.unLinkOrder,
+      this.deleteOrder,
+      this.addNote,
+      this.view,
+      this.pick})
       : super(key: key);
 
   final ResPickOrderListGetData? data;
@@ -22,9 +27,16 @@ class PickOrderListView extends StatelessWidget {
   final Function? addNote;
   final Function? view;
   final Function? pick;
+  LocalUser? userData;
+
+  getUserData()async{
+    userData = await UserPrefs.shared.getUser;
+  }
 
   @override
   Widget build(BuildContext context) {
+
+
     final isDesktop = Responsive.isDesktop(context);
 
     final isMobile = Responsive.isMobile(context);
@@ -47,45 +59,16 @@ class PickOrderListView extends StatelessWidget {
           Expanded(
               child: Wrap(
             children: [
+              listEliment(width: width, title: 'Sales Order No :', value: '${data?.soNumber ?? ''}'),
+              listEliment(width: width, title: 'Company :', value: '${data?.companyName ?? ''}'),
+              listEliment(width: width, title: 'Customer Location :', value: '${data?.customerLocation ?? ''}'),
+              listEliment(width: width, title: 'Ship Date :', value: '${data?.shippingDate ?? ''}', hasDateIcon: true),
+              listEliment(width: width, title: 'Created On :', value: '${data?.createdDate ?? ''}', hasDateIcon: true),
               listEliment(
-                  width: width,
-                  title: 'Sales Order No :',
-                  value: '${data?.soNumber ?? ''}'),
-              listEliment(
-                  width: width,
-                  title: 'Company :',
-                  value: '${data?.companyName ?? ''}'),
-              listEliment(
-                  width: width,
-                  title: 'Customer Location :',
-                  value: '${data?.customerLocation ?? ''}'),
-              listEliment(
-                  width: width,
-                  title: 'Ship Date :',
-                  value: '${data?.shippingDate ?? ''}',
-                  hasDateIcon: true),
-              listEliment(
-                  width: width,
-                  title: 'Created On :',
-                  value: '${data?.createdDate ?? ''}',
-                  hasDateIcon: true),
-              listEliment(
-                  width: width,
-                  title: 'Completed On :',
-                  value: '${data?.completedOn ?? '-'}',
-                  hasDateIcon: true),
-              listEliment(
-                  width: width,
-                  title: 'Customer :',
-                  value: '${data?.customerName ?? ''}'),
-              listEliment(
-                  width: width,
-                  title: 'Warehouse :',
-                  value: '${data?.warehouseName ?? ''}'),
-              listEliment(
-                  width: width,
-                  title: 'Carrier (Ship Via) :',
-                  value: '${data?.shipperName ?? ''}'),
+                  width: width, title: 'Completed On :', value: '${data?.completedOn ?? '-'}', hasDateIcon: true),
+              listEliment(width: width, title: 'Customer :', value: '${data?.customerName ?? ''}'),
+              listEliment(width: width, title: 'Warehouse :', value: '${data?.warehouseName ?? ''}'),
+              listEliment(width: width, title: 'Carrier (Ship Via) :', value: '${data?.shipperName ?? ''}'),
               pickOrderButton(context)
             ],
           )),
@@ -95,34 +78,54 @@ class PickOrderListView extends StatelessWidget {
     );
   }
 
-  PopupMenuButton<dynamic> popupButton(
-      BuildContext context, ResPickOrderListGetData? data) {
+  PopupMenuButton<dynamic> popupButton(BuildContext context, ResPickOrderListGetData? data) {
     final isPickInProgress = data?.statusTerm == 'Pick In Progress';
-
+    // bool? isLinkBtn;
+    getUserData();
     PopupMenuItem? linkUnlinkBtn() {
-      if (isPickInProgress) {
-        if (data?.isPickOrderLinkedOrNot == true) {
-          return menuBox(
-              value: 'unlink',
-              text: 'Pick Order Unlink',
-              icon: kImgPopupPickOrderPopup);
+
+
+      if (data?.statusTerm != "" && data?.statusTerm!.toUpperCase() == "PICK ORDER ACKNOWLEDGED") {
+        if (data?.isPickOrderLinkedOrNot == true &&
+            (data?.isAbleToPickOrNot == true ||
+                userData?.userType_Term == "Super Admin" ||
+                data?.isPickOrderAcknowledegerOrNot == true)) {
+          return menuBox(value: 'unlink', text: 'Pick Order Unlink', icon: kImgPopupPickOrderPopup);
         } else {
-          return menuBox(
-              value: 'link',
-              text: 'Pick Order Link',
-              icon: kImgPopupPickOrderPopup);
+          if ((data?.isPickOrderAcknowledegerOrNot == true || userData?.userType_Term == "Super Admin") &&
+              data?.isAbleToAcknowledge == true) {
+            return menuBox(value: 'link', text: 'Pick Order Link', icon: kImgPopupPickOrderPopup);
+          }
+        }
+      } else {
+        print(userData?.userType_Term);
+        if (data?.isPickOrderLinkedOrNot == true &&
+            (data?.isAbleToPickOrNot == true ||
+                userData?.userType_Term == "Super Admin" ||
+                data?.isPickOrderAcknowledegerOrNot == true) &&
+            data?.isAbleToAcknowledge == true) {
+          return menuBox(value: 'unlink', text: 'Pick Order Unlink', icon: kImgPopupPickOrderPopup);
         }
       }
+      return null;
+
+      // if (isLinkBtn == false) {
+      //   menuBox(value: 'unlink', text: 'Pick Order Unlink', icon: kImgPopupPickOrderPopup);
+      // } else if (isLinkBtn == true) {
+      //   menuBox(value: 'link', text: 'Pick Order Link', icon: kImgPopupPickOrderPopup);
+      // }
+      // return null;
     }
 
     PopupMenuItem? pickBtn() {
+
       if (isPickInProgress) {
         if (data?.isPoAlreadyLinkOrNot == true) {
           if (data?.isPickOrderLinkedOrNot == true) {
             if (data?.isAbleToPickOrNot == true) {
               return menuBox(value: 'pick', text: 'Pick', icon: kImgPopupPick);
             }
-          }else {
+          } else {
             return menuBox(value: 'pick', text: 'Pick', icon: kImgPopupPick);
           }
         }
@@ -143,50 +146,73 @@ class PickOrderListView extends StatelessWidget {
             }
           }
 
-          if (value == 'pick'){
+          if (value == 'pick') {
             if (pick != null) {
               pick!();
             }
           }
 
-          if (value == 'link'){
+          if (value == 'link') {
             if (linkOrder != null) {
               linkOrder!();
             }
           }
 
-          if (value == 'unlink'){
+          if (value == 'unlink') {
             if (unLinkOrder != null) {
               unLinkOrder!();
             }
           }
 
-          if (value == 'delete'){
+          if (value == 'delete') {
             if (deleteOrder != null) {
               deleteOrder!();
             }
           }
 
-          if (value == 'note'){
+          if (value == 'note') {
             if (addNote != null) {
               addNote!();
             }
           }
-
-
         },
         itemBuilder: (context) => [
+              // if(data?.)
               menuBox(value: 'view', text: 'View', icon: kImgPopupViewIcon),
+
               if (data?.isInvoiceIsCreatedOrNot == false)
-                menuBox(
-                    value: 'note',
-                    text: 'Pick Order Note',
-                    icon: kImgPopupPickOrderNoteIcon),
+                menuBox(value: 'note', text: 'Pick Order Note', icon: kImgPopupPickOrderNoteIcon),
+
               if (linkUnlinkBtn() != null) linkUnlinkBtn()!,
 
               if (pickBtn() != null) pickBtn()!,
 
-              menuBox(value: 'delete', text: 'Delete', icon: kImgPopupDelete),
+              if (data?.isPickOrderIsPickedOrNot == false)
+                menuBox(value: 'delete', text: 'Delete', icon: kImgPopupDelete),
+              // if (data?.statusTerm != "" && data?.statusTerm!.toUpperCase() == "PICK ORDER ACKNOWLEDGED")
+              //   {
+              //     // getUserData();
+              //     if (data?.isPickOrderLinkedOrNot == true &&
+              //         (data?.isAbleToPickOrNot == true ||
+              //             userData?.userType_Term == "Super Admin" ||
+              //             data?.isPickOrderAcknowledegerOrNot == true))
+              //       {linkUnlinkBtn()}.first!
+              //     else
+              //       {
+              //         if ((data?.isPickOrderAcknowledegerOrNot == true || userData?.userType_Term == "Super Admin") &&
+              //             data?.isAbleToAcknowledge == true)
+              //           {linkUnlinkBtn()}.first!
+              //       }.first
+              //   }.first
+              // else
+              //   {
+              //     if (data?.isPickOrderLinkedOrNot == true &&
+              //         (data?.isAbleToPickOrNot == true ||
+              //             userData?.userType_Term == "Super Admin" ||
+              //             data?.isPickOrderAcknowledegerOrNot == true) &&
+              //         data?.isAbleToAcknowledge == true)
+              //       {linkUnlinkBtn()}.first!
+              //   }.first,
             ]);
   }
 
@@ -200,19 +226,17 @@ class PickOrderListView extends StatelessWidget {
         Text(
           'Pick Order Status :',
           maxLines: 1,
-          style: TextStyle(
-              fontWeight: FontWeight.w500, fontSize: kFlexibleSize(14)),
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: kFlexibleSize(14)),
         ),
         SizedBox(height: kFlexibleSize(5)),
         InkWell(
             onTap: () {
-              if(!isPicked){
+              if (!isPicked) {
                 return;
               }
               CustomPopup(context,
                   title: 'Change Pick Order Status',
-                  message:
-                      'Are you sure you want to change status of Pick Order Issued to Pick In Progress?',
+                  message: 'Are you sure you want to change status of Pick Order Issued to Pick In Progress?',
                   primaryBtnTxt: 'Yes',
                   secondaryBtnTxt: 'Close', primaryAction: () {
                 changeStatus();
@@ -221,12 +245,9 @@ class PickOrderListView extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
-                  color: isPicked ? Colors.transparent : Colors.green,
-                  borderRadius: BorderRadius.circular(20)),
+                  color: isPicked ? Colors.transparent : Colors.green, borderRadius: BorderRadius.circular(20)),
               child: Text(
-                isPicked
-                    ? 'Pick Order Issued'
-                    : 'Pick In Progress (${data?.pickedByUserName ?? ''})',
+                isPicked ? 'Pick Order Issued' : 'Pick In Progress (${data?.pickedByUserName ?? ''})',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: kFlexibleSize(14),
@@ -238,8 +259,7 @@ class PickOrderListView extends StatelessWidget {
     );
   }
 
-  PopupMenuItem menuBox(
-      {required String value, required String text, required Widget icon}) {
+  PopupMenuItem menuBox({required String value, required String text, required Widget icon}) {
     return PopupMenuItem<String>(
       child: SizedBox(
         width: kFlexibleSize(150),
@@ -252,8 +272,7 @@ class PickOrderListView extends StatelessWidget {
                 child: Text(
               text,
               maxLines: 2,
-              style: TextStyle(
-                  fontSize: kFlexibleSize(14), fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: kFlexibleSize(14), fontWeight: FontWeight.w400),
             )),
           ],
         ),
@@ -262,14 +281,9 @@ class PickOrderListView extends StatelessWidget {
     );
   }
 
-  Widget listEliment(
-      {required double width,
-      required String title,
-      required String value,
-      bool? hasDateIcon}) {
+  Widget listEliment({required double width, required String title, required String value, bool? hasDateIcon}) {
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: kFlexibleSize(15), right: kFlexibleSize(15)),
+      padding: EdgeInsets.only(bottom: kFlexibleSize(15), right: kFlexibleSize(15)),
       child: SizedBox(
         width: width,
         child: Column(
@@ -279,8 +293,7 @@ class PickOrderListView extends StatelessWidget {
             Text(
               title,
               maxLines: 1,
-              style: TextStyle(
-                  fontWeight: FontWeight.w500, fontSize: kFlexibleSize(14)),
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: kFlexibleSize(14)),
             ),
             SizedBox(height: kFlexibleSize(5)),
             Row(
@@ -297,9 +310,7 @@ class PickOrderListView extends StatelessWidget {
                   child: Text(value,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: kFlexibleSize(14))),
+                      style: TextStyle(fontWeight: FontWeight.w400, fontSize: kFlexibleSize(14))),
                 ),
               ],
             )

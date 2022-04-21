@@ -8,12 +8,13 @@ import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/views/network_image.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
-  CommonAppBar({Key? key, this.hasLeading, this.title, this.isTitleSearch, this.hasBackButton}) : super(key: key);
+  CommonAppBar({Key? key, this.hasLeading, this.title, this.isTitleSearch, this.hasBackButton, this.isTitleScan}) : super(key: key);
 
   bool? hasBackButton;
   bool? hasLeading;
   String? title;
   bool? isTitleSearch = false;
+  bool? isTitleScan = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +58,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.white,
       elevation: 0.0,
       centerTitle: false,
-      title: isTitleSearch == null ? Text(title ?? "") : Container(
+      title: isTitleScan == null ? isTitleSearch == null ? Text(title ?? "") : Container(
         alignment: Alignment.centerLeft,
         width: _size.width < kFlexibleSize(200) ? kFlexibleSize(200) : _size.width * 0.4,
         child: SizedBox(
@@ -71,6 +72,19 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             hint: 'Search',
+          ),
+        ),
+      ) : Container(
+        alignment: Alignment.centerLeft,
+        width: _size.width < kFlexibleSize(200) ? kFlexibleSize(200) : _size.width * 0.4,
+        child: SizedBox(
+          height: kFlexibleSize(45),
+          child: LeadingTextField(
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: kCommonAppBarScanImage
+            ),
+            hint: 'Scan',
           ),
         ),
       ),

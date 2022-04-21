@@ -22,7 +22,6 @@ class PalletProviderImpl extends PalletProvider {
 
 
   PalletProviderImpl({required this.repo}){
-
     _lineItemRes = ApiResponse();
     _palletsRes = ApiResponse();
   }

@@ -60,6 +60,7 @@ class ResPickOrderListGetData {
     this.pickOrderLinkedTo,
     this.pickOrderLinkedOn,
     this.isPickOrderIsPickedOrNot,
+    this.isPickOrderAcknowledegerOrNot,
     this.isPickOrderLinked,
     this.isPickOrderLinkedOrNot,
     this.isPoAlreadyLinkOrNot,
@@ -70,8 +71,11 @@ class ResPickOrderListGetData {
     this.pickedByUserName,
     this.pickOrderNote,
     this.isInvoiceIsCreatedOrNot,
+    this.isAbleToAcknowledge
   });
 
+  bool? isPickOrderAcknowledegerOrNot;
+  bool? isAbleToAcknowledge;
   int? pickOrderId;
   int? salesOrderId;
   int? companyId;
@@ -152,6 +156,8 @@ class ResPickOrderListGetData {
     pickOrderLinkedTo: json["pickOrderLinkedTo"] == null ? null : json["pickOrderLinkedTo"],
     pickOrderLinkedOn: json["pickOrderLinkedOn"] == null ? null : DateTime.parse(json["pickOrderLinkedOn"]),
     isPickOrderIsPickedOrNot: json["isPickOrderIsPickedOrNot"] == null ? null : json["isPickOrderIsPickedOrNot"],
+    isAbleToAcknowledge: json["isAbleToAcknowledge"] == null ? null : json["isAbleToAcknowledge"],
+    isPickOrderAcknowledegerOrNot: json["isPickOrderAcknowledegerOrNot"] == null ? null : json["isPickOrderAcknowledegerOrNot"],
     isPickOrderLinked: json["isPickOrderLinked"] == null ? null : json["isPickOrderLinked"],
     isPickOrderLinkedOrNot: json["isPickOrderLinkedOrNot"] == null ? null : json["isPickOrderLinkedOrNot"],
     isPoAlreadyLinkOrNot: json["isPOAlreadyLinkOrNot"] == null ? null : json["isPOAlreadyLinkOrNot"],

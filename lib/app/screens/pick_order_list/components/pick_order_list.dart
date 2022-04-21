@@ -19,6 +19,7 @@ class PickOrderList extends StatelessWidget {
     TableHeaderView(text: 'Requested Qty'),
     TableHeaderView(text: 'Actual Picked'),
     TableHeaderView(text: 'UOM'),
+    TableHeaderView(text: 'Suggested Location'),
     TableHeaderView(text: 'Status'),
     TableHeaderView(text: 'Action'),
   ]);
@@ -28,7 +29,7 @@ class PickOrderList extends StatelessWidget {
       return Container();
     }
 
-    final width = (MediaQuery.of(context).size.width - 75);
+    final width = (MediaQuery.of(context).size.width - 77);
 
     return SingleChildScrollView(
       physics: ClampingScrollPhysics(),
@@ -43,26 +44,25 @@ class PickOrderList extends StatelessWidget {
               final data = list[index - 1];
 
               return TableRow(children: [
-                TableCellView(text: '${data.itemName ?? '-'}'),
-                TableCellView(text: '${data.poNumber ?? '-'}'),
+                TableCellView(text: '${data.itemId ?? '-'}'),
+                TableCellView(text: data.poNumber ?? '-'),
                 TableCellView(text: '${data.palletNo ?? '-'}'),
                 TableCellView(text: '${data.availableQty ?? '-'}'),
                 TableCellView(text: '${data.qty ?? '-'}'),
                 TableCellView(text: '${data.actualPicked ?? '-'}'),
-                TableCellView(text: '${data.uom ?? '-'}'),
-                TableCellView(text: '${data.currentPartStatusTerm ?? '-'}'),
+                TableCellView(text: data.uom ?? '-'),
+                TableCellView(text: '{data.sfgr a'),
+                TableCellView(text: data.currentPartStatusTerm ?? '-'),
                 TableCellView(
                     child: Wrap(
                       children: [
                         ActionButton(
-                          color: Color(0XffB981FF),
+                          color: const Color(0XffB981FF),
                           icon: kImgPopupViewIconWhite,
                           text: 'View',onTap: (){
-
                           if(viewOnClick != null){
                             viewOnClick!(data.pickOrderSODetailID ?? 0);
                           }
-
                         },),
                         if(isEditing && data.currentPartStatusTerm == 'Part In Progress')
                         ActionButton(
@@ -94,7 +94,7 @@ class PickOrderList extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(2),
-              color: Color(0xffE5E5E5),
+              color: const Color(0xffE5E5E5),
               border: Border.all(color: Colors.black.withOpacity(0.25))),
           child: Center(
             child: Padding(

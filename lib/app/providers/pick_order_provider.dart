@@ -1,7 +1,11 @@
+
 import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_view.dart';
 import 'package:demo_win_wms/app/providers/base_notifier.dart';
+import 'package:demo_win_wms/app/providers/home_provider.dart';
 import 'package:demo_win_wms/app/repository/pick_order_repository.dart';
 import 'package:demo_win_wms/app/utils/api_response.dart';
+
+import '../data/entity/res/res_pick_order_list_get.dart';
 
 abstract class PickOrderProvider extends BaseNotifier {
 
@@ -23,6 +27,7 @@ class PickOrderProviderImpl extends PickOrderProvider {
   ApiResponse<ResGetPickOrderDataForView>? get getPickOrder => _getPickOrder;
 
   List<SalesOrderDetailList>? filteredSalesOrderDetailList;
+
 
   searchFromSalesOderList({required String str}){
 
@@ -47,6 +52,7 @@ class PickOrderProviderImpl extends PickOrderProvider {
     }
 
   }
+
 
   Future getPickOrderData() async {
 

@@ -25,13 +25,10 @@ class ShippingVerificationScreen extends StatefulWidget {
   const ShippingVerificationScreen({Key? key}) : super(key: key);
 
   @override
-  State<ShippingVerificationScreen> createState() =>
-      _ShippingVerificationScreenState();
+  State<ShippingVerificationScreen> createState() => _ShippingVerificationScreenState();
 }
 
-class _ShippingVerificationScreenState
-    extends State<ShippingVerificationScreen> {
-  int currentIndex = 0;
+class _ShippingVerificationScreenState extends State<ShippingVerificationScreen> {
   int pageLimit = 100;
   String? selectedRange = "100";
   String? selectedStartPoint = "0";
@@ -43,13 +40,24 @@ class _ShippingVerificationScreenState
   DateTime? selectedEndDate;
   String dropdownValue = "Unverified";
   bool redirecting = false;
-  ScrollController? _scrollController;
   bool isLoading = false;
   PageController? pageController;
+  ScrollController? scrollController;
   int? totalCount;
   int? itemCount = 1;
   bool? loading = false;
   String? searchText = "";
+  int startingIndex = 1;
+  int selectedIndex = 1;
+  int length = 20;
+
+  BoxDecoration unselectedBox =
+       BoxDecoration(color: const Color(0xffE5E5E5).withOpacity(0.5), borderRadius: const BorderRadius.all(const Radius.circular(3)));
+
+  BoxDecoration selectedBox =
+      const BoxDecoration(color: Color(0xff7F849A), borderRadius: BorderRadius.all(Radius.circular(3)));
+
+  bool isListLoaded = true;
 
   @override
   void initState() {
@@ -57,39 +65,29 @@ class _ShippingVerificationScreenState
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
-      _scrollController = ScrollController();
       pageController = PageController();
+      scrollController = ScrollController();
       // _scrollController?.addListener(pagination);
       await fetchList();
     });
   }
 
   filterData(BuildContext context, String str) {
-    context
-        .read<ShippingVerificationProvider>()
-        .searchFromShippingVerificationList(str: str);
+    context.read<ShippingVerificationProvider>().searchFromShippingVerificationList(str: str);
   }
 
   void getTotalCount() async {
     final home = context.read<ShippingVerificationProvider>();
-    final isListLoaded =
-        home.shippingVerificationList?.state == Status.COMPLETED;
 
     try {
       setState(() {
-        totalCount =
-            home.shippingVerificationList?.data?.data?.first.totalCount ?? 0;
-        itemCount = (totalCount == null || totalCount == 0)
-            ? 1
-            : (totalCount! / 100).ceil();
+        totalCount = home.shippingVerificationList?.data?.data?.first.totalCount ?? 0;
+        itemCount = (totalCount == null || totalCount == 0) ? 1 : (totalCount! / pageLimit).ceil();
       });
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-    }
-    if (kDebugMode) {
-      print('totalCount inside getTotalCount :$totalCount ');
     }
   }
 
@@ -100,24 +98,25 @@ class _ShippingVerificationScreenState
       //add api for load the more data according to new page
     });
 
-    // print("totalCount : - $totalCount");
-    if (((currentIndex == 0 ? 1 : currentIndex) * pageLimit) < totalCount!) {
+    if (((selectedIndex == 0 ? 1 : selectedIndex) * pageLimit) < totalCount!) {
       selectedRange = (pageLimit).toString();
-      selectedStartPoint = ((currentIndex) * pageLimit).toString();
+      selectedStartPoint = ((selectedIndex) * pageLimit).toString();
+      setState(() {
+        selectedIndex += 1;
+      });
       await fetchList();
-    } else if (((currentIndex == 0 ? 1 : currentIndex) * pageLimit) >
-        totalCount!) {
-      if (totalCount! - ((currentIndex == 0 ? 1 : currentIndex) * pageLimit) >
-          0) {
+    } else if (((selectedIndex == 0 ? 1 : selectedIndex) * pageLimit) > totalCount!) {
+      if (totalCount! - ((selectedIndex == 0 ? 1 : selectedIndex) * pageLimit) > 0) {
         selectedRange = (pageLimit).toString();
-        selectedStartPoint = ((currentIndex) * pageLimit).toString();
+        selectedStartPoint = ((selectedIndex) * pageLimit).toString();
+        setState(() {
+          selectedIndex += 1;
+        });
         await fetchList();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("No more data to show")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No more data to show")));
       }
     }
-
     setState(() {
       isLoading = false;
       // page += 1;
@@ -128,11 +127,14 @@ class _ShippingVerificationScreenState
     setState(() {
       isLoading = true;
     });
-    print(currentIndex);
 
-    if (currentIndex > 0) {
+    if (selectedIndex > 0) {
       selectedRange = (pageLimit).toString();
-      selectedStartPoint = ((currentIndex - 1) * pageLimit).toString();
+      selectedStartPoint = ((selectedIndex - 1) * pageLimit).toString();
+      setState(() {
+      selectedIndex -= 1;
+
+      });
       await fetchList();
     }
 
@@ -146,14 +148,12 @@ class _ShippingVerificationScreenState
       final home = context.read<ServiceProviderImpl>();
       await home.getShippingVerificationFilters();
     } on UnAuthorised catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
       final auth = context.read<AuthProviderImpl>();
       Navigator.of(context).popUntil((route) => route.isFirst);
       auth.unAuthorizeUser();
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -172,26 +172,20 @@ class _ShippingVerificationScreenState
           numOfResults: pageLimit.toString());
       getTotalCount();
       filterData(context, searchText!);
-      final res = list.shippingVerificationList?.data?.data?.length;
-    } on UnAuthorised catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Something went wrong')));
+    } on UnAuthorised {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       final auth = context.read<AuthProviderImpl>();
       Navigator.of(context).popUntil((route) => route.isFirst);
       auth.unAuthorizeUser();
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Something went wrong')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Something went wrong')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final home = context.read<ServiceProviderImpl>();
-    final listProvider = context.read<ShippingVerificationProvider>();
     final isLoading = home.shippingverificationfilters?.state == Status.LOADING;
-    final isListLoaded =
-        listProvider.shippingVerificationList?.state == Status.COMPLETED;
     return Scaffold(
         appBar: CommonAppBar(
           hasLeading: true,
@@ -215,17 +209,12 @@ class _ShippingVerificationScreenState
                               child: Text(
                                 "SHIPPING VERIFICATION",
                                 textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.w700),
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
                               ),
                             )),
-                        // SizedBox(
-                        // height: MediaQuery.of(context).size.height * .8,
-                        // child:
                         Expanded(
                           child: Container(
-                            margin: const EdgeInsets.only(
-                                top: 10, bottom: 20, left: 20, right: 20),
+                            margin: const EdgeInsets.only(top: 10, bottom: 20, left: 20, right: 20),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                             ),
@@ -235,13 +224,10 @@ class _ShippingVerificationScreenState
                                 mainAxisSize: MainAxisSize.min,
                                 // crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Padding(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: filters(context)),
-                                  pages(context),
+                                  Padding(padding: const EdgeInsets.only(top: 20), child: filters(context)),
+                                  if (!isLoading) pages(context),
                                   const SizedBox(height: 10),
-                                  if (!isLoading)
-                                    Expanded(child: dataTable(context)),
+                                  if (!isLoading) Expanded(child: dataTable(context)),
                                 ],
                               ),
                             ),
@@ -253,17 +239,17 @@ class _ShippingVerificationScreenState
                   ),
                 ],
               ),
-              // if (!isListLoaded)
-              //   Center(
-              //     child: LoadingSmall(
-              //       color: Colors.blue,
-              //       size: 50,
-              //     ),
-              //   )
+              if (!isListLoaded)
+                Center(
+                  child: LoadingSmall(
+                    color: Colors.blue,
+                    size: 50,
+                  ),
+                )
             ],
           ),
           drawerScrimColor: Colors.transparent,
-          drawer: const DrawerWidget(),
+          drawer: DrawerWidget(),
         ));
   }
 
@@ -284,9 +270,7 @@ class _ShippingVerificationScreenState
               ? InkWell(
                   onTap: () {
                     if (msg == "Verified") {
-                      Navigator.of(context)
-                          .pushNamed(KVerifyEditRoute)
-                          .then((value) {
+                      Navigator.of(context).pushNamed(kVerifyEditRoute).then((value) {
                         if (value == true) {
                           fetchList();
                         }
@@ -295,9 +279,7 @@ class _ShippingVerificationScreenState
                   },
                   child: Container(
                     padding: EdgeInsets.all(kFlexibleSize(10)),
-                    decoration: BoxDecoration(
-                        color: const Color(0xff26C281),
-                        borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: const Color(0xff26C281), borderRadius: BorderRadius.circular(2)),
                     child: Icon(
                       Icons.check_rounded,
                       color: Colors.white,
@@ -307,9 +289,7 @@ class _ShippingVerificationScreenState
                 )
               : Container(
                   padding: EdgeInsets.all(kFlexibleSize(10)),
-                  decoration: BoxDecoration(
-                      color: const Color(0xff26C281),
-                      borderRadius: BorderRadius.circular(2)),
+                  decoration: BoxDecoration(color: const Color(0xff26C281), borderRadius: BorderRadius.circular(2)),
                   child: Icon(
                     Icons.check_rounded,
                     color: Colors.white,
@@ -324,9 +304,7 @@ class _ShippingVerificationScreenState
               ? InkWell(
                   onTap: () {
                     if (msg == "Verified") {
-                      Navigator.of(context)
-                          .pushNamed(KVerifyEditRoute)
-                          .then((value) {
+                      Navigator.of(context).pushNamed(kVerifyEditRoute).then((value) {
                         if (value == true) {
                           fetchList();
                         }
@@ -335,9 +313,7 @@ class _ShippingVerificationScreenState
                   },
                   child: Container(
                     padding: EdgeInsets.all(kFlexibleSize(10)),
-                    decoration: BoxDecoration(
-                        color: const Color(0xff337AB7),
-                        borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: const Color(0xff337AB7), borderRadius: BorderRadius.circular(2)),
                     child: SizedBox(
                       child: kShippingEditIcon,
                       width: kFlexibleSize(20),
@@ -346,9 +322,7 @@ class _ShippingVerificationScreenState
                 )
               : Container(
                   padding: EdgeInsets.all(kFlexibleSize(10)),
-                  decoration: BoxDecoration(
-                      color: const Color(0xff337AB7),
-                      borderRadius: BorderRadius.circular(5)),
+                  decoration: BoxDecoration(color: const Color(0xff337AB7), borderRadius: BorderRadius.circular(5)),
                   child: SizedBox(
                     child: kShippingEditIcon,
                     width: kFlexibleSize(20),
@@ -360,11 +334,7 @@ class _ShippingVerificationScreenState
   }
 
   Widget secondActionBTNs(
-      {bool? isCreditMemoGen,
-      int? invoiceID,
-      String? invoiceNo,
-      bool? isBolAttachment,
-      int? salesOrderID}) {
+      {bool? isCreditMemoGen, int? invoiceID, String? invoiceNo, bool? isBolAttachment, int? salesOrderID}) {
     final home = context.watch<ShippingVerificationProvider>();
     final isLoading = home.shippingVerificationList?.state == Status.LOADING;
     final hasError = home.shippingVerificationList?.state == Status.ERROR;
@@ -391,21 +361,17 @@ class _ShippingVerificationScreenState
         child: Wrap(
           runSpacing: 3.0,
           spacing: 3.0,
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             InkWell(
               onTap: () {
                 setState(() {
                   loading = true;
                 });
-                _openPDF(
-                    invoiceID: invoiceID, invoiceNo: invoiceNo, msg: "ASN");
+                _openPDF(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: "ASN");
               },
               child: Container(
                 padding: EdgeInsets.all(kFlexibleSize(10)),
-                decoration: BoxDecoration(
-                    color: const Color(0xff67809F),
-                    borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: const Color(0xff67809F), borderRadius: BorderRadius.circular(2)),
                 child: Icon(
                   Icons.remove_red_eye,
                   color: Colors.white,
@@ -418,10 +384,7 @@ class _ShippingVerificationScreenState
                 setState(() {
                   loading = true;
                 });
-                _openPDF(
-                    invoiceID: invoiceID,
-                    invoiceNo: invoiceNo,
-                    msg: isCreditMemoGen! ? "CREDIT" : "INVOICE");
+                _openPDF(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: isCreditMemoGen! ? "CREDIT" : "INVOICE");
                 // PdfView(controller: pdfController!,);
               },
               child: Container(
@@ -449,9 +412,7 @@ class _ShippingVerificationScreenState
                     },
                     child: Container(
                       padding: EdgeInsets.all(kFlexibleSize(10)),
-                      decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(2)),
+                      decoration: BoxDecoration(color: Colors.blueAccent, borderRadius: BorderRadius.circular(2)),
                       child: SizedBox(
                         child: kShippingInvoiceIcon,
                         width: kFlexibleSize(20),
@@ -475,10 +436,8 @@ class _ShippingVerificationScreenState
   Widget dataTable(BuildContext context) {
     final home = context.watch<ShippingVerificationProvider>();
     final filters = context.watch<ServiceProviderImpl>();
-    final filtersLoaded =
-        filters.shippingverificationfilters?.state == Status.COMPLETED;
-    final listloading =
-        home.shippingVerificationList?.state == Status.COMPLETED;
+    final filtersLoaded = filters.shippingverificationfilters?.state == Status.COMPLETED;
+    final listloading = home.shippingVerificationList?.state == Status.COMPLETED;
 
     if (filtersLoaded) {
       if (!listloading) {
@@ -492,8 +451,7 @@ class _ShippingVerificationScreenState
             width: MediaQuery.of(context).size.width * 0.95,
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(
-                  5), /*border: Border.all(color: Colors.black.withOpacity(0.1))*/
+              borderRadius: BorderRadius.circular(5), /*border: Border.all(color: Colors.black.withOpacity(0.1))*/
             ),
             child: table());
       }
@@ -525,9 +483,7 @@ class _ShippingVerificationScreenState
     if (hasError) {
       return NoDataFoundView(
         retryCall: () {
-          context
-              .read<ShippingVerificationProvider>()
-              .getShippingVerificationList();
+          context.read<ShippingVerificationProvider>().getShippingVerificationList();
         },
       );
     }
@@ -547,10 +503,8 @@ class _ShippingVerificationScreenState
         children: [
           Container(
             padding: const EdgeInsets.symmetric(vertical: 5),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    style: BorderStyle.solid,
-                    color: Colors.black.withOpacity(0.1))),
+            decoration:
+                BoxDecoration(border: Border.all(style: BorderStyle.solid, color: Colors.black.withOpacity(0.1))),
             child: Table(
               // border: TableBorder.all(),
               columnWidths: const {
@@ -594,44 +548,32 @@ class _ShippingVerificationScreenState
 
                   final data = list?[index];
 
-                  return TableRow(
-                      decoration: BoxDecoration(color: colorForRow),
-                      children: [
-                        Center(
-                          child: secondActionBTNs(
-                              isCreditMemoGen: data?.isCreditMemoGenerated,
-                              invoiceNo: data?.invoiceNo,
-                              invoiceID: data?.invoiceId,
-                              isBolAttachment:
-                                  data?.isBolAttachmentUploadedOrNot,
-                              salesOrderID: data?.salesOrderID),
-                        ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: sonButton(
-                                data!,
-                                data.isAllPalletsVerifiedOrNot,
-                                data.isInvoiceIsCreatedOrNot),
-                          ),
-                        ),
-                        Center(
-                            child: childText(
-                                '${data.customerName} ', Colors.black)),
-                        Center(
-                          child: childText(
-                              '${data.customerLocation}', Colors.black),
-                        ),
-                        Center(
-                          child: childText(
-                              '${data.shipperName} (${data.carrierName})',
-                              Colors.black),
-                        ),
-                        Center(
-                            child: childText(
-                                '${data.shipDate?.day}/${data.shipDate?.month}/${data.shipDate?.year}',
-                                Colors.black)),
-                      ]);
+                  return TableRow(decoration: BoxDecoration(color: colorForRow), children: [
+                    Center(
+                      child: secondActionBTNs(
+                          isCreditMemoGen: data?.isCreditMemoGenerated,
+                          invoiceNo: data?.invoiceNo,
+                          invoiceID: data?.invoiceId,
+                          isBolAttachment: data?.isBolAttachmentUploadedOrNot,
+                          salesOrderID: data?.salesOrderID),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: sonButton(data!, data.isAllPalletsVerifiedOrNot, data.isInvoiceIsCreatedOrNot),
+                      ),
+                    ),
+                    Center(child: childText('${data.customerName} ', Colors.black)),
+                    Center(
+                      child: childText('${data.customerLocation}', Colors.black),
+                    ),
+                    Center(
+                      child: childText('${data.shipperName} (${data.carrierName})', Colors.black),
+                    ),
+                    Center(
+                        child: childText(
+                            '${data.shipDate?.day}/${data.shipDate?.month}/${data.shipDate?.year}', Colors.black)),
+                  ]);
                 }),
               ),
             ),
@@ -640,85 +582,6 @@ class _ShippingVerificationScreenState
       ),
     );
   }
-
-  // Widget table(Widget headerWidget(String text), List<ShippingVerificationListData>? list) {
-  //
-  //   return Column(
-  //     children: [
-  //
-  //       Row(children:  [
-  //         headerWidget('Documents'),
-  //         headerWidget('SON'),
-  //         headerWidget('Customer'),
-  //         headerWidget('Customer Location'),
-  //         headerWidget('Ship Via (Carrier)'),
-  //         headerWidget('Ship Date'),
-  //       ]),
-  //
-  //       Table(children: list!
-  //           .map((e) => TableRow(children: [
-  //         (firstActionBTNs(e)),
-  //         (secondActionBTNs(
-  //             isCreditMemoGen: e.isCreditMemoGenerated,
-  //             invoiceNo: e.invoiceNo,
-  //             invoiceID: e.invoiceId)),
-  //         (Padding(
-  //           padding: const EdgeInsets.symmetric(
-  //               vertical: 8, horizontal: 5),
-  //           child: SONButton(
-  //               e,
-  //               childText,
-  //               e.isAllPalletsVerifiedOrNot,
-  //               e.isInvoiceIsCreatedOrNot),
-  //         )),
-  //         (childText('${e.customerName} ', Colors.black)),
-  //         (
-  //             childText('${e.customerLocation}', Colors.black)),
-  //         (childText(
-  //             '${e.shipperName} (${e.carrierName})', Colors.black)),
-  //         (childText('${e.shipDate}', Colors.black))
-  //       ]))
-  //           .toList(),),
-  //     ],
-  //   );
-  //
-  //   return DataTable(
-  //         columns: [
-  //           DataColumn(label: headerWidget('Action')),
-  //           DataColumn(label: headerWidget('Documents')),
-  //           DataColumn(label: headerWidget('SON')),
-  //           DataColumn(label: headerWidget('Customer')),
-  //           DataColumn(label: headerWidget('Customer Location')),
-  //           DataColumn(label: headerWidget('Ship Via (Carrier)')),
-  //           DataColumn(label: headerWidget('Ship Date')),
-  //         ],
-  //         rows: list!
-  //             .map((e) => DataRow(cells: [
-  //                   DataCell(firstActionBTNs(e)),
-  //                   DataCell(secondActionBTNs(
-  //                       isCreditMemoGen: e.isCreditMemoGenerated,
-  //                       invoiceNo: e.invoiceNo,
-  //                       invoiceID: e.invoiceId)),
-  //                   DataCell(Padding(
-  //                     padding: const EdgeInsets.symmetric(
-  //                         vertical: 8, horizontal: 5),
-  //                     child: SONButton(
-  //                         e,
-  //                         childText,
-  //                         e.isAllPalletsVerifiedOrNot,
-  //                         e.isInvoiceIsCreatedOrNot),
-  //                   )),
-  //                   DataCell(childText('${e.customerName} ', Colors.black)),
-  //                   DataCell(
-  //                       childText('${e.customerLocation}', Colors.black)),
-  //                   DataCell(childText(
-  //                       '${e.shipperName} (${e.carrierName})', Colors.black)),
-  //                   DataCell(childText('${e.shipDate}', Colors.black))
-  //                 ]))
-  //             .toList(),
-  //
-  //       );
-  // }
 
   Widget sonButton(
     ShippingVerificationListData e,
@@ -744,14 +607,11 @@ class _ShippingVerificationScreenState
               setState(() {
                 loading = true;
               });
-              _callPathToVerify(
-                  salesOrderID: e.salesOrderID!, pickOrderId: e.pickOrderId!);
+              _callPathToVerify(salesOrderID: e.salesOrderID!, pickOrderId: e.pickOrderId!);
             },
             child: Center(
                 child: Container(
-                    decoration: BoxDecoration(
-                        color: btnColor,
-                        borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: btnColor, borderRadius: BorderRadius.circular(2)),
                     padding: const EdgeInsets.all(5),
                     child: childText('${e.soNumber}', Colors.white)))),
         e.isAllPalletsVerifiedOrNot!
@@ -760,16 +620,11 @@ class _ShippingVerificationScreenState
                   setState(() {
                     loading = true;
                   });
-                  _callPathToVerify(
-                      salesOrderID: e.salesOrderID!,
-                      pickOrderId: e.pickOrderId!,
-                      msg: "Edit");
+                  _callPathToVerify(salesOrderID: e.salesOrderID!, pickOrderId: e.pickOrderId!, msg: "Edit");
                 },
                 child: Center(
                   child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(2)),
                     padding: const EdgeInsets.all(5),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -796,8 +651,7 @@ class _ShippingVerificationScreenState
   Widget filters(BuildContext context) {
     final service = context.watch<ServiceProviderImpl>();
 
-    final isLoading =
-        service.shippingverificationfilters?.state == Status.LOADING;
+    final isLoading = service.shippingverificationfilters?.state == Status.LOADING;
 
     final hasError = service.shippingverificationfilters?.state == Status.ERROR;
 
@@ -825,12 +679,10 @@ class _ShippingVerificationScreenState
         Expanded(
             child: Wrap(
           children: [
-            if (service.shippingverificationfilters?.data?.data?.customerlist !=
-                null)
+            if (service.shippingverificationfilters?.data?.data?.customerlist != null)
               ShippingVerificationFilterDropDown(
                 width: 250,
-                data: service
-                    .shippingverificationfilters!.data!.data!.customerlist!,
+                data: service.shippingverificationfilters!.data!.data!.customerlist!,
                 selectedValue: selectedCustomer,
                 hint: 'Customer',
                 onChange: (customer) {
@@ -838,13 +690,10 @@ class _ShippingVerificationScreenState
                 },
                 // icon: kImgCustomerIcon
               ),
-            if (service.shippingverificationfilters?.data?.data
-                    ?.customerlocationlist !=
-                null)
+            if (service.shippingverificationfilters?.data?.data?.customerlocationlist != null)
               ShippingVerificationFilterDropDown(
                 width: 300,
-                data: service.shippingverificationfilters!.data!.data!
-                    .customerlocationlist!,
+                data: service.shippingverificationfilters!.data!.data!.customerlocationlist!,
                 selectedValue: selectedCustomerLocation,
                 hint: 'Customer Location',
                 onChange: (location) {
@@ -852,12 +701,10 @@ class _ShippingVerificationScreenState
                 },
                 // icon: kImgCustomerLocationIcon
               ),
-            if (service.shippingverificationfilters?.data?.data?.shipvialist !=
-                null)
+            if (service.shippingverificationfilters?.data?.data?.shipvialist != null)
               ShippingVerificationFilterDropDown(
                 width: 200,
-                data: service
-                    .shippingverificationfilters!.data!.data!.shipvialist!,
+                data: service.shippingverificationfilters!.data!.data!.shipvialist!,
                 selectedValue: selectedShipVia,
                 hint: 'Ship Via',
                 onChange: (ship) {
@@ -868,9 +715,7 @@ class _ShippingVerificationScreenState
             DatePickView(
                 showBorder: true,
                 passedDate: selectedStartDate,
-                title: selectedStartDate != null
-                    ? (selectedStartDate?.toStrCommonFormat() ?? '')
-                    : 'Ship Date Start',
+                title: selectedStartDate != null ? (selectedStartDate?.toStrCommonFormat() ?? '') : 'Ship Date Start',
                 selectedDate: (date) {
                   setState(() {
                     selectedStartDate = date;
@@ -879,21 +724,17 @@ class _ShippingVerificationScreenState
             DatePickView(
                 showBorder: true,
                 passedDate: selectedEndDate,
-                title: selectedEndDate != null
-                    ? (selectedEndDate?.toStrCommonFormat() ?? '')
-                    : 'Ship Date End',
+                title: selectedEndDate != null ? (selectedEndDate?.toStrCommonFormat() ?? '') : 'Ship Date End',
                 selectedDate: (date) {
                   setState(() {
                     selectedEndDate = date;
                   });
                 }),
             dropDownContainer(),
-            if (service.shippingverificationfilters?.data?.data?.carrierlist !=
-                null)
+            if (service.shippingverificationfilters?.data?.data?.carrierlist != null)
               ShippingVerificationFilterDropDown(
                 width: 190,
-                data: service
-                    .shippingverificationfilters!.data!.data!.carrierlist!,
+                data: service.shippingverificationfilters!.data!.data!.carrierlist!,
                 selectedValue: selectedCarrier,
                 hint: 'Carrier ',
                 onChange: (carrier) {
@@ -903,8 +744,7 @@ class _ShippingVerificationScreenState
               ),
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
-                  borderRadius: BorderRadius.circular(2)),
+                  border: Border.all(color: Colors.black.withOpacity(0.1)), borderRadius: BorderRadius.circular(2)),
               height: 44,
               width: kFlexibleSize(290),
               child: TextField(
@@ -922,8 +762,7 @@ class _ShippingVerificationScreenState
           ],
         )),
         Flex(
-          direction:
-              Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
+          direction: Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
           children: [
             PickOrderFilterButton(
               bgColor: kPrimaryColor,
@@ -944,8 +783,8 @@ class _ShippingVerificationScreenState
                         return;
                       });
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Please select valid date duration')));
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(content: Text('Please select valid date duration')));
                       return;
                     }
                   }
@@ -991,7 +830,6 @@ class _ShippingVerificationScreenState
   }
 
   Container dropDownContainer() {
-    final home = context.read<ShippingVerificationProvider>();
     return Container(
       decoration: BoxDecoration(
           border: Border.all(color: Colors.black.withOpacity(0.1)),
@@ -1014,17 +852,15 @@ class _ShippingVerificationScreenState
                 onChanged: (String? newValue) {
                   setState(() {
                     if (dropdownValue != newValue) {
+                      pageLimit = 100;
                       dropdownValue = newValue!;
                       selectedStartPoint = "0";
-
-                      // pageController?.jumpToPage(0);
                       fetchList();
                     }
                     // dropdownValue = newValue!;
                   });
                 },
-                items: <String>['Unverified', 'Verified', 'All']
-                    .map<DropdownMenuItem<String>>((String value) {
+                items: <String>['Unverified', 'Verified', 'All'].map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -1042,31 +878,27 @@ class _ShippingVerificationScreenState
       await home.checkForVerification(salesOrderID: salesOrderID);
     }
     final verificationVar = home.checkForVrf;
-    if (verificationVar?.data?.data?.first.errorMessage
-                ?.toUpperCase()
-                .compareTo("USER CAN VERIFY THIS SALESORDER.") ==
+    if (verificationVar?.data?.data?.first.errorMessage?.toUpperCase().compareTo("USER CAN VERIFY THIS SALESORDER.") ==
             0 &&
         verificationVar?.data?.data?.first.primaryKey == "1") {
-      await home.GetEditScreenData(
-          salesOrderID: salesOrderID,
-          PickOrderID: pickOrderId,
-          i: dropdownValue == "Unverified" ? 0 : 1);
+      isListLoaded = false;
+      await home.getEditScreenData(
+          salesOrderID: salesOrderID, pickOrderID: pickOrderId, i: dropdownValue == "Unverified" ? 0 : 1);
       if (home.editScreen?.state == Status.COMPLETED) {
-        Navigator.pushNamed(context, KVerifyEditRoute, arguments: msg)
-            .then((value) {
+        setState(() {
+          isListLoaded = true;
+        });
+        Navigator.pushNamed(context, kVerifyEditRoute, arguments: msg).then((value) {
           if (value == true) {
             fetchList();
           }
         });
       }
     } else {
-      await home.GetEditScreenData(
-          salesOrderID: salesOrderID,
-          PickOrderID: pickOrderId,
-          i: dropdownValue == "Unverified" ? 0 : 1);
+      await home.getEditScreenData(
+          salesOrderID: salesOrderID, pickOrderID: pickOrderId, i: dropdownValue == "Unverified" ? 0 : 1);
       if (home.editScreen?.state == Status.COMPLETED) {
-        Navigator.pushNamed(context, KVerifyEditRoute, arguments: msg)
-            .then((value) {
+        Navigator.pushNamed(context, kVerifyEditRoute, arguments: msg).then((value) {
           if (value == true) {
             fetchList();
           }
@@ -1083,11 +915,8 @@ class _ShippingVerificationScreenState
     await home.getPdfPath(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: msg);
     final path = home.getASN_PdfPath?.data?.data;
 
-    print("http://wmsqa.softcube.in" + path!);
-
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            PdfViewScreen(path: "http://wmsqa.softcube.in" + path)));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => PdfViewScreen(path: "http://wmsqa.softcube.in" + path!)));
     setState(() {
       loading = false;
     });
@@ -1097,14 +926,8 @@ class _ShippingVerificationScreenState
     final home = context.read<ShippingVerificationProvider>();
     await home.getBolPath(salesOrderID: salesOrderID);
     final path = home.getBolPDF?.data?.data;
-    final message = home.getBolPDF?.data?.message;
-
-    print(message);
-
-      print("http://wmsqa.softcube.in" + path!);
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            PdfViewScreen(path: "http://wmsqa.softcube.in" + path)));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => PdfViewScreen(path: "http://wmsqa.softcube.in" + path!)));
     loading = false;
   }
 
@@ -1112,7 +935,7 @@ class _ShippingVerificationScreenState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
-        // mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           const Text("Showing :", style: TextStyle(fontSize: 12)),
           const SizedBox(
@@ -1121,15 +944,13 @@ class _ShippingVerificationScreenState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             height: 30,
-            decoration:
-                BoxDecoration(border: Border.all(color: Color(0xffCACACA))),
+            decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA))),
             child: DropdownButton(
                 iconSize: 12,
                 underline: const SizedBox(),
                 value: pageLimit,
                 elevation: 4,
-                style: const TextStyle(fontWeight: FontWeight.w600,color: Colors.black),
-
+                style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
                 items: const [
                   DropdownMenuItem(
                     child: Text(
@@ -1157,54 +978,256 @@ class _ShippingVerificationScreenState
                     fetchList();
                   });
                 }),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                height: 30,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (startingIndex - 3 > 0) {
+                            startingIndex = startingIndex - 3;
+                          } else {
+                            startingIndex = 1;
+                          }
+                        });
+                        // _scrollController.jumpTo(2);
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        height: 40,
+                        width: 30,
+                        child: Icon(
+                          Icons.fast_rewind,
+                          color: const Color(0xff263238).withOpacity(0.5),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          setState(() {
+                            if (startingIndex - 1 > 0) {
+                              startingIndex = startingIndex - 1;
+                            } else {
+                              startingIndex = 1;
+                            }
+                          });
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
+                        height: 40,
+                        width: 30,
+                        child: Icon(
+                          Icons.arrow_left_outlined,
+                          color: const Color(0xff263238).withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    ListView.builder(
+                      // controller: _scrollController,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (BuildContext context, index) {
+                        BoxDecoration box = selectedIndex == (startingIndex + index) ? selectedBox : unselectedBox;
+
+                        if (index == 5 && startingIndex != itemCount! - 6) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(2))),
+                            child: const Center(
+                              child: Text(
+                                "...",
+                                // textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        } else {
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = startingIndex + index;
+                                getPage();
+                              });
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              decoration: box,
+                              child: const Center(
+                                child: Text(
+                                  "...",
+                                  // textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        if (index == 6) {
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                startingIndex = itemCount! - 6;
+                                selectedIndex = startingIndex + index;
+                                getPage();
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              decoration: box,
+                              // height: 40,
+                              // width: 30,
+                              child: Center(
+                                child: Text(
+                                  "$itemCount",
+                                  // textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = startingIndex + index;
+                              getPage();
+                              _setPageNumber(index);
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: box,
+                            // height: 40,
+                            // width: 30,
+                            child: Center(
+                              child: Text(
+                                "${startingIndex + index}",
+                                // textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: itemCount! >= 7 ? 7 : itemCount,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          if(itemCount! < 7) {
+                            startingIndex = itemCount!;
+                          }
+                          else{
+                            if (startingIndex + 8 < itemCount!) {
+                              startingIndex += 1;
+                            } else {
+                              if (itemCount! - 7 > 0) {
+                                startingIndex = itemCount! - 6;
+                              } else {
+                                startingIndex = itemCount! - 7;
+                              }
+                            }
+                          }
+
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        child: Icon(
+                          Icons.arrow_right_outlined,
+                          color: const Color(0xff263238).withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (startingIndex + 8 < itemCount!) {
+                              startingIndex += 3;
+                            } else {
+                              if (itemCount! - 6 > 0) {
+                                startingIndex = itemCount! - 6;
+                              } else {
+                                startingIndex = 1;
+                              }
+                            }
+                          });
+                          // _scrollController.jumpTo(2);
+                        },
+                        child: Container(
+                          decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
+                          child: Icon(
+                            Icons.fast_forward,
+                            color: const Color(0xff263238).withOpacity(0.5),
+                            size: 20,
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+            ),
           )
-          //
-          // InkWell(
-          //   onTap: () {
-          //     previousPage();
-          //     pageController?.jumpToPage(currentIndex - 1);
-          //   },
-          //   child: Container(
-          //     width: 40,
-          //     height: 40,
-          //     color: kPrimaryColor,
-          //     child: const Icon(Icons.chevron_left),
-          //   ),
-          // ),
-          // SizedBox(
-          //     width: 60,
-          //     height: 40,
-          //     // color: Colors.red,
-          //     child: PageView.builder(
-          //       scrollDirection: Axis.horizontal,
-          //       controller: pageController,
-          //       itemBuilder: (context, index) {
-          //         return Container(
-          //           decoration:
-          //               BoxDecoration(border: Border.all(color: Colors.grey)),
-          //           width: 50,
-          //           child: Center(child: Text('${index + 1}')),
-          //         );
-          //       },
-          //       onPageChanged: (ind) {
-          //         currentIndex = ind;
-          //       },
-          //       itemCount: itemCount,
-          //     )),
-          // InkWell(
-          //   onTap: () {
-          //     pageController?.jumpToPage(currentIndex + 1);
-          //     nextPage();
-          //   },
-          //   child: Container(
-          //     width: 40,
-          //     height: 40,
-          //     color: kPrimaryColor,
-          //     child: const Icon(Icons.chevron_right),
-          //   ),
-          // ),
         ],
       ),
     );
+  }
+
+  _setPageNumber(int index) {
+    if (index == 0 || index == 1) {
+      if (index == 0) {
+        if (startingIndex - (index + 2) > 0) {
+          setState(() {
+            startingIndex -= index + 2;
+          });
+        } else {
+          setState(() {
+            startingIndex = 1;
+          });
+        }
+      } else {
+        if (startingIndex - (index) > 0) {
+          setState(() {
+            startingIndex -= index;
+          });
+        } else {
+          setState(() {
+            startingIndex = 1;
+          });
+        }
+      }
+    } else if (index == 3 || index == 4) {
+      if (index == 3) {
+        if (startingIndex + 7 <= itemCount!) {
+          setState(() {
+            startingIndex += 1;
+          });
+        }
+      } else {
+        if (startingIndex + 7 < itemCount!) {
+          setState(() {
+            startingIndex += 2;
+          });
+        } else {
+          setState(() {
+            startingIndex = itemCount! - 6;
+          });
+        }
+      }
+    } else {}
+  }
+
+  getPage() {
+    selectedStartPoint = (pageLimit * (selectedIndex - 1)).toString();
+    fetchList();
   }
 }

@@ -36,6 +36,7 @@ class PalletDataImpl extends PalletData{
 
     final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/GetPalletListData_ByID',data:
     {
+
       "UserID": user.userID,
       "PickOrderSODetailID": PickOrderSODetailID,
       "PickOrderID": PickOrderID,

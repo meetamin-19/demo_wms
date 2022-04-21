@@ -56,14 +56,14 @@ class Menu extends StatelessWidget {
     //     size: size ?? 15,
     //   )
     // },
-    {
-      'title': 'inventory Audit',
-      'icon': Icon(
-        Icons.description,
-        color: color ?? Colors.white,
-        size: size ?? 15,
-      )
-    },
+    // {
+    //   'title': 'inventory Audit',
+    //   'icon': Icon(
+    //     Icons.description,
+    //     color: color ?? Colors.white,
+    //     size: size ?? 15,
+    //   )
+    // },
     // {
     //   'title': 'quality orders',
     //   'icon': Icon(
@@ -109,10 +109,11 @@ class Menu extends StatelessWidget {
               if (index == 1){
                 Navigator.of(context).pushNamed(kPickOrderHomeRoute);
               }else if (index == 2){
-                Navigator.of(context).pushNamed(KVerifyShippingHomeScreen);
-              }else if(index == 3) {
-                Navigator.pushNamed(context, kInventoryAudit);
+                Navigator.of(context).pushNamed(kVerifyShippingHomeScreen);
               }
+              // else if(index == 3) {
+              //   Navigator.pushNamed(context, kInventoryAudit);
+              // }
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 5),

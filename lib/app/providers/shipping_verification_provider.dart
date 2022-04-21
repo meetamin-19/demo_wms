@@ -157,10 +157,10 @@ class ShippingVerificationProvider extends BaseNotifier {
     }
   }
 
-  Future GetEditScreenData(
-      {int? PickOrderID, int? salesOrderID, int? i}) async {
+  Future getEditScreenData(
+      {int? pickOrderID, int? salesOrderID, int? i}) async {
     final res = await repo.getEditScreenData(
-        pickOrderID: PickOrderID, salesOrderID: salesOrderID, i: i);
+        pickOrderID: pickOrderID, salesOrderID: salesOrderID, i: i);
 
     try {
       apiResIsLoading(_editScreen!);

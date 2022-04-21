@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/constants.dart';
+
 class SideMenuColumnWidget extends StatelessWidget {
-
-
-  const SideMenuColumnWidget(this.ctx, {Key? key}) : super(key: key);
+   SideMenuColumnWidget(this.ctx, {Key? key}) : super(key: key);
 
   final BuildContext ctx;
   static List items({Color? color,double? size}) => [
@@ -82,6 +82,8 @@ class SideMenuColumnWidget extends StatelessWidget {
     //   )
     // },
   ];
+
+  List<String> listOfWidgets = [kInitialRoute, kPickOrderHomeRoute, kVerifyShippingHomeScreen];
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -103,12 +105,23 @@ class SideMenuColumnWidget extends StatelessWidget {
                     // Icon(Icons.menu,size: 24,color: Colors.white,));
                   }
               ),
-              for(int i = 1; i< items().length; i++) {
-                Container(
-                  padding: const EdgeInsets.only(top: 21),
-                  child: items(size: 24)[i]["icon"],
-                )
-              }.first,
+              for(int i = 1; i< items().length; i++)
+                InkWell(
+                  onTap: () {
+                    var route = ModalRoute.of(context);
+                    bool isSameRoute = false;
+                    if (route != null) {
+                      route.settings.name == listOfWidgets[i-1] ? isSameRoute = true : isSameRoute = false;
+                    }
+                    if(!isSameRoute) Navigator.pushNamed(context, listOfWidgets[i - 1]);
+                  },
+                  child: {
+                  Container(
+                    padding: const EdgeInsets.only(top: 21),
+                    child: items(size: 24)[i]["icon"],
+                  )
+                }.first,
+              ),
 
               // SizedBox(
               //   height: 20,

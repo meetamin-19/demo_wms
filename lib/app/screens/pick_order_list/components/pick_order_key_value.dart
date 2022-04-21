@@ -27,7 +27,7 @@ class PickOrderKeyValue extends StatelessWidget {
               color: Colors.grey.withOpacity(0.1),
               borderRadius: BorderRadius.circular(5.0),
               border: Border.all(color: Colors.black.withOpacity(0.25))),
-          child: Text('${value ?? ''}'),
+          child: Text(value ?? ''),
         ),
       ],
     );

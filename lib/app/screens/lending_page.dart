@@ -20,6 +20,7 @@ class LendingPage extends BaseStateLess{
 
     final size = MediaQuery.of(context).size;
 
+
     // if(size.width / 1440 > 0.65){
     //   kFontRatio = size.width / 1440;//375 will de designer's width
     // }else{

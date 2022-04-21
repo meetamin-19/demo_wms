@@ -21,12 +21,12 @@ String kPickOrderHomeRoute = '/PickItemScreen';
 String kPickOrderListRoute = '/PickOrderListScreen';
 String kPalletViewScreenRoute = '/PalletViewScreen';
 String kPalletScreenEditRoute = '/PalletScreenEdit';
-String KVerifyShippingHomeScreen = '/ShippingVerificationScreen';
-String KVerifyEditRoute = '/VerifyScreen';
+String kVerifyShippingHomeScreen = '/ShippingVerificationScreen';
+String kVerifyEditRoute = '/VerifyScreen';
 String kInventoryAudit = '/InventoryAudit';
 String kCamera = '/Camera';
 
-final kImagePath = 'assets/images/';
+const kImagePath = 'assets/images/';
 
 final Image kImgAppIconSmall = Image.asset(kImagePath + 'app-icon-small.png',fit: BoxFit.contain);
 final Image kImgAppIconBig = Image.asset(kImagePath + 'app-icon-big.png',fit: BoxFit.contain);
@@ -53,9 +53,7 @@ final Image kImgPopupViewIconWhite = Image.asset(kImagePath + 'view-popup-icon.p
 
 final Image kShippingEditIcon = Image.asset(kImagePath + 'edit-shiping-verificaiton-icon.png',fit: BoxFit.contain);
 final Image kShippingInvoiceIcon = Image.asset(kImagePath + 'invoice-shiping-verificaiton-icon.png',fit: BoxFit.contain,color: Colors.white,);
-
-
-
+final Image kCommonAppBarScanImage = Image.asset(kImagePath + 'scan-image.png');
 final Image kImgAddIcon = Image.asset(kImagePath + 'add-icon.png',fit: BoxFit.contain);
 
 double kFontRatio = 1.0;

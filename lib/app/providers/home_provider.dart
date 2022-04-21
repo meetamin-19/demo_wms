@@ -24,8 +24,7 @@ class HomeProvider extends BaseNotifier {
 
   ApiResponse<ResPickorderLinkUserList>? _assignedToUserList;
 
-  ApiResponse<ResPickorderLinkUserList>? get assignedToUserList =>
-      _assignedToUserList;
+  ApiResponse<ResPickorderLinkUserList>? get assignedToUserList => _assignedToUserList;
 
   ApiResponse<EmptyRes>? _linkUser;
 
@@ -34,6 +33,8 @@ class HomeProvider extends BaseNotifier {
   ApiResponse<EmptyRes>? _unLinkUser;
 
   ApiResponse<EmptyRes>? get unLinkUser => _unLinkUser;
+
+  List<ResPickOrderListGetData>? filteredPickOrderList;
 
   final ServiceProviderImpl service;
 
@@ -51,6 +52,7 @@ class HomeProvider extends BaseNotifier {
 
   Future getPickerList(
       {Company? company,
+      Company? warehouse,
       Company? customer,
       Company? cusLoc,
       DateTime? startDate,
@@ -62,6 +64,7 @@ class HomeProvider extends BaseNotifier {
 
       final res = await repo.getPickOrderList(
           req: ReqPickOrderListGet(
+              warehouseId: warehouse?.value ?? '0',
               companyId: company?.value ?? '0',
               customerId: customer?.value ?? '0',
               customerLocationId: cusLoc?.value ?? '0',
@@ -79,6 +82,30 @@ class HomeProvider extends BaseNotifier {
       print(e);
       apiResIsFailed(_pickOrderList!, e);
       rethrow;
+    }
+  }
+
+  searchFromPickOrderList({required String str}) {
+    final searchString = str.toLowerCase();
+
+    if (searchString.replaceAll(' ', '').isEmpty) {
+      filteredPickOrderList = _pickOrderList?.data?.data;
+      notifyListeners();
+    } else {
+      filteredPickOrderList = _pickOrderList?.data?.data?.where((element) {
+        final doesContains = (element.salesOrderId ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.companyName ?? '').toLowerCase().contains(searchString) ||
+            (element.customerLocation ?? '').toLowerCase().contains(searchString) ||
+            (element.customerName ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.warehouseName ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.carrierName ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.shipperName ?? '').toLowerCase().contains(searchString) ||
+            (element.statusTerm ?? '').toLowerCase().contains(searchString) ||
+            (element.createdDate ?? '').toLowerCase().contains(searchString) ||
+            (element.shippingDate ?? '').toLowerCase().contains(searchString);
+        return doesContains;
+      }).toList();
+      notifyListeners();
     }
   }
 
@@ -118,15 +145,12 @@ class HomeProvider extends BaseNotifier {
     }
   }
 
-  Future pickorderInsertUpdateLinkPickOrder(
-      {ResPickOrderListGetData? data, required String assignToId}) async {
+  Future pickorderInsertUpdateLinkPickOrder({ResPickOrderListGetData? data, required String assignToId}) async {
     try {
       apiResIsLoading(_linkUser!);
 
       final res = await repo.pickorderInsertUpdateLinkPickOrder(
-          pickOrderID: data?.pickOrderId ?? 0,
-          pickOrderLinkedTo: assignToId,
-          updatelog: data?.updatelog ?? '');
+          pickOrderID: data?.pickOrderId ?? 0, pickOrderLinkedTo: assignToId, updatelog: data?.updatelog ?? '');
 
       if (res.success == true) {
         apiResIsSuccess<EmptyRes>(_linkUser!, res);
@@ -142,14 +166,12 @@ class HomeProvider extends BaseNotifier {
     }
   }
 
-  Future pickorderInsertUpdateUnlinkPickOrder(
-      {ResPickOrderListGetData? data}) async {
+  Future pickorderInsertUpdateUnlinkPickOrder({ResPickOrderListGetData? data}) async {
     try {
       apiResIsLoading(_unLinkUser!);
 
       final res = await repo.pickorderInsertUpdateUnlinkPickOrder(
-          pickOrderID: data?.pickOrderId ?? 0,
-          updatelog: data?.updatelog ?? "");
+          pickOrderID: data?.pickOrderId ?? 0, updatelog: data?.updatelog ?? "");
 
       if (res.success == true) {
         apiResIsSuccess<EmptyRes>(_unLinkUser!, res);

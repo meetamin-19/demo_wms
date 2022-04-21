@@ -1,3 +1,4 @@
+import 'package:demo_win_wms/app/screens/base_components/common_data_showing_component.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
 import 'package:demo_win_wms/app/providers/pallet_provider.dart';
@@ -8,9 +9,10 @@ import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/utils/enums.dart';
 import 'package:demo_win_wms/app/utils/responsive.dart';
-import 'package:demo_win_wms/app/views/base_button.dart';
 import 'package:demo_win_wms/app/views/loading_small.dart';
 import 'package:demo_win_wms/app/views/no_data_found.dart';
+
+import '../../views/colored_bg_text.dart';
 
 class PalletScreenEdit extends StatelessWidget {
   const PalletScreenEdit({Key? key}) : super(key: key);
@@ -18,7 +20,7 @@ class PalletScreenEdit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(),
+      appBar: CommonAppBar(hasLeading: true,isTitleSearch: true,),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -42,7 +44,7 @@ class PalletScreenEdit extends StatelessWidget {
                             decoration: BoxDecoration(
                                 color: Colors.redAccent,
                                 borderRadius: BorderRadius.circular(2)),
-                            child: Text(
+                            child: const Text(
                               'Complete Pick Order',
                               style: TextStyle(
                                   color: Colors.white,
@@ -58,7 +60,7 @@ class PalletScreenEdit extends StatelessWidget {
                             decoration: BoxDecoration(
                                 color: Color(0xFF11BCCB),
                                 borderRadius: BorderRadius.circular(2)),
-                            child: Text(
+                            child: const Text(
                               'Complete part',
                               style: TextStyle(
                                   color: Colors.white,
@@ -83,7 +85,7 @@ class PalletScreenEdit extends StatelessWidget {
                           borderRadius: BorderRadius.circular(2)),
                       child: Row(
                         children: [
-                          Expanded(
+                         const Expanded(
                               child: Text(
                                 'Add Pallet',
                                 style: TextStyle(
@@ -117,7 +119,7 @@ class PalletScreenEdit extends StatelessWidget {
 
     final pickOrder = pallet.lineItemRes?.data?.data?.pickOrder;
 
-    return Text('Part Status: ${pickOrder?.statusTerm ?? ''}',style: TextStyle(
+    return Text('Part Status: ${pickOrder?.statusTerm ?? ''}',style: const TextStyle(
                     fontWeight: FontWeight.bold
                   ),);
   }
@@ -224,19 +226,19 @@ class PalletScreenEdit extends StatelessWidget {
         return Wrap(
           runSpacing: 10,
           children: [
-            PickOrderKeyValue(width: width,title: 'Order No',value: '${pickOrder.soNumber ?? '-'}'),
+            CommonDataViewComponent(width: width,title: 'Order No',value: '${pickOrder.soNumber ?? '-'}'),
             SizedBox(width: 10),
-            PickOrderKeyValue(width: width,title: 'Box Qty',value: '${pickOrderSoDetails.boxQty ?? '-'}'),
+            CommonDataViewComponent(width: width,title: 'Box Qty',value: '${pickOrderSoDetails.boxQty ?? '-'}'),
             if(isTab)
               SizedBox(width: 10),
-            PickOrderKeyValue(width: width,title: 'Part Number',value: '${pickOrderSoDetails.itemName ?? '-'}'),
+            CommonDataViewComponent(width: width,title: 'Part Number',value: '${pickOrderSoDetails.itemName ?? '-'}'),
             SizedBox(width: 10),
-            PickOrderKeyValue(width: width,title: 'Requested Qty',value: '${pickOrderSoDetails.requestedQty ?? '-'}'),
+            CommonDataViewComponent(width: width,title: 'Requested Qty',value: '${pickOrderSoDetails.requestedQty ?? '-'}'),
             if(isTab)
               SizedBox(width: 10),
-            PickOrderKeyValue(width: width,title: 'PO Number',value: '${pickOrderSoDetails.poNumber ?? '-'}'),
+            CommonDataViewComponent(width: width,title: 'PO Number',value: '${pickOrderSoDetails.poNumber ?? '-'}'),
             SizedBox(width: 10),
-            PickOrderKeyValue(width: width,title: 'UOM',value: '${pickOrderSoDetails.uom ?? '-'}'),
+            CommonDataViewComponent(width: width,title: 'UOM',value: '${pickOrderSoDetails.uom ?? '-'}'),
           ],
         );
       },);
@@ -347,7 +349,28 @@ class PalletScreenEdit extends StatelessWidget {
             return TableRow(
                 children: [
                   value('${data?.itemName ?? '-'}'),
-                  value('${data?.locationName ?? '-'}\n${data?.warehouseName ?? '-'}\n${data?.sectionName ?? '-'}\n${data?.companyName ?? '-'}'),
+                  Wrap(
+                    runSpacing: 5.0,
+                    spacing: 5.0,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                            '${data?.locationName}'),
+                      ),
+                      const SizedBox(width: 5),
+                      ColoredBGText(
+                          text: '${data?.warehouseName}',
+                          color: const Color(0xffFF5555)),
+                      ColoredBGText(
+                          text: '${data?.sectionName}',
+                          color: const Color(0xffB981FF)),
+                      ColoredBGText(
+                          text:
+                          '${data?.companyName}',
+                          color: const Color(0xffB981FF)),
+                    ],
+                  ),
                   value('${data?.locationType ?? '-'}'),
                   value('${data?.monthName ?? '-'}'),
                   value('${data?.fullYear ?? '-'}'),
@@ -366,8 +389,8 @@ class PalletScreenEdit extends StatelessWidget {
             color: kDarkFontColor,
           ),
           padding: EdgeInsets.all(10),
-          child: Text(
-            'Item Stock',
+          child: const Text(
+            'Suggested Loaction',
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
           ),

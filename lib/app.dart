@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/screens/inventory_audit/inventory_audit_screen.dart';
-import 'package:demo_win_wms/app/screens/pick_order/picked_line_items.dart';
+import 'package:demo_win_wms/app/screens/pick_order/picked_order_home.dart';
 import 'package:demo_win_wms/app/screens/pallet_screen_edit/pallet_screen_edit.dart';
 import 'package:demo_win_wms/app/screens/pallet_screen_view//pallet_screen.dart';
-import 'package:demo_win_wms/app/screens/pick_order_list/pick_order_list_screen.dart';
+import 'package:demo_win_wms/app/screens/pick_order_list/pick_order_list_view.dart';
 import 'package:demo_win_wms/app/screens/shipping_verification/shipping_verification_screen.dart';
 import 'package:demo_win_wms/app/screens/shipping_verification/shipping_verify_edit_screen.dart';
 import 'app/screens/login/login_screen.dart';
@@ -42,8 +42,8 @@ Widget app(){
       kPickOrderListRoute: (context) => PickOrderListScreen(),
       kPalletViewScreenRoute: (context) => PalletScreenView(),
       kPalletScreenEditRoute: (context) => PalletScreenEdit(),
-      KVerifyShippingHomeScreen: (context) => ShippingVerificationScreen(),
-      KVerifyEditRoute: (context) => ShippingVerifyEditScreen(),
+      kVerifyShippingHomeScreen: (context) => ShippingVerificationScreen(),
+      kVerifyEditRoute: (context) => ShippingVerifyEditScreen(),
       kInventoryAudit : (context) => InventoryAuditScreen(),
       kCamera : (context) => CameraScreen(),
     },

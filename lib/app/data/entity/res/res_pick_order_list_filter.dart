@@ -29,6 +29,7 @@ class Data {
     this.customer,
     this.customerLocation,
     this.status,
+    this.warehouse,
     this.shipVia,
   });
 
@@ -37,10 +38,12 @@ class Data {
   List<Company>? customerLocation;
   List<Company>? status;
   List<Company>? shipVia;
+  List<Company>? warehouse;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     company: json["company"] == null ? null : List<Company>.from(json["company"].map((x) => Company.fromJson(x))),
     customer: json["customer"] == null ? null : List<Company>.from(json["customer"].map((x) => Company.fromJson(x))),
+    warehouse: json["warehouselist"] == null ? null : List<Company>.from(json["warehouselist"].map((x) => Company.fromJson(x))),
     customerLocation: json["customerLocation"] == null ? null : List<Company>.from(json["customerLocation"].map((x) => Company.fromJson(x))),
     status: json["status"] == null ? null : List<Company>.from(json["status"].map((x) => Company.fromJson(x))),
     shipVia: json["shipVia"] == null ? null : List<Company>.from(json["shipVia"].map((x) => Company.fromJson(x))),

@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       .pushNamed(kPickOrderHomeRoute);
                                 } else if (index == 2) {
                                   Navigator.of(context)
-                                      .pushNamed(KVerifyShippingHomeScreen);
+                                      .pushNamed(kVerifyShippingHomeScreen);
                                 } else if (index == 6) {
                                   Navigator.of(context)
                                       .pushNamed(kInventoryAudit);
