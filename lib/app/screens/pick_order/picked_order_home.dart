@@ -1,4 +1,5 @@
 import 'package:demo_win_wms/app/screens/base_components/sidemenu_column.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/data_service/web_service.dart';
 import 'package:demo_win_wms/app/data/entity/Res/res_pick_order_list_filter.dart';
@@ -86,6 +87,8 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
   bool isScreenLoading = false;
 
+  String? dropdownValue;
+
   fetchPickList() async {
     try {
       final home = context.read<HomeProvider>();
@@ -95,7 +98,9 @@ class _PickedLineItemState extends State<PickedLineItem> {
           customer: selectedCustomer,
           warehouse: selectedWarehouse,
           shipVia: selectedShipVia,
-          status: selectedStatus,
+          status: dropdownValue == "Complete / Closed"
+              ? dropdownValue = "Completed / Short, Completed / Over, Completed / Exact, Pick Order Completed"
+              : dropdownValue,
           startDate: selectedStartDate,
           endDate: selectedEndDate);
       filterData(context, searchText!);
@@ -183,6 +188,44 @@ class _PickedLineItemState extends State<PickedLineItem> {
         isScreenLoading = false;
       });
     } catch (e) {
+      setState(() {
+        isScreenLoading = false;
+      });
+    }
+  }
+
+
+  deletePickOrder({required ResPickOrderListGetData data}) async {
+    setState(() {
+      isScreenLoading = true;
+    });
+
+    try {
+      final home = context.read<HomeProvider>();
+      await home.deletePickOrder(data: data);
+
+      setState(() {
+        isScreenLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isScreenLoading = false;
+      });
+    }
+  }
+  getPickOrderNoteText({required ResPickOrderListGetData data}) async {
+    setState(() {
+      isScreenLoading = true;
+    });
+
+    try{
+      final home = context.read<HomeProvider>();
+      await home.getPickOrderNoteText( pickOrderId : data.pickOrderId);
+      setState(() {
+        isScreenLoading = false;
+      });
+    }
+    catch (e) {
       setState(() {
         isScreenLoading = false;
       });
@@ -292,7 +335,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: home.filteredPickOrderList?.length ?? 0,
       // itemCount: home.pickOrderList?.data?.data?.length ?? 0,
       itemBuilder: (context, index) {
@@ -327,13 +370,21 @@ class _PickedLineItemState extends State<PickedLineItem> {
           deleteOrder: () {
             CustomPopup(context, title: 'Delete', message: 'Are you sure you want to delete ?', primaryBtnTxt: 'Yes',
                 primaryAction: () {
-              if (home.pickOrderList?.data?.data?[index] != null) {}
+              if (home.pickOrderList?.data?.data?[index] != null) {
+                deletePickOrder(data: home.pickOrderList!.data!.data![index]);
+              }
             }, secondaryBtnTxt: 'Close');
           },
-          addNote: () {
+          addNote: () async {
+            if(home.pickOrderList?.data?.data?[index] != null) {
+             await getPickOrderNoteText(data: home.pickOrderList!.data!.data![index]);
+            }
+            print("is the object null : ${home.pickOrderList?.data?.data?[index]}");
+            print(home.getPickOrderNote?.data?.data?.pickOrder?.pickOrderNote);
             CustomPopupWithTextField(context,
+                text: home.getPickOrderNote?.data?.data?.pickOrder?.pickOrderNote ?? '',
                 title: 'Pick Order Note',
-                message: 'Pick Order Note',
+                message: 'View or Edit Pick Order Note',
                 primaryBtnTxt: 'Save',
                 hint: 'Enter Pick Order Note',
                 secondaryBtnTxt: 'Close');
@@ -384,7 +435,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
     if (isLoading) {
       return Container(
-          margin: EdgeInsets.symmetric(vertical: 20),
+          margin: const EdgeInsets.symmetric(vertical: 20),
           height: 50,
           color: Colors.white,
           child: Center(child: LoadingSmall()));
@@ -424,7 +475,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
                     selectedCustomer = company;
                   },
                   icon: kImgCustomerIcon),
-            if(service.pickOrderFilters?.data?.data?.warehouse != null)
+            if (service.pickOrderFilters?.data?.data?.warehouse != null)
               PickUpFilterDropDown(
                   data: service.pickOrderFilters!.data!.data!.warehouse!,
                   selectedValue: selectedWarehouse,
@@ -467,15 +518,19 @@ class _PickedLineItemState extends State<PickedLineItem> {
                     selectedShipVia = company;
                   },
                   icon: kImgDateIcon),
-            if (service.pickOrderFilters?.data?.data?.status != null)
-              PickUpFilterDropDown(
-                  data: service.pickOrderFilters!.data!.data!.status!,
-                  selectedValue: selectedStatus,
-                  hint: 'Status',
-                  onChange: (company) {
-                    selectedStatus = company;
-                  },
-                  icon: kImgStatusIcon),
+
+            dropdownForStatus(),
+
+            //
+            // if (service.pickOrderFilters?.data?.data?.status != null)
+            //   PickUpFilterDropDown(
+            //       data: service.pickOrderFilters!.data!.data!.status!,
+            //       selectedValue: selectedStatus,
+            //       hint: 'Status',
+            //       onChange: (company) {
+            //         selectedStatus = company;
+            //       },
+            //       icon: kImgStatusIcon),
             Container(
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.black.withOpacity(0.1)),
@@ -516,6 +571,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
               text: 'Clear',
               onTap: () {
                 setState(() {
+                  dropdownValue = null;
                   selectedCompany = null;
                   selectedCustomer = null;
                   selectedCustomerLocation = null;
@@ -530,6 +586,61 @@ class _PickedLineItemState extends State<PickedLineItem> {
           ],
         )
       ],
+    );
+  }
+
+  Container dropdownForStatus() {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.black.withOpacity(0.1)),
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          color: Colors.white),
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.only(top: 1, bottom: 1, left: 10, right: 10),
+      height: 44,
+      width: kFlexibleSize(290),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(child: kImgStatusIcon, height: kFlexibleSize(20), width: kFlexibleSize(20)),
+          const SizedBox(
+            width: 5,
+          ),
+          Expanded(
+            child: DropdownButton<String>(
+                hint: const Text("Status"),
+                isExpanded: true,
+                value: dropdownValue,
+                elevation: 16,
+                iconSize: 30,
+                underline: const SizedBox(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    if (dropdownValue != newValue) {
+                      dropdownValue = newValue!;
+                      if (kDebugMode) {
+                        print(newValue);
+                      }
+                      // fetchList();
+                    }
+                  });
+                },
+                items: <String>[
+                  'Pick Order Issued',
+                  'Pick Order Acknowledged',
+                  'Pick In Progress',
+                  'Completed / Closed',
+                  'Dispatched'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList()),
+          ),
+        ],
+      ),
     );
   }
 

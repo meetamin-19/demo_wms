@@ -31,7 +31,7 @@ class ServiceProviderImpl extends BaseNotifier implements ServiceProvider{
   List<Company>? get companyFilter => _pickOrderFilters?.data?.data?.company;
   List<Company>? get customerFilter => _pickOrderFilters?.data?.data?.customer;
   List<Company>? get customerLocationFilter => _pickOrderFilters?.data?.data?.customerLocation;
-  List<Company>? get statusFilter => _pickOrderFilters?.data?.data?.status;
+  // List<Company>? get statusFilter => _pickOrderFilters?.data?.data?.status;
   List<Company>? get shipViaFilter => _pickOrderFilters?.data?.data?.shipVia;
 
 

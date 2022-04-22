@@ -4,6 +4,8 @@ import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_list_get.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pickorder_link_user_list.dart';
 
+import '../data/entity/res/res_pick_order_add_note.dart';
+
 class HomeRepository {
   final HomeData dataSource;
 
@@ -29,6 +31,14 @@ class HomeRepository {
 
   Future<EmptyRes> pickorderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog}) async {
     return await dataSource.pickOrderInsertUpdateUnlinkPickOrder(pickOrderID: pickOrderID, updatelog: updatelog);
+  }
+
+  Future<EmptyRes> deletePickOrder({required int pickOrderID, required String updateLog}) async {
+    return dataSource.deletePickOrder(pickOrderID: pickOrderID, updateLog: updateLog);
+  }
+
+  Future<ResPickOrderAddNote> getPickOrderNoteText({required int pickOrderID}) async {
+    return dataSource.getPickOrderNoteText(pickOrderID: pickOrderID);
   }
 
 }

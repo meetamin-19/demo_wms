@@ -3,6 +3,8 @@ import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_vie
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/user_prefs.dart';
 
+import '../entity/res/empty_res.dart';
+
 abstract class PickOrderData{
   Future<ResGetPickOrderDataForView> getPickOrderDataForView({required int pickOrderID, required int salesOrderID});
 }
@@ -24,5 +26,4 @@ class PickOrderDataImpl extends PickOrderData{
       throw kErrorWithRes;
     }
   }
-
 }

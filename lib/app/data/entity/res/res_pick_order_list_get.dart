@@ -117,8 +117,8 @@ class ResPickOrderListGetData {
   bool? isAbleToPickOrNot;
   DateTime? pickOrderCompletedOn;
   String? shipperName;
-  dynamic pickedByUserName;
-  dynamic pickOrderNote;
+  String? pickedByUserName;
+  String? pickOrderNote;
   bool? isInvoiceIsCreatedOrNot;
 
   factory ResPickOrderListGetData.fromJson(Map<String, dynamic> json) => ResPickOrderListGetData(
@@ -165,8 +165,8 @@ class ResPickOrderListGetData {
     isAbleToPickOrNot: json["isAbleToPickOrNot"] == null ? null : json["isAbleToPickOrNot"],
     pickOrderCompletedOn: json["pickOrderCompletedOn"] == null ? null : DateTime.parse(json["pickOrderCompletedOn"]),
     shipperName: json["shipperName"] == null ? null : json["shipperName"],
-    pickedByUserName: json["pickedByUserName"],
-    pickOrderNote: json["pickOrderNote"],
+    pickedByUserName: json["pickedByUserName"] == null ? null : json["pickedByUserName"],
+    pickOrderNote: json["pickOrderNote"] == null ? null : json["pickOrderNote"],
     isInvoiceIsCreatedOrNot: json["isInvoiceIsCreatedOrNot"] == null ? null : json["isInvoiceIsCreatedOrNot"],
   );
 }

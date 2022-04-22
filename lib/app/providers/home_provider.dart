@@ -1,13 +1,12 @@
 import 'package:demo_win_wms/app/data/entity/Res/res_pick_order_list_filter.dart';
-import 'package:demo_win_wms/app/data/entity/home_entity.dart';
 import 'package:demo_win_wms/app/data/entity/req/req_pick_order_list_get.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_pick_order_add_note.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_list_get.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pickorder_link_user_list.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/repository/home_repo.dart';
 import 'package:demo_win_wms/app/utils/api_response.dart';
-import 'package:demo_win_wms/app/utils/enums.dart';
 
 import 'base_notifier.dart';
 
@@ -34,7 +33,17 @@ class HomeProvider extends BaseNotifier {
 
   ApiResponse<EmptyRes>? get unLinkUser => _unLinkUser;
 
+  ApiResponse<EmptyRes>? _deletePickOrder;
+  ApiResponse<EmptyRes>? get deletePickOrderVar => _deletePickOrder;
+
+
+  ApiResponse<ResPickOrderAddNote>? _pickOrderNote;
+  ApiResponse<ResPickOrderAddNote>? get getPickOrderNote => _pickOrderNote;
+
+
+
   List<ResPickOrderListGetData>? filteredPickOrderList;
+
 
   final ServiceProviderImpl service;
 
@@ -44,6 +53,8 @@ class HomeProvider extends BaseNotifier {
     _assignedToUserList = ApiResponse();
     _linkUser = ApiResponse();
     _unLinkUser = ApiResponse();
+    _deletePickOrder = ApiResponse();
+    _pickOrderNote = ApiResponse();
   }
 
   getFilters() {
@@ -58,7 +69,7 @@ class HomeProvider extends BaseNotifier {
       DateTime? startDate,
       DateTime? endDate,
       Company? shipVia,
-      Company? status}) async {
+      String? status}) async {
     try {
       apiResIsLoading(_pickOrderList!);
 
@@ -69,7 +80,7 @@ class HomeProvider extends BaseNotifier {
               customerId: customer?.value ?? '0',
               customerLocationId: cusLoc?.value ?? '0',
               shipperId: shipVia?.value ?? '0',
-              statusTermStr: status?.value ?? '',
+              statusTermStr: status ?? '',
               fromShipDateStr: startDate?.toIso8601String() ?? '',
               toShipDateStr: endDate?.toIso8601String() ?? ''));
 
@@ -79,7 +90,6 @@ class HomeProvider extends BaseNotifier {
         throw res.message ?? "Something Went Wrong";
       }
     } catch (e) {
-      print(e);
       apiResIsFailed(_pickOrderList!, e);
       rethrow;
     }
@@ -143,6 +153,42 @@ class HomeProvider extends BaseNotifier {
       apiResIsFailed(_assignedToUserList!, e);
       rethrow;
     }
+  }
+
+  Future deletePickOrder({ResPickOrderListGetData? data}) async {
+
+    try {
+      apiResIsLoading(_deletePickOrder!);
+
+      final res = await  repo.deletePickOrder(pickOrderID: data?.pickOrderId ?? 0, updateLog: data?.updatelog ?? '');
+
+      if(res.success == true) {
+        apiResIsSuccess<EmptyRes>(_deletePickOrder!, res);
+      } else {
+        throw '${res.message}';
+      }
+    } catch (e) {
+      apiResIsFailed(_deletePickOrder!, e);
+      rethrow;
+    }
+
+  }  Future getPickOrderNoteText({int? pickOrderId}) async {
+
+    try {
+      apiResIsLoading(_pickOrderNote!);
+
+      final res = await  repo.getPickOrderNoteText(pickOrderID: pickOrderId ?? 0);
+
+      if(res.success == true) {
+        apiResIsSuccess<ResPickOrderAddNote>(_pickOrderNote!, res);
+      } else {
+        throw '${res.message}';
+      }
+    } catch (e) {
+      apiResIsFailed(_pickOrderNote!, e);
+      rethrow;
+    }
+
   }
 
   Future pickorderInsertUpdateLinkPickOrder({ResPickOrderListGetData? data, required String assignToId}) async {

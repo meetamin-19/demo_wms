@@ -29,15 +29,13 @@ class PickOrderListView extends StatelessWidget {
   final Function? pick;
   LocalUser? userData;
 
-  getUserData()async{
+  getUserData() async {
     userData = await UserPrefs.shared.getUser;
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-    final isDesktop = Responsive.isDesktop(context);
+    // final isDesktop = Responsive.isDesktop(context);
 
     final isMobile = Responsive.isMobile(context);
 
@@ -59,16 +57,16 @@ class PickOrderListView extends StatelessWidget {
           Expanded(
               child: Wrap(
             children: [
-              listEliment(width: width, title: 'Sales Order No :', value: '${data?.soNumber ?? ''}'),
-              listEliment(width: width, title: 'Company :', value: '${data?.companyName ?? ''}'),
-              listEliment(width: width, title: 'Customer Location :', value: '${data?.customerLocation ?? ''}'),
-              listEliment(width: width, title: 'Ship Date :', value: '${data?.shippingDate ?? ''}', hasDateIcon: true),
-              listEliment(width: width, title: 'Created On :', value: '${data?.createdDate ?? ''}', hasDateIcon: true),
-              listEliment(
+              listElement(width: width, title: 'Sales Order No :', value: '${data?.soNumber ?? ''}'),
+              listElement(width: width, title: 'Company :', value: '${data?.companyName ?? ''}'),
+              listElement(width: width, title: 'Customer Location :', value: '${data?.customerLocation ?? ''}'),
+              listElement(width: width, title: 'Ship Date :', value: '${data?.shippingDate ?? ''}', hasDateIcon: true),
+              listElement(width: width, title: 'Created On :', value: '${data?.createdDate ?? ''}', hasDateIcon: true),
+              listElement(
                   width: width, title: 'Completed On :', value: '${data?.completedOn ?? '-'}', hasDateIcon: true),
-              listEliment(width: width, title: 'Customer :', value: '${data?.customerName ?? ''}'),
-              listEliment(width: width, title: 'Warehouse :', value: '${data?.warehouseName ?? ''}'),
-              listEliment(width: width, title: 'Carrier (Ship Via) :', value: '${data?.shipperName ?? ''}'),
+              listElement(width: width, title: 'Customer :', value: '${data?.customerName ?? ''}'),
+              listElement(width: width, title: 'Warehouse :', value: '${data?.warehouseName ?? ''}'),
+              listElement(width: width, title: 'Carrier (Ship Via) :', value: '${data?.shipperName ?? ''}'),
               pickOrderButton(context)
             ],
           )),
@@ -83,8 +81,6 @@ class PickOrderListView extends StatelessWidget {
     // bool? isLinkBtn;
     getUserData();
     PopupMenuItem? linkUnlinkBtn() {
-
-
       if (data?.statusTerm != "" && data?.statusTerm!.toUpperCase() == "PICK ORDER ACKNOWLEDGED") {
         if (data?.isPickOrderLinkedOrNot == true &&
             (data?.isAbleToPickOrNot == true ||
@@ -118,7 +114,6 @@ class PickOrderListView extends StatelessWidget {
     }
 
     PopupMenuItem? pickBtn() {
-
       if (isPickInProgress) {
         if (data?.isPoAlreadyLinkOrNot == true) {
           if (data?.isPickOrderLinkedOrNot == true) {
@@ -126,11 +121,25 @@ class PickOrderListView extends StatelessWidget {
               return menuBox(value: 'pick', text: 'Pick', icon: kImgPopupPick);
             }
           } else {
-            return menuBox(value: 'pick', text: 'Pick', icon: kImgPopupPick);
+            if ((data?.isPickOrderAcknowledegerOrNot == true || userData?.userType_Term == "Super Admin") &&
+                data?.isAbleToAcknowledge == true) {
+              return menuBox(value: 'pickOrder link', text: 'Pick Order Lin', icon: kImgPopupPick);
+            }
           }
         }
       }
+      return null;
     }
+
+    PopupMenuItem? pickOrderAcknowledge() {
+      if ((data?.statusTerm != '') &&
+          data?.statusTerm?.toUpperCase() == "PICK ORDER ISSUED" &&
+          data?.isAbleToAcknowledge == true) {
+        return menuBox(value: "pickOrderAcknowledge", text: "Pick Order Acknowledge", icon: kImgPopupPick);
+      }
+      return null;
+    }
+
 
     return PopupMenuButton(
         padding: EdgeInsets.zero,
@@ -187,37 +196,92 @@ class PickOrderListView extends StatelessWidget {
 
               if (pickBtn() != null) pickBtn()!,
 
+              if (pickOrderAcknowledge() != null) pickOrderAcknowledge()!,
+
+              // if()
+
+              if (pickBtn() != null) pickBtn()!,
+
               if (data?.isPickOrderIsPickedOrNot == false)
                 menuBox(value: 'delete', text: 'Delete', icon: kImgPopupDelete),
-              // if (data?.statusTerm != "" && data?.statusTerm!.toUpperCase() == "PICK ORDER ACKNOWLEDGED")
-              //   {
-              //     // getUserData();
-              //     if (data?.isPickOrderLinkedOrNot == true &&
-              //         (data?.isAbleToPickOrNot == true ||
-              //             userData?.userType_Term == "Super Admin" ||
-              //             data?.isPickOrderAcknowledegerOrNot == true))
-              //       {linkUnlinkBtn()}.first!
-              //     else
-              //       {
-              //         if ((data?.isPickOrderAcknowledegerOrNot == true || userData?.userType_Term == "Super Admin") &&
-              //             data?.isAbleToAcknowledge == true)
-              //           {linkUnlinkBtn()}.first!
-              //       }.first
-              //   }.first
-              // else
-              //   {
-              //     if (data?.isPickOrderLinkedOrNot == true &&
-              //         (data?.isAbleToPickOrNot == true ||
-              //             userData?.userType_Term == "Super Admin" ||
-              //             data?.isPickOrderAcknowledegerOrNot == true) &&
-              //         data?.isAbleToAcknowledge == true)
-              //       {linkUnlinkBtn()}.first!
-              //   }.first,
             ]);
   }
 
   Column pickOrderButton(BuildContext context) {
-    final isPicked = (data?.statusTerm == 'Pick Order Issued');
+
+    Widget clickableStatusTerm() {
+      return InkWell(
+          onTap: () {
+            CustomPopup(context,
+                title: 'Change Pick Order Status',
+                message: 'Are you sure you want to change status of Pick Order Issued to Pick In Progress?',
+                primaryBtnTxt: 'Yes',
+                secondaryBtnTxt: 'Close', primaryAction: () {
+              changeStatus();
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(20)),
+            child: Text(
+              '${data?.statusTerm} (${data?.pickedByUserName ?? ''}) ',
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: kFlexibleSize(14),
+                  color: Colors.white,
+                  decoration: null),
+            ),
+          ));
+    }
+
+    Widget pickedStatusContainer() {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(20)),
+        child: Text(
+          '${data?.statusTerm} (${data?.pickedByUserName ?? ''}) ',
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: kFlexibleSize(14),
+              color: Colors.blue,
+              decoration: null),
+        ),
+      );
+    }
+
+    Widget basicStatusText() {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(20)),
+        child: Text(
+          '${data?.statusTerm}',
+          style:
+              TextStyle(fontWeight: FontWeight.w600, fontSize: kFlexibleSize(14), color: Colors.blue, decoration: null),
+        ),
+      );
+    }
+
+    Widget statusText() {
+      if (data?.statusTerm != '' && data?.statusTerm?.toUpperCase() == "PICK ORDER ACKNOWLEDGED") {
+        if (data?.pickedByUserName != '' && data?.isAbleToPickOrNot == true) {
+          return clickableStatusTerm();
+        } else {
+          if (data?.pickedByUserName != '' && data?.pickedByUserName != null) {
+            return pickedStatusContainer();
+          } else {
+           return basicStatusText();
+          }
+        }
+      } else if (data?.statusTerm != '' && data?.statusTerm?.toUpperCase() == "COMPLETED / SHORT" ||
+          data?.statusTerm?.toUpperCase() == "COMPLETED / OVER" ||
+          data?.statusTerm?.toUpperCase() == "COMPLETED / EXACT") {
+        return clickableStatusTerm();
+      } else if (data?.pickedByUserName != '' && data?.pickedByUserName != null) {
+       return pickedStatusContainer();
+      } else {
+        return basicStatusText();
+      }
+    }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -229,32 +293,7 @@ class PickOrderListView extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.w500, fontSize: kFlexibleSize(14)),
         ),
         SizedBox(height: kFlexibleSize(5)),
-        InkWell(
-            onTap: () {
-              if (!isPicked) {
-                return;
-              }
-              CustomPopup(context,
-                  title: 'Change Pick Order Status',
-                  message: 'Are you sure you want to change status of Pick Order Issued to Pick In Progress?',
-                  primaryBtnTxt: 'Yes',
-                  secondaryBtnTxt: 'Close', primaryAction: () {
-                changeStatus();
-              });
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              decoration: BoxDecoration(
-                  color: isPicked ? Colors.transparent : Colors.green, borderRadius: BorderRadius.circular(20)),
-              child: Text(
-                isPicked ? 'Pick Order Issued' : 'Pick In Progress (${data?.pickedByUserName ?? ''})',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: kFlexibleSize(14),
-                    color: isPicked ? Colors.blue : Colors.white,
-                    decoration: isPicked ? TextDecoration.underline : null),
-              ),
-            ))
+        statusText()
       ],
     );
   }
@@ -281,7 +320,7 @@ class PickOrderListView extends StatelessWidget {
     );
   }
 
-  Widget listEliment({required double width, required String title, required String value, bool? hasDateIcon}) {
+  Widget listElement({required double width, required String title, required String value, bool? hasDateIcon}) {
     return Padding(
       padding: EdgeInsets.only(bottom: kFlexibleSize(15), right: kFlexibleSize(15)),
       child: SizedBox(

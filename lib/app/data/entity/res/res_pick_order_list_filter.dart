@@ -28,9 +28,9 @@ class Data {
     this.company,
     this.customer,
     this.customerLocation,
-    this.status,
     this.warehouse,
     this.shipVia,
+    this.status
   });
 
   List<Company>? company;

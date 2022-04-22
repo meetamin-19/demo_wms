@@ -45,7 +45,7 @@ class _PickUpFilterDropDownState extends State<PickUpFilterDropDown> {
             right: kFlexibleSize(10), bottom: kFlexibleSize(10)),
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(5)),
-        padding: EdgeInsets.only(top: 5,bottom: 5,left: 10,right: 10),
+        padding: const EdgeInsets.only(top: 5,bottom: 5,left: 10,right: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -105,9 +105,9 @@ class _PickUpFilterDropDownState extends State<PickUpFilterDropDown> {
     return DropdownButton<Company>(
       value: widget.selectedValue,
       iconSize: 30,
-      style: TextStyle(color: Colors.black),
+      style: const TextStyle(color: Colors.black),
       isExpanded: true,
-      underline: SizedBox(),
+      underline: const SizedBox(),
       items: widget.data.map<DropdownMenuItem<Company>>((Company value) {
         return DropdownMenuItem<Company>(
           value: value,
@@ -115,7 +115,7 @@ class _PickUpFilterDropDownState extends State<PickUpFilterDropDown> {
             value.text ?? '',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
             ),
           ),
@@ -123,7 +123,7 @@ class _PickUpFilterDropDownState extends State<PickUpFilterDropDown> {
       }).toList(),
       hint: Text(
         widget.hint ?? '',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 15,
         ),
       ),

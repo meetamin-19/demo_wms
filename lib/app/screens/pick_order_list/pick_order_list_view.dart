@@ -23,6 +23,10 @@ class PickOrderListScreen extends StatelessWidget {
     context.read<PickOrderProviderImpl>().getPickOrderData();
   }
 
+  // deletePickOrderMethod(BuildContext context,{required int pikOrderID, required String updateLog}) {
+  //   context.read()
+  // }
+
   filterData(BuildContext context, String str) {
     context.read<PickOrderProviderImpl>().searchFromSalesOderList(str: str);
   }

@@ -1,4 +1,5 @@
 
+import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_view.dart';
 import 'package:demo_win_wms/app/providers/base_notifier.dart';
 import 'package:demo_win_wms/app/providers/home_provider.dart';
@@ -15,9 +16,13 @@ class PickOrderProviderImpl extends PickOrderProvider {
 
   final PickOrderRepository repo;
 
+
+
   PickOrderProviderImpl({required this.repo}){
     _getPickOrder = ApiResponse();
+    _deletePickOrder = ApiResponse();
   }
+
 
   int pickOrderID = 0;
   int salesOrderID = 0;
@@ -25,6 +30,9 @@ class PickOrderProviderImpl extends PickOrderProvider {
 
   ApiResponse<ResGetPickOrderDataForView>? _getPickOrder;
   ApiResponse<ResGetPickOrderDataForView>? get getPickOrder => _getPickOrder;
+
+  ApiResponse<EmptyRes>? _deletePickOrder;
+  ApiResponse<EmptyRes>? get deletePickOrderVar => _deletePickOrder;
 
   List<SalesOrderDetailList>? filteredSalesOrderDetailList;
 
@@ -55,7 +63,6 @@ class PickOrderProviderImpl extends PickOrderProvider {
 
 
   Future getPickOrderData() async {
-
     try {
       apiResIsLoading(_getPickOrder!);
 
@@ -71,7 +78,10 @@ class PickOrderProviderImpl extends PickOrderProvider {
       apiResIsFailed(_getPickOrder!, e);
       rethrow;
     }
-
   }
+
+
+
+
 
 }
