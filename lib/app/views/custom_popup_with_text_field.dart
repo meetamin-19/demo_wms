@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 
 class CustomPopupWithTextField {
-
   final String title;
   final String message;
   final String primaryBtnTxt;
@@ -13,6 +12,7 @@ class CustomPopupWithTextField {
   String? text;
   final String? hint;
   TextEditingController? controller;
+
   final FocusNode node = FocusNode();
 
   CustomPopupWithTextField(BuildContext context, {required this.title,required this.message,required this.primaryBtnTxt, this.secondaryBtnTxt, this.primaryAction, this.secondaryAction, this.hint, this.text}){
@@ -76,9 +76,10 @@ class CustomPopupWithTextField {
                     focusNode: node,
                     controller: controller,
 
-                    decoration: InputDecoration(
+                      decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: hint
+
                     ),
                   ),),
 

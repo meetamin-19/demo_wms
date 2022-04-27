@@ -1,6 +1,6 @@
 import 'package:demo_win_wms/app/data/datasource/shipping_verification_data.dart';
 import 'package:demo_win_wms/app/data/entity/req/req_shipping_verification_list.dart';
-import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_checkforopencreditorder.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_primarykey_errormessage.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shopping_verification_edit_screen.dart';
 
@@ -25,7 +25,7 @@ class ShippingVerificationRepository {
         invoiceID: invoiceID, invoiceNo: invoiceNo, pdf: pdf);
   }
 
-  Future<ResCheckForOpenCreditOrder> checkForVerification(
+  Future<ResWithPrimaryKeyAndErrorMessage> checkForVerification(
       {int? salesOrderID}) async {
     return await dataSource.checkForVerification(salesOrderId: salesOrderID);
   }

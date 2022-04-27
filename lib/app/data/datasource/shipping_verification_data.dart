@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:demo_win_wms/app/data/entity/req/req_shipping_verification_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
-import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_checkforopencreditorder.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_primarykey_errormessage.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.dart';
 import 'package:demo_win_wms/providers_list.dart';
 
@@ -19,7 +19,7 @@ abstract class ShippingVerificationData {
 
   Future<ResPath> getPDFPath({String? invoiceNo, int? invoiceID, String? pdf});
 
-  Future<ResCheckForOpenCreditOrder> checkForVerification({int? salesOrderId});
+  Future<ResWithPrimaryKeyAndErrorMessage> checkForVerification({int? salesOrderId});
 
   Future<ResShoppingVerificationEditScreen> getEditScreenData(
       {int? pickOrderID, int? salesOrderId, int? i});
@@ -81,14 +81,14 @@ class ShippingVerificationDataImpl extends ShippingVerificationData {
   }
 
   @override
-  Future<ResCheckForOpenCreditOrder> checkForVerification(
+  Future<ResWithPrimaryKeyAndErrorMessage> checkForVerification(
       {int? salesOrderId}) async {
     final user = await UserPrefs.shared.getUser;
     final res = await WebService.shared.postApiDIO(
         url: kBaseURL + "shippingverification/CheckForOpenCreditOrder",
         data: {"SalesOrderID": salesOrderId, "UserID": user.userID});
     try {
-      return ResCheckForOpenCreditOrder.fromJson(res!);
+      return ResWithPrimaryKeyAndErrorMessage.fromJson(res!);
     } catch (e) {
       throw kErrorWithRes;
     }

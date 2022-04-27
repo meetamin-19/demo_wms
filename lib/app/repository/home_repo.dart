@@ -3,6 +3,7 @@ import 'package:demo_win_wms/app/data/entity/req/req_pick_order_list_get.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_list_get.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pickorder_link_user_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_primarykey_errormessage.dart';
 
 import '../data/entity/res/res_pick_order_add_note.dart';
 
@@ -20,12 +21,12 @@ class HomeRepository {
     return await dataSource.changePickOrderStatus(id: id);
   }
 
-  Future<ResPickorderLinkUserList> pickorderLinkPickOrder(
+  Future<ResPickOrderLinkUserList> getPickOrderLinkUserList(
       {required int id}) async {
-    return await dataSource.pickOrderLinkPickOrder(id: id);
+    return await dataSource.getPickOrderLinkUserList(id: id);
   }
 
-  Future<EmptyRes> pickorderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog}) async {
+  Future<ResWithPrimaryKeyAndErrorMessage> pickorderInsertUpdateLinkPickOrder({required int pickOrderID, required String pickOrderLinkedTo, required String updatelog}) async {
     return await dataSource.pickOrderInsertUpdateLinkPickOrder(pickOrderID: pickOrderID, pickOrderLinkedTo: pickOrderLinkedTo, updatelog: updatelog);
   }
 
@@ -39,6 +40,13 @@ class HomeRepository {
 
   Future<ResPickOrderAddNote> getPickOrderNoteText({required int pickOrderID}) async {
     return dataSource.getPickOrderNoteText(pickOrderID: pickOrderID);
+  }
+
+  Future<EmptyRes> savePickOrderNote({required int pickOrderID, required String pickOrderNote, required String updateLog}) async {
+    return dataSource.savePickOrderNote(pickOrderID: pickOrderID, pickOrderNote: pickOrderNote, updateLog:  updateLog);
+  }
+  Future<ResWithPrimaryKeyAndErrorMessage> linkUserToPickOrder({required int pickOrderID, required int id, required String updateLog}) async {
+    return dataSource.linkUserToPickOrder(updateLog:  updateLog,pickOrderId: pickOrderID,pickOrderLinkedToUserID: id);
   }
 
 }

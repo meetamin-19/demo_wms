@@ -17,7 +17,7 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
   List<CameraDescription> _cameras = <CameraDescription>[];
-  int _cameraIndex = 0;
+  int _cameraIndex = 1;
   int _cameraId = -1;
   bool _initialized = false;
   Size? _previewSize;
@@ -47,7 +47,7 @@ class _CameraScreenState extends State<CameraScreen> {
     String cameraInfo;
     List<CameraDescription> cameras = <CameraDescription>[];
 
-    int cameraIndex = 0;
+    int cameraIndex = 1;
     try {
       cameras = await CameraPlatform.instance.availableCameras();
 
@@ -60,6 +60,7 @@ class _CameraScreenState extends State<CameraScreen> {
     } on PlatformException catch (e) {
       cameraInfo = 'Failed to get cameras: ${e.code}: ${e.message}';
     }
+    // _showInSnackBar('Camera index ${cameraIndex}');
 
     if (mounted) {
       setState(() {

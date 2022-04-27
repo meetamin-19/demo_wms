@@ -13,8 +13,8 @@ class NoDataFoundView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          padding: EdgeInsets.only(bottom: 10),
-          child: Text(title ?? 'No Data Found',style: TextStyle(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Text(title ?? 'No Data Found',style: const TextStyle(
               color: Colors.grey,
               fontSize: 15
           ),),

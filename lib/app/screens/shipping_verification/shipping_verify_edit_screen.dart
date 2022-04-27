@@ -1,7 +1,7 @@
 import 'package:demo_win_wms/app/screens/base_components/common_data_showing_component.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+// import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shopping_verification_edit_screen.dart';
 import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
@@ -945,7 +945,10 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(top: 5),
-            child: HtmlWidget(value),
+            child:Text(
+              value,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            )/* HtmlWidget(value)*/,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.black.withOpacity(0.1))),

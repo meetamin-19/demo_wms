@@ -1,6 +1,7 @@
 
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_view.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_pick_order_sales_order_list.dart';
 import 'package:demo_win_wms/app/providers/base_notifier.dart';
 import 'package:demo_win_wms/app/providers/home_provider.dart';
 import 'package:demo_win_wms/app/repository/pick_order_repository.dart';
@@ -21,6 +22,7 @@ class PickOrderProviderImpl extends PickOrderProvider {
   PickOrderProviderImpl({required this.repo}){
     _getPickOrder = ApiResponse();
     _deletePickOrder = ApiResponse();
+    _getSalesOrderList = ApiResponse();
   }
 
 
@@ -31,10 +33,14 @@ class PickOrderProviderImpl extends PickOrderProvider {
   ApiResponse<ResGetPickOrderDataForView>? _getPickOrder;
   ApiResponse<ResGetPickOrderDataForView>? get getPickOrder => _getPickOrder;
 
+  ApiResponse<ResSalesOrderListGet>? _getSalesOrderList;
+  ApiResponse<ResSalesOrderListGet>? get salesOrderList => _getSalesOrderList;
+
+
   ApiResponse<EmptyRes>? _deletePickOrder;
   ApiResponse<EmptyRes>? get deletePickOrderVar => _deletePickOrder;
 
-  List<SalesOrderDetailList>? filteredSalesOrderDetailList;
+  List<SalesOrderList>? filteredSalesOrderDetailList;
 
 
   searchFromSalesOderList({required String str}){
@@ -42,10 +48,10 @@ class PickOrderProviderImpl extends PickOrderProvider {
     final searchString = str.toLowerCase();
 
     if(searchString.replaceAll(' ', '').isEmpty){
-      filteredSalesOrderDetailList = getPickOrder?.data?.data?.salesOrderDetailList;
+      filteredSalesOrderDetailList = salesOrderList?.data?.data;
       notifyListeners();
     }else{
-      filteredSalesOrderDetailList = getPickOrder?.data?.data?.salesOrderDetailList?.where((element) {
+      filteredSalesOrderDetailList = salesOrderList?.data?.data?.where((element) {
         final doesContains = (element.itemName ?? '').toLowerCase().contains(searchString)
             || (element.poNumber ?? '').toLowerCase().contains(searchString)
             || (element.palletNo ?? '').toLowerCase().contains(searchString)
@@ -53,6 +59,7 @@ class PickOrderProviderImpl extends PickOrderProvider {
             || (element.qty ?? 0).toString().toLowerCase().contains(searchString)
             || (element.actualPicked ?? 0).toString().toLowerCase().contains(searchString)
             || (element.uom ?? '').toLowerCase().contains(searchString)
+            || (element.oldestStockSuggestedLocation ?? '').toLowerCase().contains(searchString)
             || (element.currentPartStatusTerm ?? '').toLowerCase().contains(searchString);
         return doesContains;
       }).toList();
@@ -70,7 +77,6 @@ class PickOrderProviderImpl extends PickOrderProvider {
 
       if(res.success == true) {
         apiResIsSuccess<ResGetPickOrderDataForView>(_getPickOrder!, res);
-        searchFromSalesOderList(str: '');
       } else {
         throw '${res.message}';
       }
@@ -80,8 +86,23 @@ class PickOrderProviderImpl extends PickOrderProvider {
     }
   }
 
+  Future getSalesOrderList() async {
 
 
+      apiResIsLoading(_getSalesOrderList!);
 
+      final res = await repo.getSalesOrderList(pickOrderID: pickOrderID, salesOrderID: salesOrderID);
+
+      if(res.success == true) {
+        apiResIsSuccess<ResSalesOrderListGet>(_getSalesOrderList!, res);
+        searchFromSalesOderList(str: '');
+      } else {
+        throw '${res.message}';
+      }
+
+      // apiResIsFailed(_getSalesOrderList!, e);
+
+
+  }
 
 }

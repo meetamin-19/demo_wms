@@ -1,30 +1,30 @@
+import 'package:demo_win_wms/app/data/entity/res/res_pick_order_sales_order_list.dart';
 import 'package:flutter/material.dart';
-import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_view.dart';
 import 'package:demo_win_wms/app/screens/base_components/action_button.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 
 class PickOrderList extends StatelessWidget {
   const PickOrderList({Key? key, this.list, this.pickItemOnClick, this.viewOnClick,required this.isEditing}) : super(key: key);
 
-  final List<SalesOrderDetailList>? list;
+  final List<SalesOrderList>? list;
   final Function(int)? viewOnClick;
   final Function(int)? pickItemOnClick;
   final bool isEditing;
 
   TableRow get headers => TableRow(children: [
-    TableHeaderView(text: 'Part No'),
-    TableHeaderView(text: 'PO No'),
-    TableHeaderView(text: 'Pallet No'),
-    TableHeaderView(text: 'Available Qty'),
-    TableHeaderView(text: 'Requested Qty'),
-    TableHeaderView(text: 'Actual Picked'),
-    TableHeaderView(text: 'UOM'),
-    TableHeaderView(text: 'Suggested Location'),
-    TableHeaderView(text: 'Status'),
-    TableHeaderView(text: 'Action'),
+    tableHeaderView(text: 'Part No'),
+    tableHeaderView(text: 'PO No'),
+    tableHeaderView(text: 'Pallet No'),
+    tableHeaderView(text: 'Available Qty'),
+    tableHeaderView(text: 'Requested Qty'),
+    tableHeaderView(text: 'Actual Picked'),
+    tableHeaderView(text: 'UOM'),
+    tableHeaderView(text: 'Suggested Location'),
+    tableHeaderView(text: 'Status'),
+    tableHeaderView(text: 'Action'),
   ]);
 
-  Widget listView({List<SalesOrderDetailList>? list,required BuildContext context}) {
+  Widget listView({List<SalesOrderList>? list,required BuildContext context}) {
     if (list == null) {
       return Container();
     }
@@ -32,7 +32,7 @@ class PickOrderList extends StatelessWidget {
     final width = (MediaQuery.of(context).size.width - 77);
 
     return SingleChildScrollView(
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       scrollDirection: Axis.horizontal,
       child: SizedBox(
         width: width < 500 ? 900 : width,
@@ -41,19 +41,38 @@ class PickOrderList extends StatelessWidget {
             if (index == 0) {
               return headers;
             } else {
+
+
+
               final data = list[index - 1];
 
+
+              var actualPickedQty = data.actualPicked;
+              var requestedQty = data.qty ?? 0;
+              var isPartInQaAlertOrNot = data.isPartInQaAlertOrNot == true;
+              var isPartInTote = data.isPartInTote == true;
+              var availableQty = data.availableQty ?? 0 ;
+              var transistQty = data.transistQty ?? 0;
+              var isQtyArrivingBeforeShipDate = data.isQtyArrivingBeforeShipDate == true;
+
+              if(requestedQty > availableQty) {
+                if(isQtyArrivingBeforeShipDate && (availableQty + transistQty) >= requestedQty){
+
+                }
+              }
+
+
               return TableRow(children: [
-                TableCellView(text: '${data.itemId ?? '-'}'),
-                TableCellView(text: data.poNumber ?? '-'),
-                TableCellView(text: '${data.palletNo ?? '-'}'),
-                TableCellView(text: '${data.availableQty ?? '-'}'),
-                TableCellView(text: '${data.qty ?? '-'}'),
-                TableCellView(text: '${data.actualPicked ?? '-'}'),
-                TableCellView(text: data.uom ?? '-'),
-                TableCellView(text: '{data.sfgr a'),
-                TableCellView(text: data.currentPartStatusTerm ?? '-'),
-                TableCellView(
+                tableCellViewWithColor(text: '${data.itemId ?? '-'}', bgColor: Colors.red),
+                tableCellView(text: data.poNumber ?? '-'),
+                tableCellView(text: data.palletNo ?? '-'),
+                tableCellView(text: '${data.availableQty ?? '-'}'),
+                tableCellView(text: '${data.qty ?? '-'}'),
+                tableCellView(text: '${data.actualPicked ?? '-'}'),
+                tableCellView(text: data.uom ?? '-'),
+                tableCellView(text: data.oldestStockSuggestedLocation ?? '-'),
+                tableCellView(text: data.currentPartStatusTerm ?? '-'),
+                tableCellView(
                     child: Wrap(
                       children: [
                         ActionButton(
@@ -61,14 +80,14 @@ class PickOrderList extends StatelessWidget {
                           icon: kImgPopupViewIconWhite,
                           text: 'View',onTap: (){
                           if(viewOnClick != null){
-                            viewOnClick!(data.pickOrderSODetailID ?? 0);
+                            viewOnClick!(data.pickOrderSoDetailId ?? 0);
                           }
                         },),
                         if(isEditing && data.currentPartStatusTerm == 'Part In Progress')
                         ActionButton(
                             onTap: (){
                               if(pickItemOnClick != null){
-                                pickItemOnClick!(data.pickOrderSODetailID ?? 0);
+                                pickItemOnClick!(data.pickOrderSoDetailId ?? 0);
                               }
                             },
                             color: Color(0XffFF5555),
@@ -86,7 +105,7 @@ class PickOrderList extends StatelessWidget {
 
 
 
-  Widget TableHeaderView({required String text}) {
+  Widget tableHeaderView({required String text}) {
     return Padding(
       padding: EdgeInsets.all(kFlexibleSize(2.5)),
       child: ConstrainedBox(
@@ -112,7 +131,7 @@ class PickOrderList extends StatelessWidget {
     );
   }
 
-  Widget TableCellView({Widget? child, String? text}) {
+  Widget tableCellView({Widget? child, String? text}) {
     Widget myChild = Text(
       text ?? '',
       style:
@@ -132,6 +151,33 @@ class PickOrderList extends StatelessWidget {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(2),
               border: Border.all(color: Colors.black.withOpacity(0.25))),
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: Center(
+              child: myChild,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget tableCellViewWithColor({required String text , required Color bgColor , Color? textColor, Color? textBgColor }){
+    Widget myChild = Text(
+      text ?? '',
+      style:
+      TextStyle(fontWeight: FontWeight.w500, fontSize: kFlexibleSize(16),color: textColor ?? Colors.white,backgroundColor: textBgColor ?? Colors.transparent),
+      textAlign: TextAlign.center,
+    );
+    return Padding(
+      padding: const EdgeInsets.all(2.5),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: kFlexibleSize(35)),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2),
+            color: bgColor
+              ),
           child: Padding(
             padding: const EdgeInsets.all(2),
             child: Center(

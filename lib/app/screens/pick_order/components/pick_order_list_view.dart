@@ -123,7 +123,7 @@ class PickOrderListView extends StatelessWidget {
           } else {
             if ((data?.isPickOrderAcknowledegerOrNot == true || userData?.userType_Term == "Super Admin") &&
                 data?.isAbleToAcknowledge == true) {
-              return menuBox(value: 'pickOrder link', text: 'Pick Order Lin', icon: kImgPopupPick);
+              return menuBox(value: 'link', text: 'Pick Order Link', icon: kImgPopupPick);
             }
           }
         }
@@ -149,9 +149,17 @@ class PickOrderListView extends StatelessWidget {
           height: kFlexibleSize(20),
         ),
         onSelected: (value) async {
+          print(value);
+
           if (value == 'view') {
             if (view != null) {
               view!();
+            }
+          }
+
+          if (value == 'pickOrderAcknowledge') {
+            if (linkOrder != null) {
+              linkOrder!();
             }
           }
 
@@ -194,11 +202,7 @@ class PickOrderListView extends StatelessWidget {
 
               if (linkUnlinkBtn() != null) linkUnlinkBtn()!,
 
-              if (pickBtn() != null) pickBtn()!,
-
               if (pickOrderAcknowledge() != null) pickOrderAcknowledge()!,
-
-              // if()
 
               if (pickBtn() != null) pickBtn()!,
 

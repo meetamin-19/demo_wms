@@ -1,7 +1,7 @@
 import 'package:demo_win_wms/app/data/entity/req/req_shipping_verification_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/path_res.dart';
-import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_checkforopencreditorder.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_primarykey_errormessage.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list_filter.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shopping_verification_edit_screen.dart';
@@ -29,8 +29,8 @@ class ShippingVerificationProvider extends BaseNotifier {
   ApiResponse<ResPath>? _getASN_PdfPath;
   ApiResponse<ResPath>? get getASN_PdfPath => _getASN_PdfPath;
 
-  ApiResponse<ResCheckForOpenCreditOrder>? _checkForVerification;
-  ApiResponse<ResCheckForOpenCreditOrder>? get checkForVrf =>
+  ApiResponse<ResWithPrimaryKeyAndErrorMessage>? _checkForVerification;
+  ApiResponse<ResWithPrimaryKeyAndErrorMessage>? get checkForVrf =>
       _checkForVerification;
 
   ApiResponse<ResShoppingVerificationEditScreen>? _editScreen;
@@ -144,7 +144,7 @@ class ShippingVerificationProvider extends BaseNotifier {
     try {
       apiResIsLoading(_checkForVerification!);
       if (res.success == true) {
-        apiResIsSuccess<ResCheckForOpenCreditOrder>(
+        apiResIsSuccess<ResWithPrimaryKeyAndErrorMessage>(
             _checkForVerification!, res);
       }
       else {

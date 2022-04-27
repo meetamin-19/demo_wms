@@ -1,4 +1,7 @@
+import 'package:demo_win_wms/app/data/entity/res/res_pickorder_link_user_list.dart';
 import 'package:demo_win_wms/app/screens/base_components/sidemenu_column.dart';
+import 'package:demo_win_wms/app/screens/pick_order/components/pick_order_link_user_dropdown.dart';
+import 'package:demo_win_wms/app/views/custom_pop_up_with_dropdown.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/data_service/web_service.dart';
@@ -9,7 +12,6 @@ import 'package:demo_win_wms/app/providers/home_provider.dart';
 import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
-import 'package:demo_win_wms/app/screens/base_components/search_selection_screen.dart';
 import 'package:demo_win_wms/app/screens/pick_order/components/pick_order_list_view.dart';
 import 'package:demo_win_wms/app/screens/pick_order/components/pickup_filter_drop_down.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
@@ -42,7 +44,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
     // TODO: implement initState
     super.initState();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
       fetchPickList();
@@ -116,9 +118,9 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
     try {
       final home = context.read<HomeProvider>();
-      await home.pickorderLinkPickOrder(id: data.pickOrderId ?? 0);
+      await home.getPickOrderLinkUserList(id: data.pickOrderId ?? 0);
 
-      gotSearchList(data: data);
+      // gotSearchList(data: data);
 
       setState(() {
         isScreenLoading = false;
@@ -130,36 +132,36 @@ class _PickedLineItemState extends State<PickedLineItem> {
     }
   }
 
-  gotSearchList({ResPickOrderListGetData? data}) {
-    final home = context.read<HomeProvider>();
-
-    final searchList = home.assignedToUserList?.data?.data
-        ?.map((e) => SearchModel(id: int.parse(e.value ?? '0'), title: e.text ?? ''))
-        .toList();
-
-    callSearchList(
-        context: context,
-        searchList: searchList!,
-        selectedObject: (obj) async {
-          try {
-            CustomPopup(context,
-                title: 'Link Pick Order',
-                message: 'Are you sure you want to link pick order for ${obj.title} ?',
-                primaryBtnTxt: 'Yes',
-                primaryAction: () async {
-                  linkOrder(assignToId: obj.id.toString(), data: data);
-                },
-                secondaryBtnTxt: 'Close',
-                secondaryAction: () {
-                  gotSearchList(data: data);
-                });
-          } catch (e) {
-            setState(() {
-              isScreenLoading = false;
-            });
-          }
-        });
-  }
+  // gotSearchList({ResPickOrderListGetData? data}) {
+  //   final home = context.read<HomeProvider>();
+  //
+  //   final searchList = home.assignedToUserList?.data?.data
+  //       ?.map((e) => SearchModel(id: int.parse(e.value ?? '0'), title: e.text ?? ''))
+  //       .toList();
+  //
+  //   callSearchList(
+  //       context: context,
+  //       searchList: searchList!,
+  //       selectedObject: (obj) async {
+  //         try {
+  //           CustomPopup(context,
+  //               title: 'Link Pick Order',
+  //               message: 'Are you sure you want to link pick order for ${obj.title} ?',
+  //               primaryBtnTxt: 'Yes',
+  //               primaryAction: () async {
+  //                 linkOrder(assignToId: obj.id.toString(), data: data);
+  //               },
+  //               secondaryBtnTxt: 'Close',
+  //               secondaryAction: () {
+  //                 gotSearchList(data: data);
+  //               });
+  //         } catch (e) {
+  //           setState(() {
+  //             isScreenLoading = false;
+  //           });
+  //         }
+  //       });
+  // }
 
   Future linkOrder({ResPickOrderListGetData? data, required String assignToId}) async {
     final home = context.read<HomeProvider>();
@@ -170,6 +172,9 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
     await home.pickorderInsertUpdateLinkPickOrder(data: data, assignToId: assignToId);
 
+    if(home.linkUser?.state == Status.COMPLETED){
+      fetchPickList();
+    }
     setState(() {
       isScreenLoading = false;
     });
@@ -184,6 +189,10 @@ class _PickedLineItemState extends State<PickedLineItem> {
       final home = context.read<HomeProvider>();
       await home.pickorderInsertUpdateUnlinkPickOrder(data: data);
 
+      if (home.unLinkUser?.state == Status.COMPLETED) {
+        fetchPickList();
+      }
+
       setState(() {
         isScreenLoading = false;
       });
@@ -193,7 +202,6 @@ class _PickedLineItemState extends State<PickedLineItem> {
       });
     }
   }
-
 
   deletePickOrder({required ResPickOrderListGetData data}) async {
     setState(() {
@@ -213,19 +221,38 @@ class _PickedLineItemState extends State<PickedLineItem> {
       });
     }
   }
+
   getPickOrderNoteText({required ResPickOrderListGetData data}) async {
     setState(() {
       isScreenLoading = true;
     });
 
-    try{
+    try {
       final home = context.read<HomeProvider>();
-      await home.getPickOrderNoteText( pickOrderId : data.pickOrderId);
+      await home.getPickOrderNoteText(pickOrderId: data.pickOrderId);
+      setState(() {
+        isScreenLoading = false;
+      });
+    } catch (e) {
       setState(() {
         isScreenLoading = false;
       });
     }
-    catch (e) {
+  }
+
+  savePickOrderNoteText({required ResPickOrderListGetData data, required String pickOrderNote}) async {
+    setState(() {
+      isScreenLoading = true;
+    });
+
+    try {
+      final home = context.read<HomeProvider>();
+      await home.savePickOrderNote(
+          pickOrderNote: pickOrderNote, updateLog: data.updatelog, pickOrderId: data.pickOrderId);
+      setState(() {
+        isScreenLoading = false;
+      });
+    } catch (e) {
       setState(() {
         isScreenLoading = false;
       });
@@ -362,10 +389,38 @@ class _PickedLineItemState extends State<PickedLineItem> {
               }
             }, secondaryBtnTxt: 'Close');
           },
-          linkOrder: () {
-            if (home.pickOrderList?.data?.data?[index] != null) {
-              getLinkOrderUsers(data: home.pickOrderList!.data!.data![index]);
+          linkOrder: () async {
+            PickOrderLinkUser? selectedUser;
+            await getLinkOrderUsers(data: home.pickOrderList!.data!.data![index]);
+
+            if (kDebugMode) {
+              print(home.assignedToUserList?.data?.data?.userList);
             }
+            CustomPopUpWithDropDown(context,
+                primaryBtnTxt: 'Save',
+                secondaryBtnTxt: 'Cancel',
+                primaryAction: () {
+              if(selectedUser != null) {
+                linkOrder(data: home.pickOrderList!.data!.data![index],assignToId: selectedUser!.value!);
+              }
+              else{
+                print("selected User null");
+              }
+                },
+                title: 'Pick Order Acknowledge',
+                message: 'Acknowledge to',
+                dropdownWidget: home.assignedToUserList?.data?.data?.userList != null
+                    ? PickOrderLinkUserDropDown(
+                        data: home.assignedToUserList!.data!.data!.userList!,
+                        onChange: (user) {
+                          setState(() {
+                            selectedUser = user;
+                            print(selectedUser?.value);
+                          });
+                        },
+                        hint: 'Select User',
+                      )
+                    : const Text("Something went wrong in getting user list"));
           },
           deleteOrder: () {
             CustomPopup(context, title: 'Delete', message: 'Are you sure you want to delete ?', primaryBtnTxt: 'Yes',
@@ -376,18 +431,21 @@ class _PickedLineItemState extends State<PickedLineItem> {
             }, secondaryBtnTxt: 'Close');
           },
           addNote: () async {
-            if(home.pickOrderList?.data?.data?[index] != null) {
-             await getPickOrderNoteText(data: home.pickOrderList!.data!.data![index]);
+            if (home.pickOrderList?.data?.data?[index] != null) {
+              await getPickOrderNoteText(data: home.pickOrderList!.data!.data![index]);
             }
-            print("is the object null : ${home.pickOrderList?.data?.data?[index]}");
-            print(home.getPickOrderNote?.data?.data?.pickOrder?.pickOrderNote);
-            CustomPopupWithTextField(context,
-                text: home.getPickOrderNote?.data?.data?.pickOrder?.pickOrderNote ?? '',
-                title: 'Pick Order Note',
-                message: 'View or Edit Pick Order Note',
-                primaryBtnTxt: 'Save',
-                hint: 'Enter Pick Order Note',
-                secondaryBtnTxt: 'Close');
+
+            if (home.getPickOrderNote?.state == Status.COMPLETED) {
+              CustomPopupWithTextField(context,
+                  text: home.getPickOrderNote?.data?.data?.pickOrder?.pickOrderNote ?? '',
+                  title: 'Pick Order Note',
+                  message: 'View or Edit Pick Order Note',
+                  primaryBtnTxt: 'Save',
+                  hint: 'Enter Pick Order Note',
+                  secondaryBtnTxt: 'Close', primaryAction: (pickOrderNote) {
+                savePickOrderNoteText(data: home.pickOrderList!.data!.data![index], pickOrderNote: pickOrderNote);
+              });
+            }
           },
           pick: () {
             final pickOrder = this.context.read<PickOrderProviderImpl>();
@@ -401,9 +459,10 @@ class _PickedLineItemState extends State<PickedLineItem> {
               pickOrder.salesOrderID = data?.salesOrderId ?? 0;
 
               pickOrder.getPickOrderData();
+              pickOrder.getSalesOrderList();
             }
 
-            Navigator.of(context).pushNamed(kPickOrderListRoute);
+            Navigator.of(context).pushNamed(kPickOrderListRoute,arguments: true);
           },
           view: () {
             final pickOrder = this.context.read<PickOrderProviderImpl>();
@@ -417,9 +476,10 @@ class _PickedLineItemState extends State<PickedLineItem> {
               pickOrder.salesOrderID = data?.salesOrderId ?? 0;
 
               pickOrder.getPickOrderData();
+              pickOrder.getSalesOrderList();
             }
 
-            Navigator.of(context).pushNamed(kPickOrderListRoute);
+            Navigator.of(context).pushNamed(kPickOrderListRoute,arguments: false);
           },
         );
       },

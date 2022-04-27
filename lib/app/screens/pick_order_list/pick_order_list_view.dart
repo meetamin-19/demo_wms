@@ -23,6 +23,10 @@ class PickOrderListScreen extends StatelessWidget {
     context.read<PickOrderProviderImpl>().getPickOrderData();
   }
 
+  getSalesOrderData(BuildContext context) {
+    context.read<PickOrderProviderImpl>().getSalesOrderList();
+  }
+
   // deletePickOrderMethod(BuildContext context,{required int pikOrderID, required String updateLog}) {
   //   context.read()
   // }
@@ -309,11 +313,11 @@ class PickOrderListScreen extends StatelessWidget {
             runSpacing: 15,
             children: [
               CommonDataViewComponent(
-                  width: componentWidth, title: 'Order Date :', value: '${sales.dateOfSoStr ?? '-'}'),
+                  width: componentWidth, title: 'Order Date :', value: sales.dateOfSoStr ?? '-'),
               CommonDataViewComponent(
-                  width: componentWidth, title: 'Customer :', value: '${sales.customerName ?? '-'}'),
+                  width: componentWidth, title: 'Customer :', value: sales.customerName ?? '-'),
               CommonDataViewComponent(
-                  width: componentWidth, title: 'Customer Location :', value: '${sales.customerLocation ?? '-'}'),
+                  width: componentWidth, title: 'Customer Location :', value: sales.customerLocation ?? '-'),
               CommonDataViewComponent(
                   width: componentWidth, title: 'Account :', value: '${sales.accountNumber ?? '-'}'),
               CommonDataViewComponent(width: componentWidth, title: 'Terms :', value: '${sales.soTerm ?? '-'}'),

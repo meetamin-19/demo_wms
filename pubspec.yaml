@@ -40,7 +40,7 @@ dependencies:
   dio: ^4.0.0
   dropdown_search: ^2.0.1
   camera_windows: ^0.1.0
-  flutter_widget_from_html_core: ^0.8.5
+#  flutter_widget_from_html_core: ^0.8.5
   file_picker: ^4.5.1
   pdfx: ^2.0.1+2
   internet_file: ^1.0.0+2

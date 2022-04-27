@@ -1,5 +1,5 @@
-class ResCheckForOpenCreditOrder {
-  ResCheckForOpenCreditOrder({
+class ResWithPrimaryKeyAndErrorMessage {
+  ResWithPrimaryKeyAndErrorMessage({
     this.success,
     this.message,
     this.data,
@@ -13,7 +13,7 @@ class ResCheckForOpenCreditOrder {
   int? statusCode;
   int? statusValueCode;
 
-  factory ResCheckForOpenCreditOrder.fromJson(Map<String, dynamic> json) => ResCheckForOpenCreditOrder(
+  factory ResWithPrimaryKeyAndErrorMessage.fromJson(Map<String, dynamic> json) => ResWithPrimaryKeyAndErrorMessage(
     success: json["success"] == null ? null : json["success"],
     message: json["message"] == null ? null : json["message"],
     data: json["data"] == null ? null : List<Data>.from(json["data"].map((x) => Data.fromJson(x))),

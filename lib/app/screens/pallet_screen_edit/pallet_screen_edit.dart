@@ -4,7 +4,6 @@ import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.
 import 'package:demo_win_wms/app/providers/pallet_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_theme_container.dart';
-import 'package:demo_win_wms/app/screens/pick_order_list/components/pick_order_key_value.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/utils/enums.dart';

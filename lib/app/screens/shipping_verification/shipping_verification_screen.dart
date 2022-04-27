@@ -62,7 +62,7 @@ class _ShippingVerificationScreenState extends State<ShippingVerificationScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
       pageController = PageController();

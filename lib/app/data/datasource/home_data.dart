@@ -7,14 +7,16 @@ import 'package:demo_win_wms/app/data/entity/res/res_pickorder_link_user_list.da
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/user_prefs.dart';
 
+import '../entity/res/res_primarykey_errormessage.dart';
+
 abstract class HomeData {
   Future<ResPickOrderListGet> getPickOrderList({required ReqPickOrderListGet req});
 
   Future<EmptyRes> changePickOrderStatus({required int id});
 
-  Future<ResPickorderLinkUserList> pickOrderLinkPickOrder({required int id});
+  Future<ResPickOrderLinkUserList> getPickOrderLinkUserList({required int id});
 
-  Future<EmptyRes> pickOrderInsertUpdateLinkPickOrder(
+  Future<ResWithPrimaryKeyAndErrorMessage> pickOrderInsertUpdateLinkPickOrder(
       {required int pickOrderID, required String pickOrderLinkedTo, required String updatelog});
 
   Future<EmptyRes> pickOrderInsertUpdateUnlinkPickOrder({required int pickOrderID, required String updatelog});
@@ -27,6 +29,12 @@ abstract class HomeData {
     required int pickOrderID,
     required String pickOrderNote,
     required String updateLog,
+  });
+
+  Future<ResWithPrimaryKeyAndErrorMessage> linkUserToPickOrder({
+    required int pickOrderId,
+    required String updateLog,
+    required int pickOrderLinkedToUserID
   });
 }
 
@@ -59,26 +67,26 @@ class HomeDataImpl implements HomeData {
   }
 
   @override
-  Future<ResPickorderLinkUserList> pickOrderLinkPickOrder({required int id}) async {
+  Future<ResPickOrderLinkUserList> getPickOrderLinkUserList({required int id}) async {
     final user = await UserPrefs.shared.getUser;
 
     final res = await WebService.shared.postApiDIO(
-        url: kBaseURL + 'pickorder/pickorderLinkPickOrder', data: {"PickOrderID": id, "UserID": user.userID});
+        url: kBaseURL + 'pickorder/GetAcknowledgementUserListData', data: {"PickOrderID": id, "UserID": user.userID});
 
     try {
-      return ResPickorderLinkUserList.fromJson(res!);
+      return ResPickOrderLinkUserList.fromJson(res!);
     } catch (e) {
       throw kErrorWithRes;
     }
   }
 
   @override
-  Future<EmptyRes> pickOrderInsertUpdateLinkPickOrder(
+  Future<ResWithPrimaryKeyAndErrorMessage> pickOrderInsertUpdateLinkPickOrder(
       {required int pickOrderID, required String pickOrderLinkedTo, required String updatelog}) async {
     final user = await UserPrefs.shared.getUser;
 
     final res = await WebService.shared.postApiDIO(
-        url: kBaseURL + 'pickorder/pickorderInsertUpdateLinkPickOrder',
+        url: kBaseURL + 'pickorder/SaveAcknowledgwmentPickOrder',
         data: {
           "PickOrderID": pickOrderID,
           "PickOrderLinkedTo": pickOrderLinkedTo,
@@ -87,7 +95,7 @@ class HomeDataImpl implements HomeData {
         });
 
     try {
-      return EmptyRes.fromJson(res!);
+      return ResWithPrimaryKeyAndErrorMessage.fromJson(res!);
     } catch (e) {
       throw kErrorWithRes;
     }
@@ -138,8 +146,47 @@ class HomeDataImpl implements HomeData {
   }
 
   @override
-  Future<EmptyRes> savePickOrderNote({required int pickOrderID, required String pickOrderNote, required String updateLog}) {
-    // TODO: implement savepickOrderNote
-    throw UnimplementedError();
+  Future<EmptyRes> savePickOrderNote(
+      {required int pickOrderID, required String pickOrderNote, required String updateLog}) async {
+    final user = await UserPrefs.shared.getUser;
+
+    final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/SavePickOrderNote', data: {
+      "PickOrderID": pickOrderID,
+      "pickOrderNote": pickOrderNote,
+      "Updatelog": updateLog,
+      "UserID": user.userID
+    });
+
+    try {
+      return EmptyRes.fromJson(res!);
+    } catch (e) {
+      throw kErrorWithRes;
+    }
   }
+
+
+  @override
+  Future<ResWithPrimaryKeyAndErrorMessage> linkUserToPickOrder({
+    required int pickOrderId,
+    required String updateLog,
+    required int pickOrderLinkedToUserID
+  }) async {
+
+    final user = await UserPrefs.shared.getUser;
+
+    final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/SaveAcknowledgwmentPickOrder', data: {
+      "PickOrderID": pickOrderId,
+      "PickOrderLinkedTo": pickOrderLinkedToUserID,
+      "Updatelog": updateLog,
+      "UserID": user.userID
+    });
+
+    try {
+      return ResWithPrimaryKeyAndErrorMessage.fromJson(res!);
+    } catch (e) {
+      throw kErrorWithRes;
+    }
+  }
+
+// Future
 }
