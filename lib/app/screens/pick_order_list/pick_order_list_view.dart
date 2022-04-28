@@ -177,33 +177,34 @@ class PickOrderListScreen extends StatelessWidget {
                           height: 30,
                           decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA))),
                           child: DropdownButton(
-                              iconSize: 12,
-                              underline: const SizedBox(),
-                              value: 10,
-                              elevation: 4,
-                              style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
-                              items: const [
-                                DropdownMenuItem(
-                                  child: Text(
-                                    "100 Rows",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  value: 100,
+                            iconSize: 12,
+                            underline: const SizedBox(),
+                            value: 10,
+                            elevation: 4,
+                            style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+                            items: const [
+                              DropdownMenuItem(
+                                child: Text(
+                                  "100 Rows",
+                                  style: TextStyle(fontSize: 12),
                                 ),
-                                DropdownMenuItem(
-                                  child: Text("50 Rows", style: TextStyle(fontSize: 12)),
-                                  value: 50,
-                                ),
-                                DropdownMenuItem(
-                                  child: Text("25 Rows", style: TextStyle(fontSize: 12)),
-                                  value: 25,
-                                ),
-                                DropdownMenuItem(
-                                  child: Text("10 Rows", style: TextStyle(fontSize: 12)),
-                                  value: 10,
-                                )
-                              ], onChanged: (int? value) {  },
+                                value: 100,
                               ),
+                              DropdownMenuItem(
+                                child: Text("50 Rows", style: TextStyle(fontSize: 12)),
+                                value: 50,
+                              ),
+                              DropdownMenuItem(
+                                child: Text("25 Rows", style: TextStyle(fontSize: 12)),
+                                value: 25,
+                              ),
+                              DropdownMenuItem(
+                                child: Text("10 Rows", style: TextStyle(fontSize: 12)),
+                                value: 10,
+                              )
+                            ],
+                            onChanged: (int? value) {},
+                          ),
                         )
                       ],
                     ),
@@ -312,26 +313,20 @@ class PickOrderListScreen extends StatelessWidget {
             spacing: 20,
             runSpacing: 15,
             children: [
-              CommonDataViewComponent(
-                  width: componentWidth, title: 'Order Date :', value: sales.dateOfSoStr ?? '-'),
-              CommonDataViewComponent(
-                  width: componentWidth, title: 'Customer :', value: sales.customerName ?? '-'),
+              CommonDataViewComponent(width: componentWidth, title: 'Order Date :', value: sales.dateOfSoStr ?? '-'),
+              CommonDataViewComponent(width: componentWidth, title: 'Customer :', value: sales.customerName ?? '-'),
               CommonDataViewComponent(
                   width: componentWidth, title: 'Customer Location :', value: sales.customerLocation ?? '-'),
-              CommonDataViewComponent(
-                  width: componentWidth, title: 'Account :', value: '${sales.accountNumber ?? '-'}'),
-              CommonDataViewComponent(width: componentWidth, title: 'Terms :', value: '${sales.soTerm ?? '-'}'),
-              CommonDataViewComponent(
-                  width: componentWidth, title: 'Ship Date :', value: '${sales.shipDateStr ?? '-'}'),
-              CommonDataViewComponent(width: componentWidth, title: 'Ship Via :', value: '${sales.shipperName ?? '-'}'),
-              CommonDataViewComponent(width: componentWidth, title: 'Carrier :', value: '${sales.carrierName ?? '-'}'),
+              CommonDataViewComponent(width: componentWidth, title: 'Account :', value: sales.accountNumber ?? '-'),
+              CommonDataViewComponent(width: componentWidth, title: 'Terms :', value: sales.soTerm ?? '-'),
+              CommonDataViewComponent(width: componentWidth, title: 'Ship Date :', value: sales.shipDateStr ?? '-'),
+              CommonDataViewComponent(width: componentWidth, title: 'Ship Via :', value: sales.shipperName ?? '-'),
+              CommonDataViewComponent(width: componentWidth, title: 'Carrier :', value: sales.carrierName ?? '-'),
               CommonDataViewComponent(width: componentWidth, title: 'FOB :', value: 'Shipping Point'),
               CommonDataViewComponent(
-                  width: componentWidth, title: 'Proto/PPAP :', value: '${sales.isAttachedProtoPpapStr ?? '-'}'),
+                  width: componentWidth, title: 'Proto/PPAP :', value: sales.isAttachedProtoPpapStr ?? '-'),
               CommonDataViewComponent(
-                  width: componentWidth,
-                  title: 'Additional Quantity :',
-                  value: '${sales.isAllowAdditionalQtyStr ?? '-'}'),
+                  width: componentWidth, title: 'Additional Quantity :', value: sales.isAllowAdditionalQtyStr ?? '-'),
               CommonDataViewComponent(width: componentWidth, title: 'Sales Note :', value: '${sales.soNotes ?? '-'}'),
             ],
           );
