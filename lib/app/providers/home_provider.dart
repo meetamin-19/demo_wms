@@ -15,31 +15,38 @@ class HomeProvider extends BaseNotifier {
   HomeRepository repo;
 
   ApiResponse<ResPickOrderListGet>? _pickOrderList;
+
   ApiResponse<ResPickOrderListGet>? get pickOrderList => _pickOrderList;
 
   ApiResponse<EmptyRes>? _statusChange;
+
   ApiResponse<EmptyRes>? get statusChange => _statusChange;
 
   ApiResponse<ResPickOrderLinkUserList>? _assignedToUserList;
+
   ApiResponse<ResPickOrderLinkUserList>? get assignedToUserList => _assignedToUserList;
 
   ApiResponse<ResWithPrimaryKeyAndErrorMessage>? _linkUser;
+
   ApiResponse<ResWithPrimaryKeyAndErrorMessage>? get linkUser => _linkUser;
 
   ApiResponse<EmptyRes>? _unLinkUser;
+
   ApiResponse<EmptyRes>? get unLinkUser => _unLinkUser;
 
   ApiResponse<EmptyRes>? _deletePickOrder;
+
   ApiResponse<EmptyRes>? get deletePickOrderVar => _deletePickOrder;
 
   ApiResponse<ResPickOrderAddNote>? _pickOrderNote;
+
   ApiResponse<ResPickOrderAddNote>? get getPickOrderNote => _pickOrderNote;
 
   ApiResponse<EmptyRes>? _savePickOrderNote;
+
   ApiResponse<EmptyRes>? get savePickOrderNoteVar => _savePickOrderNote;
 
   // ApiResponse<ResWithPrimaryKeyAndErrorMessage>? _linkUser;
-
 
   List<ResPickOrderListGetData>? filteredPickOrderList;
 
@@ -60,20 +67,25 @@ class HomeProvider extends BaseNotifier {
     service.getPickupFilters();
   }
 
-  Future getPickerList(
-      {Company? company,
-      Company? warehouse,
-      Company? customer,
-      Company? cusLoc,
-      DateTime? startDate,
-      DateTime? endDate,
-      Company? shipVia,
-      String? status}) async {
+  Future getPickerList({
+    Company? company,
+    String? listStartAt,
+    String? numOfResults,
+    Company? warehouse,
+    Company? customer,
+    Company? cusLoc,
+    DateTime? startDate,
+    DateTime? endDate,
+    Company? shipVia,
+    String? status,
+  }) async {
     try {
       apiResIsLoading(_pickOrderList!);
 
       final res = await repo.getPickOrderList(
           req: ReqPickOrderListGet(
+              listStartAt: listStartAt ?? '0',
+              numOfResults: numOfResults ?? '100',
               warehouseId: warehouse?.value ?? '0',
               companyId: company?.value ?? '0',
               customerId: customer?.value ?? '0',
@@ -102,7 +114,7 @@ class HomeProvider extends BaseNotifier {
       notifyListeners();
     } else {
       filteredPickOrderList = _pickOrderList?.data?.data?.where((element) {
-        final doesContains = (element.salesOrderId ?? 0).toString().toLowerCase().contains(searchString) ||
+        final doesContains = (element.soNumber ?? 0).toString().toLowerCase().contains(searchString) ||
             (element.companyName ?? '').toLowerCase().contains(searchString) ||
             (element.customerLocation ?? '').toLowerCase().contains(searchString) ||
             (element.customerName ?? 0).toString().toLowerCase().contains(searchString) ||
@@ -196,17 +208,14 @@ class HomeProvider extends BaseNotifier {
 
       if (res.success == true) {
         apiResIsSuccess<EmptyRes>(_savePickOrderNote!, res);
-      }
-      else {
+      } else {
         throw '${res.message}';
       }
-    }
-    catch (e) {
+    } catch (e) {
       apiResIsFailed(_savePickOrderNote!, e);
       rethrow;
     }
   }
-
 
   Future pickorderInsertUpdateLinkPickOrder({ResPickOrderListGetData? data, required String assignToId}) async {
     try {

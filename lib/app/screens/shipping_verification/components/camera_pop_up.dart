@@ -47,7 +47,8 @@ class _CameraScreenState extends State<CameraScreen> {
     String cameraInfo;
     List<CameraDescription> cameras = <CameraDescription>[];
 
-    int cameraIndex = 1;
+    int cameraIndex = 0;
+
     try {
       cameras = await CameraPlatform.instance.availableCameras();
 
@@ -274,7 +275,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 padding: const EdgeInsets.symmetric(
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   height: MediaQuery.of(context).size.height * .8,
                   width: MediaQuery.of(context).size.width * .8,
                   child: Align(

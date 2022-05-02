@@ -96,19 +96,23 @@ class PickOrder {
   PickOrder({
     this.statusTerm,
     this.soNumber,
+    this.pickOrderID
   });
 
+  int? pickOrderID;
   String? statusTerm;
   String? soNumber;
 
   factory PickOrder.fromJson(Map<String, dynamic> json) => PickOrder(
     statusTerm: json["status_Term"] == null ? null : json["status_Term"],
+    pickOrderID: json["pickOrderID"] == null ? 0 : json["pickOrderID"],
     soNumber: json["soNumber"] == null ? null : json["soNumber"],
   );
 }
 
 class PickOrderSoDetail {
   PickOrderSoDetail({
+    this.pickOrderSODetailID,
     this.poNumber,
     this.uom,
     this.updatelog,
@@ -116,8 +120,11 @@ class PickOrderSoDetail {
     this.boxQty,
     this.requestedQty,
     this.currentPartStatusTerm,
+    this.itemID,
   });
 
+  int? pickOrderSODetailID;
+  int? itemID;
   String? poNumber;
   String? uom;
   String? updatelog;
@@ -129,10 +136,12 @@ class PickOrderSoDetail {
   factory PickOrderSoDetail.fromJson(Map<String, dynamic> json) => PickOrderSoDetail(
     poNumber: json["poNumber"] == null ? null : json["poNumber"],
     uom: json["uom"] == null ? null : json["uom"],
+    pickOrderSODetailID: json["pickOrderSODetailID"] == null ? null : json["pickOrderSODetailID"],
     updatelog: json["updatelog"] == null ? null : json["updatelog"],
+    itemID: json["itemID"] == null ? null : json["itemID"],
     itemName: json["itemName"] == null ? null : json["itemName"],
     boxQty: json["boxQty"] == null ? null : json["boxQty"],
-    requestedQty: json["requestedQty"] == null ? null : json["requestedQty"],
+    requestedQty: json["qty"] == null ? null : json["qty"].toInt(),
     currentPartStatusTerm: json["currentPartStatusTerm"] == null ? null : json["currentPartStatusTerm"],
   );
 }

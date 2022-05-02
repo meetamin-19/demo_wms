@@ -1,4 +1,7 @@
+import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_data_showing_component.dart';
+import 'package:demo_win_wms/app/views/custom_popup_view.dart';
+import 'package:demo_win_wms/providers_list.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
 import 'package:demo_win_wms/app/providers/pallet_provider.dart';
@@ -19,79 +22,75 @@ class PalletScreenEdit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(hasLeading: true,isTitleSearch: true,),
+      appBar: CommonAppBar(
+        hasLeading: true,
+        isTitleSearch: true,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: CommonThemeContainer(
             title: '',
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 header(context),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    partStatus(context),
-                    Row(
-                      children: [
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-                            decoration: BoxDecoration(
-                                color: Colors.redAccent,
-                                borderRadius: BorderRadius.circular(2)),
-                            child: const Text(
-                              'Complete Pick Order',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
-                            ),
+                const SizedBox(height: 15),
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(2)),
+                          child: const Text(
+                            'Complete Pick Order',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
                           ),
                         ),
-                        SizedBox(width: 10),
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-                            decoration: BoxDecoration(
-                                color: Color(0xFF11BCCB),
-                                borderRadius: BorderRadius.circular(2)),
-                            child: const Text(
-                              'Complete part',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
-                            ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          completePart(context);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          decoration:
+                              BoxDecoration(color: const Color(0xFF11BCCB), borderRadius: BorderRadius.circular(2)),
+                          child: const Text(
+                            'Complete part',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 15),
+                partStatus(context),
+                const SizedBox(height: 15),
                 Align(
                   alignment: Alignment.centerRight,
                   child: InkWell(
+                    onTap: () {
+                      addPallet(context);
+                    },
                     child: Container(
                       width: 120,
-                      padding: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-                      decoration: BoxDecoration(
-                          color: Color(0xFF11BCCB),
-                          borderRadius: BorderRadius.circular(2)),
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      decoration: BoxDecoration(color: const Color(0xFF11BCCB), borderRadius: BorderRadius.circular(2)),
                       child: Row(
                         children: [
-                         const Expanded(
+                          const Expanded(
                               child: Text(
-                                'Add Pallet',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 15),
-                              )),
+                            'Add Pallet',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                          )),
                           SizedBox(
                             child: kImgAddIcon,
                             width: 15,
@@ -102,7 +101,7 @@ class PalletScreenEdit extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 15),
                 pallets(context)
               ],
             ),
@@ -112,15 +111,22 @@ class PalletScreenEdit extends StatelessWidget {
     );
   }
 
-  Text partStatus(BuildContext context) {
-
+  Widget partStatus(BuildContext context) {
     final pallet = context.read<PalletProviderImpl>();
 
-    final pickOrder = pallet.lineItemRes?.data?.data?.pickOrder;
+    final pickOrder = pallet.lineItemRes?.data?.data?.pickOrderSoDetail;
 
-    return Text('Part Status: ${pickOrder?.statusTerm ?? ''}',style: const TextStyle(
-                    fontWeight: FontWeight.bold
-                  ),);
+    // final palletVar = pallet.palletsRes?.data?.data?.pickOrderPalletList?.first;
+
+    return Container(
+      padding: const EdgeInsets.only(left: 10),
+      decoration: const BoxDecoration(
+          color: Color(0xffc0edf1), border: Border(left: BorderSide(color: Color(0xff58d0da), width: 3))),
+      child: Text(
+        'Part Status: ${pickOrder?.currentPartStatusTerm ?? ''}',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
   }
 
   Widget header(BuildContext context) {
@@ -134,10 +140,9 @@ class PalletScreenEdit extends StatelessWidget {
                     border: Border.all(color: kBorderColor),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child:lineItem(context)
-              ),
+                  child: lineItem(context)),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Container(
@@ -145,8 +150,7 @@ class PalletScreenEdit extends StatelessWidget {
                     border: Border.all(color: kBorderColor),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child:itemStock(context)
-              ),
+                  child: itemStock(context)),
             ),
           ],
         ),
@@ -162,11 +166,10 @@ class PalletScreenEdit extends StatelessWidget {
                       border: Border.all(color: kBorderColor),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child:lineItem(context)
-                ),
+                    child: lineItem(context)),
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               flex: 2,
               child: ClipRRect(
@@ -176,8 +179,7 @@ class PalletScreenEdit extends StatelessWidget {
                       border: Border.all(color: kBorderColor),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child:itemStock(context)
-                ),
+                    child: itemStock(context)),
               ),
             )
           ],
@@ -205,8 +207,7 @@ class PalletScreenEdit extends StatelessWidget {
       }
 
       final pickOrder = pallet.lineItemRes?.data?.data?.pickOrder;
-      final pickOrderSoDetails =
-          pallet.lineItemRes?.data?.data?.pickOrderSoDetail;
+      final pickOrderSoDetails = pallet.lineItemRes?.data?.data?.pickOrderSoDetail;
 
       if (pickOrder == null || pickOrderSoDetails == null) {
         return NoDataFoundView(
@@ -216,32 +217,31 @@ class PalletScreenEdit extends StatelessWidget {
         );
       }
 
-      return LayoutBuilder(builder: (context, constraints) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final isTab = Responsive.isTablet(context);
 
-        final isTab = Responsive.isTablet(context);
+          final width = (constraints.maxWidth - 50) / (isTab ? 3 : 2);
 
-        final width = (constraints.maxWidth - 30) / (isTab ? 3 : 2);
-
-        return Wrap(
-          runSpacing: 10,
-          children: [
-            CommonDataViewComponent(width: width,title: 'Order No',value: '${pickOrder.soNumber ?? '-'}'),
-            SizedBox(width: 10),
-            CommonDataViewComponent(width: width,title: 'Box Qty',value: '${pickOrderSoDetails.boxQty ?? '-'}'),
-            if(isTab)
-              SizedBox(width: 10),
-            CommonDataViewComponent(width: width,title: 'Part Number',value: '${pickOrderSoDetails.itemName ?? '-'}'),
-            SizedBox(width: 10),
-            CommonDataViewComponent(width: width,title: 'Requested Qty',value: '${pickOrderSoDetails.requestedQty ?? '-'}'),
-            if(isTab)
-              SizedBox(width: 10),
-            CommonDataViewComponent(width: width,title: 'PO Number',value: '${pickOrderSoDetails.poNumber ?? '-'}'),
-            SizedBox(width: 10),
-            CommonDataViewComponent(width: width,title: 'UOM',value: '${pickOrderSoDetails.uom ?? '-'}'),
-          ],
-        );
-      },);
-
+          return Wrap(
+            runSpacing: 5,
+            children: [
+              CommonDataViewComponent(width: width, title: 'Order No', value: pickOrder.soNumber ?? '-'),
+              const SizedBox(width: 10),
+              CommonDataViewComponent(width: width, title: 'Box Qty', value: '${pickOrderSoDetails.boxQty ?? '-'}'),
+              if (isTab) const SizedBox(width: 10),
+              CommonDataViewComponent(width: width, title: 'Part Number', value: pickOrderSoDetails.itemName ?? '-'),
+              const SizedBox(width: 10),
+              CommonDataViewComponent(
+                  width: width, title: 'Requested Qty', value: '${pickOrderSoDetails.requestedQty ?? '-'}'),
+              if (isTab) const SizedBox(width: 10),
+              CommonDataViewComponent(width: width, title: 'PO Number', value: pickOrderSoDetails.poNumber ?? '-'),
+              const SizedBox(width: 10),
+              CommonDataViewComponent(width: width, title: 'UOM', value: pickOrderSoDetails.uom ?? '-'),
+            ],
+          );
+        },
+      );
     }
 
     return Column(
@@ -251,16 +251,15 @@ class PalletScreenEdit extends StatelessWidget {
           decoration: BoxDecoration(
             color: kDarkFontColor,
           ),
-          padding: EdgeInsets.all(10),
-          child: Text(
+          padding: const EdgeInsets.all(10),
+          child: const Text(
             'Line Item',
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         table(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -271,19 +270,19 @@ class PalletScreenEdit extends StatelessWidget {
     Widget header(String text) => Container(
           child: Text(
             text,
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
             textAlign: TextAlign.center,
           ),
           color: kBorderColor,
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
         );
     Widget value(String text) => Container(
           child: Text(
             text,
-            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
+            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
             textAlign: TextAlign.center,
           ),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
         );
 
     Widget table() {
@@ -304,11 +303,8 @@ class PalletScreenEdit extends StatelessWidget {
       }
 
       final pickOrder = pallet.lineItemRes?.data?.data?.pickOrder;
-      final pickOrderSoDetails =
-          pallet.lineItemRes?.data?.data?.pickOrderSoDetail;
-      final itemLocationList =
-          pallet.lineItemRes?.data?.data?.itemLocationList;
-
+      final pickOrderSoDetails = pallet.lineItemRes?.data?.data?.pickOrderSoDetail;
+      final itemLocationList = pallet.lineItemRes?.data?.data?.itemLocationList;
 
       if (pickOrder == null || pickOrderSoDetails == null) {
         return NoDataFoundView(
@@ -319,20 +315,19 @@ class PalletScreenEdit extends StatelessWidget {
       }
 
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 7),
         child: Table(
-          columnWidths: {
-            0:FlexColumnWidth(5),
-            1:FlexColumnWidth(8),
-            2:FlexColumnWidth(5),
-            3:FlexColumnWidth(5),
-            4:FlexColumnWidth(5),
-            5:FlexColumnWidth(5),
+          columnWidths: const {
+            0: FlexColumnWidth(5),
+            1: FlexColumnWidth(22),
+            2: FlexColumnWidth(5),
+            3: FlexColumnWidth(5),
+            4: FlexColumnWidth(5),
+            5: FlexColumnWidth(5),
           },
           border: TableBorder.all(color: kBorderColor),
           children: List.generate((itemLocationList?.length ?? 0) + 1, (index) {
-
-            if(index == 0){
+            if (index == 0) {
               return TableRow(children: [
                 header('Part No.'),
                 header('Location'),
@@ -345,35 +340,31 @@ class PalletScreenEdit extends StatelessWidget {
 
             final data = itemLocationList?[index - 1];
 
-            return TableRow(
-                children: [
-                  value('${data?.itemName ?? '-'}'),
-                  Wrap(
+            return TableRow(children: [
+              value(data?.itemName ?? '-'),
+              Padding(
+                padding: const EdgeInsets.only(top: 5, left: 2),
+                child: Center(
+                  child: Wrap(
                     runSpacing: 5.0,
                     spacing: 5.0,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: Text(
-                            '${data?.locationName}'),
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                        child: Text('${data?.locationName}'),
                       ),
-                      const SizedBox(width: 5),
-                      ColoredBGText(
-                          text: '${data?.warehouseName}',
-                          color: const Color(0xffFF5555)),
-                      ColoredBGText(
-                          text: '${data?.sectionName}',
-                          color: const Color(0xffB981FF)),
-                      ColoredBGText(
-                          text:
-                          '${data?.companyName}',
-                          color: const Color(0xffB981FF)),
+                      // const SizedBox(width: 2),
+                      ColoredBGText(text: '${data?.warehouseName}', color: const Color(0xffFF5555)),
+                      ColoredBGText(text: '${data?.sectionName}', color: const Color(0xffB981FF)),
+                      ColoredBGText(text: '${data?.companyName}', color: const Color(0xffB981FF)),
                     ],
                   ),
-                  value('${data?.locationType ?? '-'}'),
-                  value('${data?.monthName ?? '-'}'),
-                  value('${data?.fullYear ?? '-'}'),
-                  value('${data?.availableQty ?? 0}'),
+                ),
+              ),
+              value(data?.locationType ?? '-'),
+              value(data?.monthName ?? '-'),
+              value(data?.fullYear ?? '-'),
+              value('${data?.availableQty ?? 0}'),
             ]);
           }),
         ),
@@ -387,16 +378,15 @@ class PalletScreenEdit extends StatelessWidget {
           decoration: BoxDecoration(
             color: kDarkFontColor,
           ),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: const Text(
-            'Suggested Loaction',
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            'Suggested Location',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         table(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -413,7 +403,7 @@ class PalletScreenEdit extends StatelessWidget {
     final hasError = provider.palletsRes?.state == Status.ERROR;
 
     if (hasError) {
-      return NoDataFoundView(
+      return const NoDataFoundView(
         title: 'No Pallets Found',
       );
     }
@@ -421,32 +411,113 @@ class PalletScreenEdit extends StatelessWidget {
     final data = provider.palletsRes?.data?.data?.pickOrderPalletList;
 
     if (data == null) {
-      return NoDataFoundView(
+      return const NoDataFoundView(
         title: 'No Pallets Found',
       );
     }
 
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: data.length,
       itemBuilder: (context, index) {
         final res = data[index];
 
         return PalletEditList(
-          PickOrder: res,
+          pickOrder: res,
           pallets: res.child,
         );
       },
     );
   }
+
+  completePart(BuildContext context) async {
+    bool? checkForCycleBool;
+    final pallet = context.read<PalletProviderImpl>();
+    final itemId = pallet.lineItemRes?.data?.data?.pickOrderSoDetail?.itemID;
+    final pickOrderId = pallet.lineItemRes?.data?.data?.pickOrder?.pickOrderID;
+    final pickOrderSODetailID = pallet.lineItemRes?.data?.data?.pickOrderSoDetail?.pickOrderSODetailID;
+    pallet.selectedItemID = itemId ?? 0;
+    pallet.selectedPickOrderID = pickOrderId ?? 0;
+    pallet.selectedPickOrderSODetailID = pickOrderSODetailID ?? 0;
+    final int isCheckRequired = pallet.checkForCycleCountVar?.data?.data?.first.isCycleCountRequiredOrNot ?? 0;
+    await pallet.checkForCycleCounts();
+
+    if (isCheckRequired == 0) {
+      await pallet.getCompletePartStatus(cycleCount: true);
+      if (pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.primaryKey == "0") {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+                "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(
+                "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+      }
+      if (pallet.getCompletePartStatusVar?.state == Status.COMPLETED) {
+        print("Bruhhhhhh it is completed");
+      }
+    } else {
+      CustomPopup(context,
+          title: 'Cycle Count Alert ',
+          message: 'Please complete cycle count verification and then complete part number',
+          primaryBtnTxt: 'Wrong Inventory',
+          secondaryBtnTxt: 'Correct Inventory', primaryAction: () async{
+        pallet.getCompletePartStatus(cycleCount: true);
+        if (pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.primaryKey == "0") {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                  "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+
+        } else {
+          await pallet.getPallets(addPallet: false);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              content: Text(
+                  "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+        }
+      }, secondaryAction: () {
+        pallet.getCompletePartStatus(cycleCount: false);
+        if (pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.primaryKey == "0") {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                  "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              content: Text(
+                  "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+        }
+      });
+    }
+  }
+
+  addPallet(BuildContext context) async{
+    final pallet = context.read<PalletProviderImpl>();
+    final itemId = pallet.lineItemRes?.data?.data?.pickOrderSoDetail?.itemID;
+    final pickOrderId = pallet.lineItemRes?.data?.data?.pickOrder?.pickOrderID;
+    final pickOrderSODetailID = pallet.lineItemRes?.data?.data?.pickOrderSoDetail?.pickOrderSODetailID;
+    pallet.selectedItemID = itemId ?? 0;
+    pallet.selectedPickOrderID = pickOrderId ?? 0;
+    pallet.selectedPickOrderSODetailID = pickOrderSODetailID ?? 0;
+    await pallet.getPallets(addPallet: true);
+
+    if (pallet.palletsRes?.data?.data?.objSaveUpdateResponseModel?.first.primaryKey == "0") {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("${pallet.palletsRes?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+    }
+  }
 }
 
 class PalletEditList extends StatefulWidget {
-  const PalletEditList({Key? key, required this.PickOrder, this.pallets})
-      : super(key: key);
+  const PalletEditList({Key? key, required this.pickOrder, this.pallets}) : super(key: key);
 
-  final PickOrderPalletList PickOrder;
+  final PickOrderPalletList pickOrder;
 
   final List<PickOrderdetailList>? pallets;
 
@@ -456,20 +527,26 @@ class PalletEditList extends StatefulWidget {
 
 class _PalletEditListState extends State<PalletEditList> {
   bool isVisible = false;
-
+  TextEditingController? locationTextController;
+  TextEditingController? partTextController;
   bool isFocused = false;
+  bool isFirstCompleted = false;
 
+  void initState() {
+    super.initState();
+    locationTextController = TextEditingController();
+    partTextController = TextEditingController();
+  }
   @override
   Widget build(BuildContext context) {
+
     final width = MediaQuery.of(context).size.width;
 
     final fieldsWidth = width * 0.37;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: kBorderColor)),
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: kBorderColor)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -489,24 +566,20 @@ class _PalletEditListState extends State<PalletEditList> {
             child: Container(
               width: double.infinity,
               color: isFocused ? kDarkFontColor : kDarkFontColor,
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      '${widget.PickOrder.palletNo ?? ''}',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                      widget.pickOrder.palletNo ?? '',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
-                  Text('Pallet Status: ${widget.PickOrder.statusTerm ?? ''}',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),
+                  Text('Pallet Status: ${widget.pickOrder.statusTerm ?? ''}',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   Container(
                       width: 44,
-                      child: Icon(
-                          isVisible ? Icons.arrow_drop_down : Icons.arrow_right,
-                          color: Colors.white))
+                      child: Icon(isVisible ? Icons.arrow_drop_down : Icons.arrow_right, color: Colors.white))
                 ],
               ),
             ),
@@ -526,14 +599,12 @@ class _PalletEditListState extends State<PalletEditList> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Scan Location',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.start,
                                 ),
-                                SizedBox(height: 10),
+                                const SizedBox(height: 10),
                                 SizedBox(
                                   width: fieldsWidth,
                                   child: ClipRRect(
@@ -541,32 +612,33 @@ class _PalletEditListState extends State<PalletEditList> {
                                     child: Container(
                                       height: 50,
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          border:
-                                              Border.all(color: kBorderColor)),
+                                        color: isFirstCompleted ? Colors.grey : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(color: kBorderColor)),
                                       child: Row(
                                         children: [
-                                          Expanded(
+                                           Expanded(
                                             child: TextField(
+                                              onEditingComplete: () {
+                                                checkScanLocation(locationTextController?.text, palletProvider.palletsRes?.data?.data?.pickOrderPalletList);
+                                              },
+                                              controller: locationTextController!,
                                               autofocus: true,
-                                              decoration: InputDecoration(
-                                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                              enabled: !isFirstCompleted,
+                                              decoration: const InputDecoration(
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
                                                   border: InputBorder.none),
                                             ),
                                           ),
                                           Container(
                                             height: 50,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
+                                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                                             color: kThemeBlueFontColor,
-                                            child: Center(
+                                            child: const Center(
                                               child: Text(
                                                 'Change Location',
                                                 style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500),
+                                                    color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                                               ),
                                             ),
                                           )
@@ -581,14 +653,12 @@ class _PalletEditListState extends State<PalletEditList> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Scan Part',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.start,
                                 ),
-                                SizedBox(height: 10),
+                                const SizedBox(height: 10),
                                 SizedBox(
                                   width: fieldsWidth,
                                   child: ClipRRect(
@@ -596,17 +666,16 @@ class _PalletEditListState extends State<PalletEditList> {
                                     child: Container(
                                       height: 50,
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          border:
-                                              Border.all(color: kBorderColor)),
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(color: kBorderColor)),
                                       child: Row(
                                         children: [
                                           Expanded(
                                             child: TextField(
+                                              controller: partTextController,
                                               autofocus: true,
                                               decoration: InputDecoration(
-                                                // prefixIcon: LoadingSmall(),
+                                                  // prefixIcon: LoadingSmall(),
                                                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
                                                   border: InputBorder.none),
                                             ),
@@ -629,32 +698,24 @@ class _PalletEditListState extends State<PalletEditList> {
                           children: [
                             InkWell(
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-                                decoration: BoxDecoration(
-                                    color: kThemeBlueFontColor,
-                                    borderRadius: BorderRadius.circular(2)),
-                                child: Text(
-                                  'Bind Location',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                decoration:
+                                    BoxDecoration(color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+                                child: const Text(
+                                  'Complete Pallet',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             InkWell(
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-                                decoration: BoxDecoration(
-                                    color: Colors.redAccent,
-                                    borderRadius: BorderRadius.circular(2)),
-                                child: Text(
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                decoration:
+                                    BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(2)),
+                                child: const Text(
                                   'Delete Pallet',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
                                 ),
                               ),
                             ),
@@ -668,24 +729,30 @@ class _PalletEditListState extends State<PalletEditList> {
       ),
     );
   }
+  void checkScanLocation(String? loc) {
+    final provider = context.read<PalletProviderImpl>();
+    final details = provider.lineItemRes?.data?.data?.pickOrder?.soNumber;
+    if(loc?.isNotEmpty == true && loc != null){
 
+    }
+  }
   Widget table({List<PickOrderdetailList>? pallets}) {
     Widget header(String text) => Container(
           child: Text(
             text,
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
             textAlign: TextAlign.center,
           ),
           color: kBorderColor,
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
         );
     Widget value(String text) => Container(
           child: Text(
             text,
-            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
+            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
             textAlign: TextAlign.center,
           ),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
         );
 
     return Padding(
@@ -711,11 +778,11 @@ class _PalletEditListState extends State<PalletEditList> {
 
             return TableRow(
               children: [
-                value('${pallet?.itemName ?? ''}'),
-                value('${pallet?.palletNo ?? ''}'),
-                value('${pallet?.locationTitle ?? ''}'),
-                value('${pallet?.monthName ?? ''}'),
-                value('${pallet?.year ?? ''}'),
+                value(pallet?.itemName ?? ''),
+                value(pallet?.palletNo ?? ''),
+                value(pallet?.locationTitle ?? ''),
+                value(pallet?.monthName ?? ''),
+                value(pallet?.year ?? ''),
                 value('${pallet?.actualPicked ?? 0.0}'),
                 value('${pallet?.numberOfBoxes ?? 0}'),
               ],
@@ -724,3 +791,6 @@ class _PalletEditListState extends State<PalletEditList> {
     );
   }
 }
+
+
+

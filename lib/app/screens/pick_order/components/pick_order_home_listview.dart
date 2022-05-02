@@ -1,4 +1,5 @@
 import 'package:demo_win_wms/app/utils/user_prefs.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_list_get.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
@@ -57,16 +58,16 @@ class PickOrderListView extends StatelessWidget {
           Expanded(
               child: Wrap(
             children: [
-              listElement(width: width, title: 'Sales Order No :', value: '${data?.soNumber ?? ''}'),
-              listElement(width: width, title: 'Company :', value: '${data?.companyName ?? ''}'),
-              listElement(width: width, title: 'Customer Location :', value: '${data?.customerLocation ?? ''}'),
-              listElement(width: width, title: 'Ship Date :', value: '${data?.shippingDate ?? ''}', hasDateIcon: true),
-              listElement(width: width, title: 'Created On :', value: '${data?.createdDate ?? ''}', hasDateIcon: true),
+              listElement(width: width, title: 'Sales Order No :', value: data?.soNumber ?? ''),
+              listElement(width: width, title: 'Company :', value: data?.companyName ?? ''),
+              listElement(width: width, title: 'Customer Location :', value: data?.customerLocation ?? ''),
+              listElement(width: width, title: 'Ship Date :', value: data?.shippingDate ?? '', hasDateIcon: true),
+              listElement(width: width, title: 'Created On :', value: data?.createdDate ?? '', hasDateIcon: true),
               listElement(
-                  width: width, title: 'Completed On :', value: '${data?.completedOn ?? '-'}', hasDateIcon: true),
-              listElement(width: width, title: 'Customer :', value: '${data?.customerName ?? ''}'),
-              listElement(width: width, title: 'Warehouse :', value: '${data?.warehouseName ?? ''}'),
-              listElement(width: width, title: 'Carrier (Ship Via) :', value: '${data?.shipperName ?? ''}'),
+                  width: width, title: 'Completed On :', value: data?.completedOn ?? '-', hasDateIcon: true),
+              listElement(width: width, title: 'Customer :', value: data?.customerName ?? ''),
+              listElement(width: width, title: 'Warehouse :', value: data?.warehouseName ?? ''),
+              listElement(width: width, title: 'Carrier (Ship Via) :', value: data?.shipperName ?? ''),
               pickOrderButton(context)
             ],
           )),
@@ -94,7 +95,9 @@ class PickOrderListView extends StatelessWidget {
           }
         }
       } else {
-        print(userData?.userType_Term);
+        if (kDebugMode) {
+          print(userData?.userType_Term);
+        }
         if (data?.isPickOrderLinkedOrNot == true &&
             (data?.isAbleToPickOrNot == true ||
                 userData?.userType_Term == "Super Admin" ||
@@ -149,7 +152,9 @@ class PickOrderListView extends StatelessWidget {
           height: kFlexibleSize(20),
         ),
         onSelected: (value) async {
-          print(value);
+          if (kDebugMode) {
+            print(value);
+          }
 
           if (value == 'view') {
             if (view != null) {
@@ -310,7 +315,7 @@ class PickOrderListView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: kFlexibleSize(16), child: icon),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
                 child: Text(
               text,

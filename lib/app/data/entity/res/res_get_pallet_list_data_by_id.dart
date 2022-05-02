@@ -1,4 +1,6 @@
 
+import 'package:demo_win_wms/app/data/entity/res/res_complete_part_status.dart';
+
 class ResGetPalletListDataById {
   ResGetPalletListDataById({
     this.success,
@@ -28,10 +30,14 @@ class ResGetPalletListDataById {
 class Data {
   Data({
     this.pickOrderPalletList,
+    this.objSaveUpdateResponseModel
     // this.pickOrderdetailList,
   });
 
   List<PickOrderPalletList>? pickOrderPalletList;
+
+  List<ObjSaveUpdateResponseModel>? objSaveUpdateResponseModel;
+
   // List<PickOrderdetailList>? pickOrderdetailList;
 
 
@@ -41,7 +47,8 @@ class Data {
     final child = json["pickOrderdetailList"] == null ? null : List<PickOrderdetailList>.from(json["pickOrderdetailList"].map((x) => PickOrderdetailList.fromJson(x)));
 
     return Data(
-      pickOrderPalletList: json["pickOrderPalletList"] == null ? null : List<PickOrderPalletList>.from(json["pickOrderPalletList"].map((x) => PickOrderPalletList.fromJson(json: x,child: child))),
+        objSaveUpdateResponseModel: json["objSaveUpdateResponseModel"] == null ? null : List<ObjSaveUpdateResponseModel>.from(json["objSaveUpdateResponseModel"].map((x) => ObjSaveUpdateResponseModel.fromJson(x))),
+        pickOrderPalletList: json["pickOrderPalletList"] == null ? null : List<PickOrderPalletList>.from(json["pickOrderPalletList"].map((x) => PickOrderPalletList.fromJson(json: x,child: child))),
       // pickOrderdetailList: json["pickOrderdetailList"] == null ? null : List<PickOrderdetailList>.from(json["pickOrderdetailList"].map((x) => PickOrderdetailList.fromJson(x))),
     );
   }
@@ -77,7 +84,6 @@ class PickOrderPalletList {
   factory PickOrderPalletList.fromJson({required Map<String, dynamic> json,List<PickOrderdetailList>? child}) {
 
     final pallets = child?.where((element) => element.poPalletId == json["poPalletID"]).toList();
-
     return PickOrderPalletList(
         poPalletId: json["poPalletID"] == null ? null : json["poPalletID"],
         palletNo: json["palletNo"] == null ? null : json["palletNo"],
@@ -93,6 +99,29 @@ class PickOrderPalletList {
     );
   }
 }
+class ObjSaveUpdateResponseModel {
+  ObjSaveUpdateResponseModel({
+    this.primaryKey,
+    this.errorMessage,
+    this.data,
+    this.data1,
+  });
+
+  String? primaryKey;
+  String? errorMessage;
+  String? data;
+  bool? data1;
+
+  factory ObjSaveUpdateResponseModel.fromJson(Map<String, dynamic> json) => ObjSaveUpdateResponseModel(
+    primaryKey: json["primaryKey"] == null ? null : json["primaryKey"],
+    errorMessage: json["errorMessage"] == null ? null : json["errorMessage"],
+
+    data: json["data"] == null ? null : json["data"],
+    data1: json["data1"] == null ? null : json["data1"],
+  );
+
+}
+
 
 class PickOrderdetailList {
   PickOrderdetailList({

@@ -1125,10 +1125,10 @@ class _ShippingVerificationScreenState extends State<ShippingVerificationScreen>
                       onTap: () {
                         setState(() {
                           if(itemCount! < 7) {
-                            startingIndex = itemCount!;
+                            startingIndex = 1;
                           }
                           else{
-                            if (startingIndex + 8 < itemCount!) {
+                            if (startingIndex + 7 < itemCount!) {
                               startingIndex += 1;
                             } else {
                               if (itemCount! - 7 > 0) {

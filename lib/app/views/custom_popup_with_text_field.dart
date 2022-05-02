@@ -73,6 +73,7 @@ class CustomPopupWithTextField {
                   ),
 
                   Padding(padding: const EdgeInsets.all(10),child: TextField(
+                    maxLines: 2,
                     focusNode: node,
                     controller: controller,
 

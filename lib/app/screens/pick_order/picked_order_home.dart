@@ -12,7 +12,7 @@ import 'package:demo_win_wms/app/providers/home_provider.dart';
 import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
-import 'package:demo_win_wms/app/screens/pick_order/components/pick_order_list_view.dart';
+import 'package:demo_win_wms/app/screens/pick_order/components/pick_order_home_listview.dart';
 import 'package:demo_win_wms/app/screens/pick_order/components/pickup_filter_drop_down.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/enums.dart';
@@ -41,7 +41,6 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -87,9 +86,27 @@ class _PickedLineItemState extends State<PickedLineItem> {
   Company? selectedShipVia;
   Company? selectedStatus;
 
+  int? totalCount;
+  int itemCount = 1;
+  int pageLimit = 100;
   bool isScreenLoading = false;
 
   String? dropdownValue;
+
+  void getTotalCount() async {
+    final home = context.read<HomeProvider>();
+
+    try {
+      setState(() {
+        totalCount = home.pickOrderList?.data?.data?.first.totalCount ?? 0;
+        itemCount = (totalCount == null || totalCount == 0) ? 1 : (totalCount! / pageLimit).ceil();
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
 
   fetchPickList() async {
     try {
@@ -104,8 +121,11 @@ class _PickedLineItemState extends State<PickedLineItem> {
               ? dropdownValue = "Completed / Short, Completed / Over, Completed / Exact, Pick Order Completed"
               : dropdownValue,
           startDate: selectedStartDate,
-          endDate: selectedEndDate);
+          endDate: selectedEndDate,
+          listStartAt: selectedStartPoint,
+          numOfResults: pageLimit.toString());
       filterData(context, searchText!);
+      getTotalCount();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
@@ -172,7 +192,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
     await home.pickorderInsertUpdateLinkPickOrder(data: data, assignToId: assignToId);
 
-    if(home.linkUser?.state == Status.COMPLETED){
+    if (home.linkUser?.state == Status.COMPLETED) {
       fetchPickList();
     }
     setState(() {
@@ -249,6 +269,17 @@ class _PickedLineItemState extends State<PickedLineItem> {
       final home = context.read<HomeProvider>();
       await home.savePickOrderNote(
           pickOrderNote: pickOrderNote, updateLog: data.updatelog, pickOrderId: data.pickOrderId);
+
+      if (home.savePickOrderNoteVar?.state == Status.ERROR) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Pick Order note was not saved . Please refresh and try again.")));
+      }
+
+      if(home.savePickOrderNoteVar?.state == Status.COMPLETED){
+        fetchPickList();
+      }
+
+
       setState(() {
         isScreenLoading = false;
       });
@@ -260,6 +291,316 @@ class _PickedLineItemState extends State<PickedLineItem> {
   }
 
   String? searchText = "";
+  int startingIndex = 1;
+  int selectedIndex = 1;
+  String? selectedRange = "100";
+  String? selectedStartPoint = "0";
+
+  BoxDecoration unselectedBox =
+  BoxDecoration(color: const Color(0xffE5E5E5).withOpacity(0.5), borderRadius: const BorderRadius.all(const Radius.circular(3)));
+
+  BoxDecoration selectedBox =
+  const BoxDecoration(color: Color(0xff7F849A), borderRadius: BorderRadius.all(Radius.circular(3)));
+
+  Widget pages(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          const Text("Showing :", style: TextStyle(fontSize: 12)),
+          const SizedBox(
+            width: 10,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            height: 30,
+            decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA))),
+            child: DropdownButton(
+                iconSize: 12,
+                underline: const SizedBox(),
+                value: pageLimit,
+                elevation: 4,
+                style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+                items: const [
+                  DropdownMenuItem(
+                    child: Text(
+                      "100 Rows",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: 100,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("50 Rows", style: TextStyle(fontSize: 12)),
+                    value: 50,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("25 Rows", style: TextStyle(fontSize: 12)),
+                    value: 25,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("10 Rows", style: TextStyle(fontSize: 12)),
+                    value: 10,
+                  )
+                ],
+                onChanged: (int? val) {
+                  setState(() {
+                    pageLimit = val!;
+                    fetchPickList();
+                  });
+                }),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                height: 30,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (startingIndex - 3 > 0) {
+                            startingIndex = startingIndex - 3;
+                          } else {
+                            startingIndex = 1;
+                          }
+                        });
+                        // _scrollController.jumpTo(2);
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        height: 40,
+                        width: 30,
+                        child: Icon(
+                          Icons.fast_rewind,
+                          color: const Color(0xff263238).withOpacity(0.5),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          setState(() {
+                            if (startingIndex - 1 > 0) {
+                              startingIndex = startingIndex - 1;
+                            } else {
+                              startingIndex = 1;
+                            }
+                          });
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
+                        height: 40,
+                        width: 30,
+                        child: Icon(
+                          Icons.arrow_left_outlined,
+                          color: const Color(0xff263238).withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    ListView.builder(
+                      // controller: _scrollController,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (BuildContext context, index) {
+                        BoxDecoration box = selectedIndex == (startingIndex + index) ? selectedBox : unselectedBox;
+
+                        if (index == 5 && startingIndex != itemCount- 6) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(2))),
+                            child: const Center(
+                              child: Text(
+                                "...",
+                                // textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        } else {
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = startingIndex + index;
+                                getPage();
+                              });
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              decoration: box,
+                              child: const Center(
+                                child: Text(
+                                  "...",
+                                  // textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        if (index == 6) {
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                startingIndex = itemCount- 6;
+                                selectedIndex = startingIndex + index;
+                                getPage();
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              decoration: box,
+                              // height: 40,
+                              // width: 30,
+                              child: Center(
+                                child: Text(
+                                  "$itemCount",
+                                  // textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = startingIndex + index;
+                              getPage();
+                              _setPageNumber(index);
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: box,
+                            // height: 40,
+                            // width: 30,
+                            child: Center(
+                              child: Text(
+                                "${startingIndex + index}",
+                                // textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: itemCount>= 7 ? 7 : itemCount,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          if(itemCount <= 7) {
+                            startingIndex = 1;
+                          }
+                          else{
+                            if (startingIndex + 8 < itemCount) {
+                              startingIndex += 1;
+                            } else {
+                              if (itemCount- 7 > 0) {
+                                startingIndex = itemCount- 6;
+                              } else {
+                                startingIndex = itemCount - 7;
+                              }
+                            }
+                          }
+
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        child: Icon(
+                          Icons.arrow_right_outlined,
+                          color: const Color(0xff263238).withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (startingIndex + 8 < itemCount) {
+                              startingIndex += 3;
+                            } else {
+                              if (itemCount - 6 > 0) {
+                                startingIndex = itemCount - 6;
+                              } else {
+                                startingIndex = 1;
+                              }
+                            }
+                          });
+                          // _scrollController.jumpTo(2);
+                        },
+                        child: Container(
+                          decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
+                          child: Icon(
+                            Icons.fast_forward,
+                            color: const Color(0xff263238).withOpacity(0.5),
+                            size: 20,
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  _setPageNumber(int index) {
+    if (index == 0 || index == 1) {
+      if (index == 0) {
+        if (startingIndex - (index + 2) > 0) {
+          setState(() {
+            startingIndex -= index + 2;
+          });
+        } else {
+          setState(() {
+            startingIndex = 1;
+          });
+        }
+      } else {
+        if (startingIndex - (index) > 0) {
+          setState(() {
+            startingIndex -= index;
+          });
+        } else {
+          setState(() {
+            startingIndex = 1;
+          });
+        }
+      }
+    } else if (index == 3 || index == 4) {
+      if (index == 3) {
+        if (startingIndex + 7 <= itemCount) {
+          setState(() {
+            startingIndex += 1;
+          });
+        }
+      } else {
+        if (startingIndex + 7 < itemCount) {
+          setState(() {
+            startingIndex += 2;
+          });
+        } else {
+          setState(() {
+            startingIndex = itemCount - 6;
+          });
+        }
+      }
+    } else {}
+  }
+
+  getPage() {
+    selectedStartPoint = (pageLimit * (selectedIndex - 1)).toString();
+    fetchPickList();
+  }
 
   Widget body(BuildContext context) {
     final _size = MediaQuery.of(context).size;
@@ -296,6 +637,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
                       //Filters
                       filters(context),
+                      pages(context),
 
                       listView(),
                     ],
@@ -337,7 +679,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
       );
     }
 
-    if (hasError || home.pickOrderList?.data?.data?.length == 0) {
+    if (hasError || home.pickOrderList?.data?.data?.isEmpty == true) {
       return Container(
         width: double.infinity,
         height: 400,
@@ -396,17 +738,15 @@ class _PickedLineItemState extends State<PickedLineItem> {
             if (kDebugMode) {
               print(home.assignedToUserList?.data?.data?.userList);
             }
-            CustomPopUpWithDropDown(context,
-                primaryBtnTxt: 'Save',
-                secondaryBtnTxt: 'Cancel',
-                primaryAction: () {
-              if(selectedUser != null) {
-                linkOrder(data: home.pickOrderList!.data!.data![index],assignToId: selectedUser!.value!);
+            CustomPopUpWithDropDown(context, primaryBtnTxt: 'Save', secondaryBtnTxt: 'Cancel', primaryAction: () {
+              if (selectedUser != null) {
+                linkOrder(data: home.pickOrderList!.data!.data![index], assignToId: selectedUser!.value!);
+              } else {
+                if (kDebugMode) {
+                  print("selected User null");
+                }
               }
-              else{
-                print("selected User null");
-              }
-                },
+            },
                 title: 'Pick Order Acknowledge',
                 message: 'Acknowledge to',
                 dropdownWidget: home.assignedToUserList?.data?.data?.userList != null
@@ -415,7 +755,9 @@ class _PickedLineItemState extends State<PickedLineItem> {
                         onChange: (user) {
                           setState(() {
                             selectedUser = user;
-                            print(selectedUser?.value);
+                            if (kDebugMode) {
+                              print(selectedUser?.value);
+                            }
                           });
                         },
                         hint: 'Select User',
@@ -462,7 +804,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
               pickOrder.getSalesOrderList();
             }
 
-            Navigator.of(context).pushNamed(kPickOrderListRoute,arguments: true);
+            Navigator.of(context).pushNamed(kPickOrderListRoute, arguments: true);
           },
           view: () {
             final pickOrder = this.context.read<PickOrderProviderImpl>();
@@ -479,7 +821,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
               pickOrder.getSalesOrderList();
             }
 
-            Navigator.of(context).pushNamed(kPickOrderListRoute,arguments: false);
+            Navigator.of(context).pushNamed(kPickOrderListRoute, arguments: false);
           },
         );
       },

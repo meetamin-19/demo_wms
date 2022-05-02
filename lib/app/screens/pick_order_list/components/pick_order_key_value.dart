@@ -22,7 +22,7 @@ class PickOrderKeyValue extends StatelessWidget {
         kFlexibleSizedBox(height: 5),
         Container(
           width: width,
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
               color: Colors.grey.withOpacity(0.1),
               borderRadius: BorderRadius.circular(5.0),

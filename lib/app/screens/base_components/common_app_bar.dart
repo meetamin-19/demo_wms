@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/providers/auth_provider.dart';
 import 'package:demo_win_wms/app/providers/home_provider.dart';
-import 'package:demo_win_wms/app/screens/pick_order//leading_text_field.dart';
+import 'package:demo_win_wms/app/screens/pick_order/components/leading_text_field.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/responsive.dart';
 import 'package:provider/provider.dart';

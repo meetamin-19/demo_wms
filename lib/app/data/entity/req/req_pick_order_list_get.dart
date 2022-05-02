@@ -10,8 +10,12 @@ class ReqPickOrderListGet {
     this.warehouseId,
     this.customerLocationId,
     this.statusTermStr,
+    this.numOfResults,
+    this.listStartAt
   });
 
+  String? listStartAt;
+  String? numOfResults;
   String? fromShipDateStr;
   String? toShipDateStr;
   String? customerId;
@@ -25,8 +29,8 @@ class ReqPickOrderListGet {
     final user = await UserPrefs.shared.getUser;
 
     return {
-      "length": 100,
-      "start": 0,
+      "length": numOfResults ?? "100",
+      "start": listStartAt ?? "0",
       "UserID": user.userID,
       "WarehouseID": warehouseId ?? 0,
       "UserType_Term": user.userType_Term,

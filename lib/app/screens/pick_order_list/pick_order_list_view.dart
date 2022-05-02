@@ -1,4 +1,5 @@
 import 'package:demo_win_wms/app/screens/base_components/common_data_showing_component.dart';
+import 'package:demo_win_wms/app/views/custom_popup_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pick_order_data_for_view.dart';
@@ -6,8 +7,8 @@ import 'package:demo_win_wms/app/providers/pallet_provider.dart';
 import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_theme_container.dart';
-import 'package:demo_win_wms/app/screens/pick_order/leading_text_field.dart';
-import 'package:demo_win_wms/app/screens/pick_order_list/components/pick_order_list.dart';
+import 'package:demo_win_wms/app/screens/pick_order/components/leading_text_field.dart';
+import 'package:demo_win_wms/app/screens/pick_order_list/components/sales_order_list.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/enums.dart';
 import 'package:demo_win_wms/app/utils/responsive.dart';
@@ -35,21 +36,43 @@ class PickOrderListScreen extends StatelessWidget {
     context.read<PickOrderProviderImpl>().searchFromSalesOderList(str: str);
   }
 
+  completePickOrder(BuildContext context) {
+    final pickOrder = context.read<PickOrderProviderImpl>();
+    final pickOrderId = pickOrder.getPickOrder?.data?.data?.pickOrder?.pickOrderId;
+
+    pickOrder.pickOrderID = pickOrderId ?? 0;
+
+    CustomPopup(context,
+        message:
+            "If you click on \"Yes\", all Parts of this Pick Order will also be completed. Are you sure you want to Complete Pick Order?",
+        title: 'Complete Pick Order',
+        primaryBtnTxt: "Yes",
+        secondaryBtnTxt: "No", primaryAction: () async{
+      await context.read<PickOrderProviderImpl>().completePickOrder();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("${pickOrder.completePickOrderVar?.data?.data?.first.errorMessage}")));
+    });
+
+    if (pickOrder.completePickOrderVar?.state == Status.COMPLETED) {
+      print("Complete Pick order API successful");
+    }
+  }
+
   scroll() {
     // controller.animateTo(400, duration: Duration(milliseconds: 400),curve: Curves.easeIn);
   }
 
-  viewItem(int id, BuildContext context) {
-    final pallet = context.read<PalletProviderImpl>();
-    final pickOrder = context.read<PickOrderProviderImpl>();
-    pallet.selectedPickOrderID = pickOrder.pickOrderID;
-    pallet.selectedPickOrderSODetailID = id;
-
-    pallet.pickOrderViewLineItem();
-    pallet.getPallets();
-
-    Navigator.of(context).pushNamed(kPalletScreenEditRoute);
-  }
+  // viewItem(int id, BuildContext context) {
+  //   final pallet = context.read<PalletProviderImpl>();
+  //   final pickOrder = context.read<PickOrderProviderImpl>();
+  //   pallet.selectedPickOrderID = pickOrder.pickOrderID;
+  //   pallet.selectedPickOrderSODetailID = id;
+  //
+  //   pallet.pickOrderViewLineItem();
+  //   pallet.getPallets();
+  //
+  //   Navigator.of(context).pushNamed(kPalletScreenEditRoute);
+  // }
 
   pickItem(int id, BuildContext context) {
     final pallet = context.read<PalletProviderImpl>();
@@ -59,7 +82,7 @@ class PickOrderListScreen extends StatelessWidget {
     pallet.selectedPickOrderSODetailID = id;
 
     pallet.pickOrderViewLineItem();
-    pallet.getPallets();
+    pallet.getPallets(addPallet: false);
 
     Navigator.of(context).pushNamed(kPalletScreenEditRoute);
   }
@@ -137,6 +160,26 @@ class PickOrderListScreen extends StatelessWidget {
               ),
             ),
             kFlexibleSizedBox(height: 10),
+            provider.isInEditingMode ? Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                  style: TextButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () {
+                    completePickOrder(context);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      // Icon(Icons.check, color: Colors.white,size: 18 ,),
+                      // kFlexibleSizedBox(width: 5),
+                      Text(
+                        "Complete Pick Order",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  )),
+            ): Container(),
+            kFlexibleSizedBox(height: 10),
             ClipRRect(
               borderRadius: BorderRadius.circular(5.0),
               child: Container(
@@ -209,10 +252,10 @@ class PickOrderListScreen extends StatelessWidget {
                       ],
                     ),
                     kFlexibleSizedBox(height: 15),
-                    PickOrderList(
+                    SalesOrderListView(
                       list: salesList,
                       viewOnClick: (int id) {
-                        viewItem(id, context);
+                        // viewItem(id, context);
                       },
                       pickItemOnClick: (int id) {
                         pickItem(id, context);
