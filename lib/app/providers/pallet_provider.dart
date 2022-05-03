@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_check_for_cycle_count.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_complete_part_status.dart';
 import 'package:dio/dio.dart';
@@ -10,6 +11,7 @@ import 'package:demo_win_wms/app/data/entity/res/res_pick_order_view_line_item.d
 import 'package:demo_win_wms/app/repository/pallet_repository.dart';
 import 'package:demo_win_wms/app/utils/api_response.dart';
 
+import '../data/entity/req/req_get_scan_part_list.dart';
 import 'base_notifier.dart';
 
 abstract class PalletProvider extends BaseNotifier {
@@ -20,6 +22,19 @@ abstract class PalletProvider extends BaseNotifier {
   Future checkForCycleCounts();
 
   Future getCompletePartStatus({required bool cycleCount});
+
+  Future getLocationData({required String locationTitle, required bool isTotePart});
+
+  Future getScanPartList({required ReqScanPartList req});
+
+  Future completePallet({required int pOPalletId, required int warehouseId, required String updateLog});
+
+  Future updatePOPalletBindLocation(
+      {required int pOPalletId, required int warehouseId, required String locationTitle, required});
+
+  Future resetLastScannedItemData({required int pOPalletID});
+
+  Future bindLocationToPallet({required int pOPalletID});
 }
 
 class PalletProviderImpl extends PalletProvider {
@@ -30,6 +45,12 @@ class PalletProviderImpl extends PalletProvider {
     _palletsRes = ApiResponse();
     _checkForCycleCount = ApiResponse();
     _getCompletePartStatus = ApiResponse();
+    _locationData = ApiResponse();
+    _scanPartList = ApiResponse();
+    _completePalletVar = ApiResponse();
+    _updateBindLocation = ApiResponse();
+    _resetPallet = ApiResponse();
+    _bindLocation = ApiResponse();
   }
 
   ApiResponse<ResPickOrderViewLineItem>? _lineItemRes;
@@ -47,6 +68,29 @@ class PalletProviderImpl extends PalletProvider {
   ApiResponse<ResGetCompletePartStatus>? _getCompletePartStatus;
 
   ApiResponse<ResGetCompletePartStatus>? get getCompletePartStatusVar => _getCompletePartStatus;
+
+  ApiResponse<EmptyRes>? _locationData;
+
+  ApiResponse<EmptyRes>? get locationData => _locationData;
+
+  ApiResponse<EmptyRes>? _scanPartList;
+
+  ApiResponse<EmptyRes>? get scanPartList => _scanPartList;
+
+  ApiResponse<EmptyRes>? _completePalletVar;
+
+  ApiResponse<EmptyRes>? get completePalletVar => _completePalletVar;
+
+  ApiResponse<EmptyRes>? _updateBindLocation;
+
+  ApiResponse<EmptyRes>? get updateBindLocation => _updateBindLocation;
+
+  ApiResponse<EmptyRes>? _resetPallet;
+
+  ApiResponse<EmptyRes>? get resetPallet => _resetPallet;
+
+  ApiResponse<EmptyRes>? _bindLocation;
+  ApiResponse<EmptyRes>? get bindLocation => _bindLocation;
 
   int selectedPickOrderSODetailID = 0;
   int selectedPickOrderID = 0;
@@ -88,8 +132,7 @@ class PalletProviderImpl extends PalletProvider {
       apiResIsLoading(_palletsRes!);
 
       final res = await repo.getPalletListDataByID(
-        addPallet: addPallet,
-          PickOrderSODetailID: selectedPickOrderSODetailID, PickOrderID: selectedPickOrderID);
+          addPallet: addPallet, PickOrderSODetailID: selectedPickOrderSODetailID, PickOrderID: selectedPickOrderID);
 
       if (res.success == true) {
         apiResIsSuccess(_palletsRes!, res);
@@ -138,6 +181,137 @@ class PalletProviderImpl extends PalletProvider {
       }
     } catch (e) {
       apiResIsFailed(_getCompletePartStatus!, e);
+    }
+  }
+
+  @override
+  Future getLocationData({required String locationTitle, required bool isTotePart}) async {
+    try {
+      apiResIsLoading(_locationData!);
+
+      final res = await repo.getLocationData(
+          pickOrderSODetailID: selectedPickOrderSODetailID, locationTitle: locationTitle, isTotePart: isTotePart);
+
+      if (res.success == true) {
+        apiResIsSuccess(_locationData!, res);
+      } else {
+        throw res.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      apiResIsFailed(_locationData!, e);
+    }
+  }
+
+  @override
+  Future getScanPartList({required ReqScanPartList req}) async {
+    try {
+      apiResIsLoading(_scanPartList!);
+
+      final res = await repo.getScanPartList(
+          req: ReqScanPartList(
+              pickOrderId: req.pickOrderId,
+              palletNo: req.palletNo,
+              pickOrderSODetailID: req.pickOrderSODetailID,
+              itemID: req.itemID,
+              itemName: req.itemName,
+              requestedQty: req.requestedQty,
+              actualPicked: req.actualPicked,
+              year: req.year,
+              month: req.month,
+              boxQty: req.boxQty,
+              companyId: req.companyId,
+              customCode: req.customCode,
+              locationID: req.locationID,
+              locationTypeTerm: req.locationTypeTerm,
+              numberOfBoxes: req.numberOfBoxes,
+              pONumber: req.pONumber,
+              pOPalletID: req.pOPalletID,
+              sODetailID: req.sODetailID,
+              warehouseID: req.warehouseID));
+      if (res.success == true) {
+        apiResIsSuccess(_scanPartList!, res);
+      } else {
+        throw res.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      apiResIsFailed(_scanPartList!, e);
+    }
+  }
+
+  @override
+  Future completePallet({required int pOPalletId, required int warehouseId, required String updateLog}) async {
+    try {
+      apiResIsLoading(_completePalletVar!);
+
+      final res = await repo.completePallet(
+          pOPalletId: pOPalletId,
+          pickOrderID: selectedPickOrderID,
+          pickOrderSODetailID: selectedPickOrderSODetailID,
+          warehouseId: warehouseId,
+          updateLog: updateLog);
+      if (res.success == true) {
+        apiResIsSuccess(_completePalletVar!, res);
+      } else {
+        throw res.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      apiResIsFailed(_completePalletVar!, e);
+    }
+  }
+
+  @override
+  Future updatePOPalletBindLocation(
+      {required int pOPalletId, required int warehouseId, required String locationTitle, required}) async {
+    try {
+      apiResIsLoading(_updateBindLocation!);
+
+      final res = await repo.updatePOPalletBindLocation(
+          pOPalletId: pOPalletId,
+          pickOrderID: selectedPickOrderID,
+          pickOrderSODetailID: selectedPickOrderSODetailID,
+          warehouseId: warehouseId,
+          locationTitle: locationTitle);
+      if (res.success == true) {
+        apiResIsSuccess(_updateBindLocation!, res);
+      } else {
+        throw res.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      apiResIsFailed(_updateBindLocation!, e);
+    }
+  }
+
+  @override
+  Future resetLastScannedItemData({required int pOPalletID}) async {
+    try {
+      apiResIsLoading(_resetPallet!);
+
+      final res = await repo.resetLastScannedItemData(
+          pOPalletId: pOPalletID, pickOrderID: selectedPickOrderID, pickOrderSODetailID: selectedPickOrderSODetailID);
+      if (res.success == true) {
+        apiResIsSuccess(_resetPallet!, res);
+      } else {
+        throw res.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      apiResIsFailed(_resetPallet!, e);
+    }
+  }
+
+  @override
+  Future bindLocationToPallet({required int pOPalletID}) async {
+    try {
+      apiResIsLoading(_bindLocation!);
+
+      final res = await repo.bindLocationToPickedPallet(
+          pOPalletId: pOPalletID, pickOrderID: selectedPickOrderID);
+      if (res.success == true) {
+        apiResIsSuccess(_bindLocation!, res);
+      } else {
+        throw res.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      apiResIsFailed(_bindLocation!, e);
     }
   }
 }

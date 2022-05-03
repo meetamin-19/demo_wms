@@ -427,8 +427,6 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                         focusNode: _focusNode2,
                                         controller: _scanPartController,
                                         onEditingComplete: () {
-                                          // print(data?.data?.pickOrderPalletList?.first
-                                          //     .poPalletId);
                                           String? txt = _scanPartController?.text;
                                           if (txt != null
                                               ? txt.contains('${data?.data?.salesOrder?.soNumber}')

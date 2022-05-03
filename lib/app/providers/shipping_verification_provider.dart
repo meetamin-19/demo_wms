@@ -80,7 +80,8 @@ class ShippingVerificationProvider extends BaseNotifier {
 
   }
 
-  Future getShippingVerificationList({String? listStartAt,
+  Future getShippingVerificationList(
+      {String? listStartAt,
     String? numOfResults,
     CarrierlistElement? customerLocation,
     CarrierlistElement? customer,

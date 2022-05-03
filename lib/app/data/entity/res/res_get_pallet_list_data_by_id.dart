@@ -66,9 +66,11 @@ class PickOrderPalletList {
     this.isPartAlreadyScannedForCurrentPallet,
     this.isPalletBindToLocationOrNot,
     this.isPartIsExistsOrNot,
-    this.child
+    this.child,
+    this.isPartInTote
   });
 
+  bool? isPartInTote;
   int? poPalletId;
   String? palletNo;
   String? updatelog;
@@ -85,7 +87,9 @@ class PickOrderPalletList {
 
     final pallets = child?.where((element) => element.poPalletId == json["poPalletID"]).toList();
     return PickOrderPalletList(
+
         poPalletId: json["poPalletID"] == null ? null : json["poPalletID"],
+        isPartInTote: json["isPartInTote"] == null ? null : json["isPartInTote"],
         palletNo: json["palletNo"] == null ? null : json["palletNo"],
         updatelog: json["updatelog"] == null ? null : json["updatelog"],
         statusTerm: json["status_Term"] == null ? null : json["status_Term"],

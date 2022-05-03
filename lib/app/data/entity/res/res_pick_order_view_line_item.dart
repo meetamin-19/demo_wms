@@ -121,8 +121,10 @@ class PickOrderSoDetail {
     this.requestedQty,
     this.currentPartStatusTerm,
     this.itemID,
+    this.isTotePart
   });
 
+  bool? isTotePart;
   int? pickOrderSODetailID;
   int? itemID;
   String? poNumber;
@@ -135,6 +137,7 @@ class PickOrderSoDetail {
 
   factory PickOrderSoDetail.fromJson(Map<String, dynamic> json) => PickOrderSoDetail(
     poNumber: json["poNumber"] == null ? null : json["poNumber"],
+    isTotePart: json["isTotePart"] == null ? null : json["isTotePart"],
     uom: json["uom"] == null ? null : json["uom"],
     pickOrderSODetailID: json["pickOrderSODetailID"] == null ? null : json["pickOrderSODetailID"],
     updatelog: json["updatelog"] == null ? null : json["updatelog"],

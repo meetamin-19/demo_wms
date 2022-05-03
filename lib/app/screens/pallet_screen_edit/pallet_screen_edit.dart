@@ -27,85 +27,91 @@ class PalletScreenEdit extends StatelessWidget {
         isTitleSearch: true,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: CommonThemeContainer(
-            title: '',
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                header(context),
-                const SizedBox(height: 15),
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(2)),
-                          child: const Text(
-                            'Complete Pick Order',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          completePart(context);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          decoration:
-                              BoxDecoration(color: const Color(0xFF11BCCB), borderRadius: BorderRadius.circular(2)),
-                          child: const Text(
-                            'Complete part',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-                partStatus(context),
-                const SizedBox(height: 15),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: InkWell(
-                    onTap: () {
-                      addPallet(context);
-                    },
-                    child: Container(
-                      width: 120,
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      decoration: BoxDecoration(color: const Color(0xFF11BCCB), borderRadius: BorderRadius.circular(2)),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: CommonThemeContainer(
+                title: '',
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    header(context),
+                    const SizedBox(height: 15),
+                    Flexible(
+                      fit: FlexFit.loose,
                       child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Expanded(
-                              child: Text(
-                            'Add Pallet',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
-                          )),
-                          SizedBox(
-                            child: kImgAddIcon,
-                            width: 15,
-                            height: 15,
-                          )
+                          InkWell(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              decoration:
+                                  BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(2)),
+                              child: const Text(
+                                'Complete Pick Order',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              completePart(context);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              decoration:
+                                  BoxDecoration(color: const Color(0xFF11BCCB), borderRadius: BorderRadius.circular(2)),
+                              child: const Text(
+                                'Complete part',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 15),
+                    partStatus(context),
+                    const SizedBox(height: 15),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: () {
+                          addPallet(context);
+                        },
+                        child: Container(
+                          width: 120,
+                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          decoration:
+                              BoxDecoration(color: const Color(0xFF11BCCB), borderRadius: BorderRadius.circular(2)),
+                          child: Row(
+                            children: [
+                              const Expanded(
+                                  child: Text(
+                                'Add Pallet',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                              )),
+                              SizedBox(
+                                child: kImgAddIcon,
+                                width: 15,
+                                height: 15,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    pallets(context)
+                  ],
                 ),
-                const SizedBox(height: 15),
-                pallets(context)
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -464,14 +470,13 @@ class PalletScreenEdit extends StatelessWidget {
           title: 'Cycle Count Alert ',
           message: 'Please complete cycle count verification and then complete part number',
           primaryBtnTxt: 'Wrong Inventory',
-          secondaryBtnTxt: 'Correct Inventory', primaryAction: () async{
+          secondaryBtnTxt: 'Correct Inventory', primaryAction: () async {
         pallet.getCompletePartStatus(cycleCount: true);
         if (pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.primaryKey == "0") {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               backgroundColor: Colors.red,
               content: Text(
                   "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
-
         } else {
           await pallet.getPallets(addPallet: false);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -491,12 +496,13 @@ class PalletScreenEdit extends StatelessWidget {
               backgroundColor: Colors.green,
               content: Text(
                   "${pallet.getCompletePartStatusVar?.data?.data?.objSaveUpdateResponseModel?.first.errorMessage}")));
+          pallet.getPallets(addPallet: false);
         }
       });
     }
   }
 
-  addPallet(BuildContext context) async{
+  addPallet(BuildContext context) async {
     final pallet = context.read<PalletProviderImpl>();
     final itemId = pallet.lineItemRes?.data?.data?.pickOrderSoDetail?.itemID;
     final pickOrderId = pallet.lineItemRes?.data?.data?.pickOrder?.pickOrderID;
@@ -531,211 +537,422 @@ class _PalletEditListState extends State<PalletEditList> {
   TextEditingController? partTextController;
   bool isFocused = false;
   bool isFirstCompleted = false;
+  FocusNode? _focusNode;
+  bool generatePDF = false;
+  bool showDeleteOption = false;
+  bool showCompletePalletButtonBool = false;
+  bool showCompletePalletButtonWithUpdate = false;
+  bool bindLocationButton = false;
+  bool showResetButton = false;
+  bool showTxtFields = false;
+  bool isLoading = false;
 
   void initState() {
     super.initState();
     locationTextController = TextEditingController();
     partTextController = TextEditingController();
+    _focusNode = FocusNode();
   }
+
+  showGeneratePDF() {
+    if (widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED" ||
+        widget.pickOrder.statusTerm?.toUpperCase() == "VERIFIED") {
+      setState(() {
+        generatePDF = true;
+      });
+    }
+  }
+
+  showTextFields() {
+    if(widget.pickOrder.statusTerm?.isNotEmpty == true && (widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED" ||widget.pickOrder.statusTerm?.toUpperCase() == "VERIFIED" ||
+        widget.pickOrder.statusTerm?.toUpperCase() == "READY FOR DISPATCH" ||widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED / SHORT" ||
+        widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED / OVER" ||widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED / EXACT")){
+    }
+    else{
+      setState((){
+      showTxtFields = true;
+      });
+    }
+  }
+
+  showDeletePallet() {
+    if (widget.pickOrder.isPartIsExistsOrNot == false) {
+      setState(() {
+        showDeleteOption = true;
+      });
+    }
+  }
+
+  Widget completePalletButton() {
+    if (widget.pickOrder.statusTerm?.toUpperCase() != "COMPLETED" &&
+        widget.pickOrder.statusTerm?.toUpperCase() != "VERIFIED") {
+      if (widget.pickOrder.isPalletBindToLocationOrNot == false) {
+        showCompletePalletButtonWithUpdate = true;
+        return InkWell(
+          onTap: () {
+            print("Complete Pallet with update");
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+            child: const Text(
+              'Complete Pallet',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+            ),
+          ),
+        );
+      } else {
+        showCompletePalletButtonBool = true;
+        return InkWell(
+          onTap: () {
+            print("Complete Pallet");
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+            child: const Text(
+              'Complete Pallet',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+            ),
+          ),
+        );
+      }
+    }
+    if (widget.pickOrder.statusTerm?.toUpperCase() != "VERIFIED" &&
+        widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED" &&
+        widget.pickOrder.isPalletBindToLocationOrNot == false) {
+      bindLocationButton = true;
+      InkWell(
+        onTap: () {
+          print("Bind Pallet");
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          decoration: BoxDecoration(color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+          child: const Text(
+            'Bind Pallet',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+          ),
+        ),
+      );
+    }
+
+    if (widget.pickOrder.statusTerm?.toUpperCase() != "VERIFIED" &&
+        widget.pickOrder.statusTerm?.toUpperCase() != "COMPLETED" &&
+        widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "READY FOR DISPATCH" &&
+        widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "COMPLETED / SHORT" &&
+        widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "COMPLETED / OVER" &&
+        widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "COMPLETED / EXACT") {
+      showResetButton = true;
+    }
+
+    return Container();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = context.read<PalletProviderImpl>();
 
+    print(provider.lineItemRes?.data?.data?.pickOrderSoDetail?.isTotePart == true);
     final width = MediaQuery.of(context).size.width;
 
     final fieldsWidth = width * 0.37;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: kBorderColor)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          InkWell(
-            onFocusChange: (isFocus) {
-              setState(() {
-                isFocused = (isFocus == true);
-              });
-            },
-            onTap: () {
-              setState(() {
-                isVisible = !isVisible;
-              });
-            },
-            child: Container(
-              width: double.infinity,
-              color: isFocused ? kDarkFontColor : kDarkFontColor,
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.pickOrder.palletNo ?? '',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                  Text('Pallet Status: ${widget.pickOrder.statusTerm ?? ''}',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  Container(
-                      width: 44,
-                      child: Icon(isVisible ? Icons.arrow_drop_down : Icons.arrow_right, color: Colors.white))
-                ],
-              ),
-            ),
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: !isVisible
-                ? Container()
-                : Column(
+    showGeneratePDF();
+    showDeletePallet();
+    return Stack(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: kBorderColor)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              InkWell(
+                onFocusChange: (isFocus) {
+                  setState(() {
+                    isFocused = (isFocus == true);
+                  });
+                },
+                onTap: () {
+                  setState(() {
+                    isVisible = !isVisible;
+                  });
+                },
+                child: Container(
+                  width: double.infinity,
+                  color: isFocused ? kDarkFontColor : kDarkFontColor,
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Scan Location',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                  textAlign: TextAlign.start,
-                                ),
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  width: fieldsWidth,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(5),
-                                    child: Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: isFirstCompleted ? Colors.grey : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(color: kBorderColor)),
-                                      child: Row(
-                                        children: [
-                                           Expanded(
-                                            child: TextField(
-                                              onEditingComplete: () {
-                                                checkScanLocation(locationTextController?.text, palletProvider.palletsRes?.data?.data?.pickOrderPalletList);
-                                              },
-                                              controller: locationTextController!,
-                                              autofocus: true,
-                                              enabled: !isFirstCompleted,
-                                              decoration: const InputDecoration(
-                                                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                                                  border: InputBorder.none),
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 50,
-                                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                                            color: kThemeBlueFontColor,
-                                            child: const Center(
-                                              child: Text(
-                                                'Change Location',
-                                                style: TextStyle(
-                                                    color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Scan Part',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                  textAlign: TextAlign.start,
-                                ),
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  width: fieldsWidth,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(5),
-                                    child: Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(color: kBorderColor)),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextField(
-                                              controller: partTextController,
-                                              autofocus: true,
-                                              decoration: InputDecoration(
-                                                  // prefixIcon: LoadingSmall(),
-                                                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                                                  border: InputBorder.none),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                      Expanded(
+                        child: Text(
+                          widget.pickOrder.palletNo ?? '',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ),
-                      table(pallets: widget.pallets),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            InkWell(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                decoration:
-                                    BoxDecoration(color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
-                                child: const Text(
-                                  'Complete Pallet',
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
-                                ),
+                      generatePDF
+                          ? TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                "Generate PDF",
+                                style: TextStyle(color: Colors.white),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            InkWell(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                decoration:
-                                    BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(2)),
-                                child: const Text(
-                                  'Delete Pallet',
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
-                                ),
+                              style: TextButton.styleFrom(backgroundColor: Colors.red))
+                          : Container(),
+                      showDeleteOption
+                          ? TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                "Delete Pallet",
+                                style: TextStyle(color: Colors.white),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
+                              style: TextButton.styleFrom(backgroundColor: Colors.red))
+                          : Container(),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text('Pallet Status: ${widget.pickOrder.statusTerm ?? ''}',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                          width: 44,
+                          child: Icon(isVisible ? Icons.arrow_drop_down : Icons.arrow_right, color: Colors.white))
                     ],
                   ),
+                ),
+              ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: !isVisible
+                    ? Container()
+                    : Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Scan Location',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    SizedBox(
+                                      width: fieldsWidth,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: Container(
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                              color:
+                                                  isFirstCompleted ? Colors.grey.withOpacity(0.4) : Colors.transparent,
+                                              borderRadius: BorderRadius.circular(5),
+                                              border: Border.all(color: kBorderColor)),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextField(
+                                                  onEditingComplete: () {
+                                                    setState(() {
+                                                      //   isFirstCompleted = true;
+                                                    });
+                                                    checkScanLocation();
+                                                  },
+                                                  controller: locationTextController!,
+                                                  autofocus: true,
+                                                  enabled: !isFirstCompleted,
+                                                  decoration: const InputDecoration(
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                                      border: InputBorder.none),
+                                                ),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isFirstCompleted = false;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  height: 50,
+                                                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                                  color: kThemeBlueFontColor,
+                                                  child: const Center(
+                                                    child: Text(
+                                                      'Change Location',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w500),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Scan Part',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    SizedBox(
+                                      width: fieldsWidth,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: Container(
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                              color:
+                                                  isFirstCompleted ? Colors.transparent : Colors.grey.withOpacity(0.4),
+                                              borderRadius: BorderRadius.circular(5),
+                                              border: Border.all(color: kBorderColor)),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextField(
+                                                  enabled: isFirstCompleted,
+                                                  autofocus: true,
+                                                  controller: partTextController,
+                                                  decoration: const InputDecoration(
+                                                      // prefixIcon: LoadingSmall(),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                                      border: InputBorder.none),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          table(pallets: widget.pallets),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                showCompletePalletButtonBool
+                                    ? InkWell(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+                                          child: const Text(
+                                            'Complete Pallet',
+                                            style: TextStyle(
+                                                color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(),
+                                const SizedBox(width: 10),
+                                showCompletePalletButtonWithUpdate
+                                    ? InkWell(
+                                        child: Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                            color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+                                        child: const Text(
+                                          'Complete Pallet',
+                                          style:
+                                              TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                                        ),
+                                      ))
+                                    : Container(),
+                                const SizedBox(width: 10),
+                                showResetButton
+                                    ? InkWell(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.redAccent, borderRadius: BorderRadius.circular(2)),
+                                          child: const Text(
+                                            'Reset',
+                                            style: TextStyle(
+                                                color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(),
+                                const SizedBox(width: 10),
+                                bindLocationButton
+                                    ? InkWell(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              color: kThemeBlueFontColor, borderRadius: BorderRadius.circular(2)),
+                                          child: const Text(
+                                            'Bind Location',
+                                            style: TextStyle(
+                                                color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                                          ),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        if (isLoading)
+          Center(
+              child: LoadingSmall(
+            color: Colors.black,
+            size: 50,
+          ))
+      ],
     );
   }
-  void checkScanLocation(String? loc) {
-    final provider = context.read<PalletProviderImpl>();
-    final details = provider.lineItemRes?.data?.data?.pickOrder?.soNumber;
-    if(loc?.isNotEmpty == true && loc != null){
 
+  void checkScanLocation() async {
+    final provider = context.read<PalletProviderImpl>();
+    if (locationTextController?.text != null && locationTextController?.text.replaceAll(" ", "") != "") {
+      setState(() {
+        isLoading = true;
+      });
+      await provider.getLocationData(
+          locationTitle: locationTextController?.text ?? " ",
+          isTotePart: provider.lineItemRes?.data?.data?.pickOrderSoDetail?.isTotePart == true);
+      if (provider.locationData?.state == Status.COMPLETED) {
+        setState(() {
+          isLoading = false;
+          isFirstCompleted = true;
+          Future.delayed(const Duration(milliseconds: 10), () {
+            FocusScope.of(context).requestFocus(_focusNode);
+          });
+        });
+      } else if (provider.locationData?.state == Status.ERROR) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${provider.locationData?.data?.message}")));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(backgroundColor: Colors.red, content: Text("Please Scan/Enter location")));
     }
   }
+
   Widget table({List<PickOrderdetailList>? pallets}) {
     Widget header(String text) => Container(
           child: Text(
@@ -791,6 +1008,3 @@ class _PalletEditListState extends State<PalletEditList> {
     );
   }
 }
-
-
-
