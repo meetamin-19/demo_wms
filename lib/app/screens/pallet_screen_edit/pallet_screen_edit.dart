@@ -47,6 +47,9 @@ class PalletScreenEdit extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
+                            onTap: () {
+
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                               decoration:
