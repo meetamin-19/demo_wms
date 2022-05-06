@@ -109,6 +109,8 @@ class HomeProvider extends BaseNotifier {
   searchFromPickOrderList({required String str}) {
     final searchString = str.toLowerCase();
 
+    filteredPickOrderList = [];
+
     if (searchString.replaceAll(' ', '').isEmpty) {
       filteredPickOrderList = _pickOrderList?.data?.data;
       notifyListeners();

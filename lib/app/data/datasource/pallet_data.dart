@@ -1,4 +1,7 @@
 import 'package:demo_win_wms/app/data/data_service/web_service.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_bind_location_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_location_data.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_view_line_item.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
@@ -21,10 +24,10 @@ abstract class PalletData {
   Future<ResGetCompletePartStatus> getCompletePartStatus(
       {required int pickOrderId, required int pickOrderSODetailID, required int itemID, required bool cycleCount});
 
-  Future<EmptyRes> getLocationData(
+  Future<ResGetLocationData> getLocationData(
       {required String locationTitle, required int pickOrderSODetailID, required bool isTotePart});
 
-  Future<EmptyRes> getScanPartList({required ReqScanPartList req});
+  Future<ResGetPalletListDataById> getScanPartList({required ReqScanPartList req});
 
   Future<EmptyRes> completePallet(
       {required int pOPalletId,
@@ -33,7 +36,7 @@ abstract class PalletData {
       required int warehouseId,
       required String updateLog});
 
-  Future<EmptyRes> bindLocationToPickedPallet({required int pOPalletId, required int pickOrderID});
+  Future<ResBindLocationList> bindLocationToPickedPallet({required int pOPalletId, required int pickOrderID});
 
   Future<EmptyRes> resetLastScannedItemData(
       {required int pOPalletId, required int pickOrderID, required int pickOrderSODetailID});
@@ -123,7 +126,7 @@ class PalletDataImpl extends PalletData {
   }
 
   @override
-  Future<EmptyRes> getLocationData(
+  Future<ResGetLocationData> getLocationData(
       {required String locationTitle, required int pickOrderSODetailID, required bool isTotePart}) async {
     final user = await UserPrefs.shared.getUser;
 
@@ -134,18 +137,21 @@ class PalletDataImpl extends PalletData {
       "IsTotePart": isTotePart
     });
     try {
-      return EmptyRes.fromJson(res!);
+      return ResGetLocationData.fromJson(res!);
     } catch (e) {
       throw kErrorWithRes;
     }
   }
 
   @override
-  Future<EmptyRes> getScanPartList({required ReqScanPartList req}) async {
-    final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/GetScanPartList', data: req.toJson());
+  Future<ResGetPalletListDataById> getScanPartList({required ReqScanPartList req}) async {
+
+    final data = await req.toJson();
+
+    final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/GetScanPartList', data: data);
 
     try {
-      return EmptyRes.fromJson(res!);
+      return ResGetPalletListDataById.fromJson(res!);
     } catch (e) {
       throw kErrorWithRes;
     }
@@ -176,7 +182,7 @@ class PalletDataImpl extends PalletData {
   }
 
   @override
-  Future<EmptyRes> bindLocationToPickedPallet({
+  Future<ResBindLocationList> bindLocationToPickedPallet({
     required int pOPalletId,
     required int pickOrderID,
   }) async {
@@ -185,7 +191,7 @@ class PalletDataImpl extends PalletData {
       "PickOrderID": pickOrderID,
     });
     try {
-      return EmptyRes.fromJson(res!);
+      return ResBindLocationList.fromJson(res!);
     } catch (e) {
       throw kErrorWithRes;
     }

@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_bind_location_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_check_for_cycle_count.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_complete_part_status.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_location_data.dart';
 import 'package:dio/dio.dart';
 
 // import 'package:printing/printing.dart';
@@ -25,7 +27,25 @@ abstract class PalletProvider extends BaseNotifier {
 
   Future getLocationData({required String locationTitle, required bool isTotePart});
 
-  Future getScanPartList({required ReqScanPartList req});
+  Future getScanPartList({required int pickOrderId,
+    required String palletNo,
+    required int pickOrderSODetailID,
+    required int itemID,
+    required String itemName,
+    required int requestedQty,
+    required int actualPicked,
+    required int year,
+    required String month,
+    required int boxQty,
+    required int companyId,
+    required String customCode,
+    required int locationID,
+    required String locationTypeTerm,
+    required int numberOfBoxes,
+    required String pONumber,
+    required int pOPalletID,
+    required int sODetailID,
+    required int warehouseID});
 
   Future completePallet({required int pOPalletId, required int warehouseId, required String updateLog});
 
@@ -69,13 +89,13 @@ class PalletProviderImpl extends PalletProvider {
 
   ApiResponse<ResGetCompletePartStatus>? get getCompletePartStatusVar => _getCompletePartStatus;
 
-  ApiResponse<EmptyRes>? _locationData;
+  ApiResponse<ResGetLocationData>? _locationData;
 
-  ApiResponse<EmptyRes>? get locationData => _locationData;
+  ApiResponse<ResGetLocationData>? get locationData => _locationData;
 
-  ApiResponse<EmptyRes>? _scanPartList;
+  ApiResponse<ResGetPalletListDataById>? _scanPartList;
 
-  ApiResponse<EmptyRes>? get scanPartList => _scanPartList;
+  ApiResponse<ResGetPalletListDataById>? get scanPartList => _scanPartList;
 
   ApiResponse<EmptyRes>? _completePalletVar;
 
@@ -89,8 +109,8 @@ class PalletProviderImpl extends PalletProvider {
 
   ApiResponse<EmptyRes>? get resetPallet => _resetPallet;
 
-  ApiResponse<EmptyRes>? _bindLocation;
-  ApiResponse<EmptyRes>? get bindLocation => _bindLocation;
+  ApiResponse<ResBindLocationList>? _bindLocation;
+  ApiResponse<ResBindLocationList>? get bindLocation => _bindLocation;
 
   int selectedPickOrderSODetailID = 0;
   int selectedPickOrderID = 0;
@@ -194,6 +214,7 @@ class PalletProviderImpl extends PalletProvider {
 
       if (res.success == true) {
         apiResIsSuccess(_locationData!, res);
+        pickOrderViewLineItem();
       } else {
         throw res.message ?? 'Something went wrong';
       }
@@ -203,35 +224,55 @@ class PalletProviderImpl extends PalletProvider {
   }
 
   @override
-  Future getScanPartList({required ReqScanPartList req}) async {
+  Future getScanPartList({required int pickOrderId,
+    required String palletNo,
+    required int pickOrderSODetailID,
+    required int itemID,
+    required String itemName,
+    required int requestedQty,
+    required int actualPicked,
+    required int year,
+    required String month,
+    required int boxQty,
+    required int companyId,
+    required String customCode,
+    required int locationID,
+    required String locationTypeTerm,
+    required int numberOfBoxes,
+    required String pONumber,
+    required int pOPalletID,
+    required int sODetailID,
+    required int warehouseID}) async {
     try {
       apiResIsLoading(_scanPartList!);
-
       final res = await repo.getScanPartList(
           req: ReqScanPartList(
-              pickOrderId: req.pickOrderId,
-              palletNo: req.palletNo,
-              pickOrderSODetailID: req.pickOrderSODetailID,
-              itemID: req.itemID,
-              itemName: req.itemName,
-              requestedQty: req.requestedQty,
-              actualPicked: req.actualPicked,
-              year: req.year,
-              month: req.month,
-              boxQty: req.boxQty,
-              companyId: req.companyId,
-              customCode: req.customCode,
-              locationID: req.locationID,
-              locationTypeTerm: req.locationTypeTerm,
-              numberOfBoxes: req.numberOfBoxes,
-              pONumber: req.pONumber,
-              pOPalletID: req.pOPalletID,
-              sODetailID: req.sODetailID,
-              warehouseID: req.warehouseID));
+              pickOrderId: pickOrderId,
+              palletNo: palletNo,
+              pickOrderSODetailID: pickOrderSODetailID,
+              itemID:itemID,
+              itemName:itemName,
+              requestedQty:requestedQty,
+              actualPicked: actualPicked,
+              year: year,
+              month: month,
+              boxQty: boxQty,
+              companyId: companyId,
+              customCode: customCode,
+              locationID: locationID,
+              locationTypeTerm: locationTypeTerm,
+              numberOfBoxes: numberOfBoxes,
+              pONumber: pONumber,
+              pOPalletID: pOPalletID,
+              sODetailID: sODetailID,
+              warehouseID: warehouseID));
       if (res.success == true) {
         apiResIsSuccess(_scanPartList!, res);
-      } else {
-        throw res.message ?? 'Something went wrong';
+        pickOrderViewLineItem();
+        getPallets(addPallet: false);
+      }
+      else {
+        throw res.message ?? "Something" ;
       }
     } catch (e) {
       apiResIsFailed(_scanPartList!, e);
@@ -251,6 +292,7 @@ class PalletProviderImpl extends PalletProvider {
           updateLog: updateLog);
       if (res.success == true) {
         apiResIsSuccess(_completePalletVar!, res);
+        getPallets(addPallet: false);
       } else {
         throw res.message ?? 'Something went wrong';
       }

@@ -282,7 +282,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                                                           hintText: 'Scan BOL Number',
                                                           contentPadding: EdgeInsets.only(left: 10, bottom: 10)),
                                                     )
-                                                  : DisabledTextField(data?.data?.salesOrder?.bolNumber ?? "1234"),
+                                                  : disabledTextField(data?.data?.salesOrder?.bolNumber ?? "1234"),
                                             ),
                                           ),
                                           (data?.data?.salesOrder?.isAllPalletsVerifiedOrNot ?? false)
@@ -606,7 +606,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     );
   }
 
-  Container DisabledTextField(String? txt) {
+  Container disabledTextField(String? txt) {
     return Container(
       color: const Color(0xffeef1f5),
       child: TextField(
@@ -629,48 +629,46 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
 
     return Align(
       alignment: Alignment.bottomRight,
-      child: Container(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            showSubmitButton
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        height: kFlexibleSize(40),
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              loading = true;
-                            });
-                            _submitUnverifiedData();
-                          },
-                          child: isLoading
-                              ? LoadingSmall(
-                                  color: Colors.white,
-                                )
-                              : const Text(
-                                  "SUBMIT",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                          style: TextButton.styleFrom(backgroundColor: Colors.green),
-                        )),
-                  )
-                : Container(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: kFlexibleSize(40),
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel"),
-                ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          showSubmitButton
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                      height: kFlexibleSize(40),
+                      child: TextButton(
+                        onPressed: () {
+                          setState(() {
+                            loading = true;
+                          });
+                          _submitUnverifiedData();
+                        },
+                        child: isLoading
+                            ? LoadingSmall(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "SUBMIT",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                        style: TextButton.styleFrom(backgroundColor: Colors.green),
+                      )),
+                )
+              : Container(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: kFlexibleSize(40),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Cancel"),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -771,7 +769,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                   ),
                 ),
               ))
-            : DataCell(Center(
+            : const DataCell(Center(
 
               )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
@@ -793,7 +791,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
     for (int i = 0; i < (lenByHalf); i++) {
       color = Colors.white;
       if(i % 2 == 0) {
-        color = Color(0xffF9F9F9);
+        color = const Color(0xffF9F9F9);
       }
       d.add(DataRow(
           color: MaterialStateProperty.all(color),
@@ -821,7 +819,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                       child: childText('verified', Colors.white),
                     )),
               ))
-            : DataCell(Center(
+            : const DataCell(Center(
 
               )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
@@ -846,7 +844,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
         color = Colors.white;
       }
       else{
-        color = Color(0xffF9F9F9);
+        color = const Color(0xffF9F9F9);
       }
       d.add(DataRow(
           color: MaterialStateProperty.all(color),
@@ -875,7 +873,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
                   ),
                 ),
               ))
-            : DataCell(Center(
+            : const DataCell(Center(
               )),
         data?.data?.pickOrderPalletList?[i].statusTerm == "Verified"
             ? DataCell(
@@ -904,7 +902,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
 
 
   Widget keyValueBox({required double width, required String key, required String value}) {
-    return Container(
+    return SizedBox(
       width: (width - 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -958,7 +956,7 @@ class _ShippingVerifyEditScreenState extends State<ShippingVerifyEditScreen> {
   }
 
   Widget keyValueBoxForWidget({required double width, required String key, required Widget value}) {
-    return Container(
+    return SizedBox(
       width: (width - 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

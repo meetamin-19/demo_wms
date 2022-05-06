@@ -1,7 +1,9 @@
 import 'package:demo_win_wms/app/data/datasource/pallet_data.dart';
 import 'package:demo_win_wms/app/data/entity/req/req_get_scan_part_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_bind_location_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_check_for_cycle_count.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_complete_part_status.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_location_data.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_pick_order_view_line_item.dart';
 
@@ -33,12 +35,12 @@ class PalletRepository {
       await dataSource.getCompletePartStatus(
           cycleCount: cycleCount, pickOrderSODetailID: pickOrderSODetailID, pickOrderId: pickOrderId, itemID: itemId);
 
-  Future<EmptyRes> getLocationData(
+  Future<ResGetLocationData> getLocationData(
       {required String locationTitle, required int pickOrderSODetailID, required bool isTotePart}) async =>
       await dataSource.getLocationData(
           locationTitle: locationTitle, pickOrderSODetailID: pickOrderSODetailID, isTotePart: isTotePart);
 
-  Future<EmptyRes> getScanPartList({required ReqScanPartList req}) async {
+  Future<ResGetPalletListDataById> getScanPartList({required ReqScanPartList req}) async {
     return await dataSource.getScanPartList(req: req);
   }
 
@@ -79,7 +81,7 @@ class PalletRepository {
     );
   }
 
-  Future<EmptyRes> bindLocationToPickedPallet({required int pOPalletId, required int pickOrderID}) async {
+  Future<ResBindLocationList> bindLocationToPickedPallet({required int pOPalletId, required int pickOrderID}) async {
     return await dataSource.bindLocationToPickedPallet(pOPalletId: pOPalletId, pickOrderID: pickOrderID);
   }
 }

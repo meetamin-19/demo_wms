@@ -60,6 +60,7 @@ class WebService {
     } on SocketException {
       throw 'No Internet connection';
     } on DioError catch (e) {
+      print(e.response);
       switch (e.type) {
         case DioErrorType.connectTimeout:
           throw 'Connection timeOut';

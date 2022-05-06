@@ -21,7 +21,7 @@ class CustomPopup {
             body: Center(
               child: Container(
                 constraints: BoxConstraints(minWidth: 100, maxWidth: size.width > 650 ? 650 : size.width * 0.9,minHeight: 100,maxHeight: size.height * 0.9),
-                padding: EdgeInsets.symmetric(vertical: 15),
+                padding: const EdgeInsets.symmetric(vertical: 15),
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10)
@@ -34,7 +34,7 @@ class CustomPopup {
                       children: [
                         // Icon(Icons.close,color: Colors.transparent,),
                         Expanded(
-                          child: Text(title,style: TextStyle(
+                          child: Text(title,style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16
                           ),textAlign: TextAlign.center,),
@@ -44,12 +44,12 @@ class CustomPopup {
                         // })
                       ],
                     ),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     Container(
                       height: 1,
                       color: Colors.black12,
                     ),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Container(
@@ -57,18 +57,18 @@ class CustomPopup {
                         child: SingleChildScrollView(
                           child: Text(message,
                             softWrap: true,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16
                             ),textAlign: TextAlign.center,),
                         ),
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     Container(
                       height: 1,
                       color: Colors.black12,
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -89,7 +89,7 @@ class CustomPopup {
                                       secondaryAction!();
                                     }
                                   },
-                                  child: Text(secondaryBtnTxt ?? "",style: TextStyle(
+                                  child: Text(secondaryBtnTxt ?? "",style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16
@@ -97,7 +97,7 @@ class CustomPopup {
                                 ),
                               ),
                             if(secondaryBtnTxt != null)
-                              SizedBox(width: 10,),
+                              const SizedBox(width: 10,),
                             Container(
                               height: 40,
                               decoration: BoxDecoration(

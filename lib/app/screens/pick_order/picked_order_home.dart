@@ -43,7 +43,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
       // Add Your Code here.
       await fetchFilters();
       fetchPickList();
@@ -315,7 +315,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             height: 30,
-            decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA))),
+            decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA)),color: Colors.white),
             child: DropdownButton(
                 iconSize: 12,
                 underline: const SizedBox(),
@@ -712,7 +712,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
           data: home.filteredPickOrderList?[index],
           changeStatus: () async {
             try {
-              await home.changePickOrderStatus(id: home.pickOrderList?.data?.data?[index].pickOrderId ?? 0);
+              await home.changePickOrderStatus(id: home.filteredPickOrderList?[index].pickOrderId ?? 0);
             } catch (e) {
               if (scaffoldKey.currentState?.context != null) {
                 ScaffoldMessenger.of(scaffoldKey.currentState!.context)
@@ -726,21 +726,21 @@ class _PickedLineItemState extends State<PickedLineItem> {
                 title: 'Unlink Pick Order',
                 message: 'Are you sure you want to Unlink Pick Order?',
                 primaryBtnTxt: 'Yes', primaryAction: () {
-              if (home.pickOrderList?.data?.data?[index] != null) {
-                unLinkOrder(data: home.pickOrderList!.data!.data![index]);
+              if (home.filteredPickOrderList?[index] != null) {
+                unLinkOrder(data: home.filteredPickOrderList![index]);
               }
             }, secondaryBtnTxt: 'Close');
           },
           linkOrder: () async {
             PickOrderLinkUser? selectedUser;
-            await getLinkOrderUsers(data: home.pickOrderList!.data!.data![index]);
+            await getLinkOrderUsers(data: home.filteredPickOrderList![index]);
 
             if (kDebugMode) {
               print(home.assignedToUserList?.data?.data?.userList);
             }
             CustomPopUpWithDropDown(context, primaryBtnTxt: 'Save', secondaryBtnTxt: 'Cancel', primaryAction: () {
               if (selectedUser != null) {
-                linkOrder(data: home.pickOrderList!.data!.data![index], assignToId: selectedUser!.value!);
+                linkOrder(data: home.filteredPickOrderList![index], assignToId: selectedUser!.value!);
               } else {
                 if (kDebugMode) {
                   print("selected User null");
@@ -767,14 +767,14 @@ class _PickedLineItemState extends State<PickedLineItem> {
           deleteOrder: () {
             CustomPopup(context, title: 'Delete', message: 'Are you sure you want to delete ?', primaryBtnTxt: 'Yes',
                 primaryAction: () {
-              if (home.pickOrderList?.data?.data?[index] != null) {
-                deletePickOrder(data: home.pickOrderList!.data!.data![index]);
+              if (home.filteredPickOrderList?[index] != null) {
+                deletePickOrder(data: home.filteredPickOrderList![index]);
               }
             }, secondaryBtnTxt: 'Close');
           },
           addNote: () async {
-            if (home.pickOrderList?.data?.data?[index] != null) {
-              await getPickOrderNoteText(data: home.pickOrderList!.data!.data![index]);
+            if (home.filteredPickOrderList?[index] != null) {
+              await getPickOrderNoteText(data: home.filteredPickOrderList![index]);
             }
 
             if (home.getPickOrderNote?.state == Status.COMPLETED) {
@@ -785,7 +785,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
                   primaryBtnTxt: 'Save',
                   hint: 'Enter Pick Order Note',
                   secondaryBtnTxt: 'Close', primaryAction: (pickOrderNote) {
-                savePickOrderNoteText(data: home.pickOrderList!.data!.data![index], pickOrderNote: pickOrderNote);
+                savePickOrderNoteText(data: home.filteredPickOrderList![index], pickOrderNote: pickOrderNote);
               });
             }
           },
@@ -794,8 +794,8 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
             pickOrder.isInEditingMode = true;
 
-            if (home.pickOrderList?.data?.data?[index] != null) {
-              final data = home.pickOrderList?.data?.data?[index];
+            if (home.filteredPickOrderList?[index] != null) {
+              final data = home.filteredPickOrderList?[index];
 
               pickOrder.pickOrderID = data?.pickOrderId ?? 0;
               pickOrder.salesOrderID = data?.salesOrderId ?? 0;
@@ -811,8 +811,8 @@ class _PickedLineItemState extends State<PickedLineItem> {
 
             pickOrder.isInEditingMode = false;
 
-            if (home.pickOrderList?.data?.data?[index] != null) {
-              final data = home.pickOrderList?.data?.data?[index];
+            if (home.filteredPickOrderList?[index] != null) {
+              final data = home.filteredPickOrderList?[index];
 
               pickOrder.pickOrderID = data?.pickOrderId ?? 0;
               pickOrder.salesOrderID = data?.salesOrderId ?? 0;

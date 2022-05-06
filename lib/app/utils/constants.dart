@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-Color kPrimaryColor = Color(0xff0097A5);
-Color kLightFontColor = Color(0xff767676);
-Color kDarkFontColor = Color(0xff5E6672);
-Color kThemeGreenFontColor = Color(0xff31C7B2);
-Color kThemeBlueFontColor = Color(0xff32C5D2);
+Color kPrimaryColor = const Color(0xff0097A5);
+Color kLightFontColor = const Color(0xff767676);
+Color kDarkFontColor = const Color(0xff5E6672);
+Color kThemeGreenFontColor = const Color(0xff31C7B2);
+Color kThemeBlueFontColor = const Color(0xff32C5D2);
 Color kBorderColor = Colors.black.withOpacity(0.3);
 
 //Base URL
