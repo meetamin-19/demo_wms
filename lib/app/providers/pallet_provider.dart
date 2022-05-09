@@ -27,32 +27,32 @@ abstract class PalletProvider extends BaseNotifier {
 
   Future getLocationData({required String locationTitle, required bool isTotePart});
 
-  Future getScanPartList({required int pickOrderId,
-    required String palletNo,
-    required int pickOrderSODetailID,
-    required int itemID,
-    required String itemName,
-    required int requestedQty,
-    required int actualPicked,
-    required int year,
-    required String month,
-    required int boxQty,
-    required int companyId,
-    required String customCode,
-    required int locationID,
-    required String locationTypeTerm,
-    required int numberOfBoxes,
-    required String pONumber,
-    required int pOPalletID,
-    required int sODetailID,
-    required int warehouseID});
+  Future getScanPartList(
+      {required int pickOrderId,
+      required String palletNo,
+      required int pickOrderSODetailID,
+      required int itemID,
+      required String itemName,
+      required int requestedQty,
+      required int actualPicked,
+      required int year,
+      required String month,
+      required int boxQty,
+      required int companyId,
+      required String customCode,
+      required int locationID,
+      required String locationTypeTerm,
+      required int numberOfBoxes,
+      required String pONumber,
+      required int pOPalletID,
+      required int sODetailID,
+      required int warehouseID});
 
   Future completePallet({required int pOPalletId, required int warehouseId, required String updateLog});
 
-  Future updatePOPalletBindLocation(
-      {required int pOPalletId, required int warehouseId, required String locationTitle, required});
+  Future updatePOPalletBindLocation({required String locationTitle});
 
-  Future resetLastScannedItemData({required int pOPalletID});
+  Future resetLastScannedItemData();
 
   Future bindLocationToPallet({required int pOPalletID});
 }
@@ -110,11 +110,16 @@ class PalletProviderImpl extends PalletProvider {
   ApiResponse<EmptyRes>? get resetPallet => _resetPallet;
 
   ApiResponse<ResBindLocationList>? _bindLocation;
+
   ApiResponse<ResBindLocationList>? get bindLocation => _bindLocation;
 
   int selectedPickOrderSODetailID = 0;
   int selectedPickOrderID = 0;
   int selectedItemID = 0;
+  String selectedPallet = "";
+  String selectedSoNumber = "";
+  int warehouseID = 0;
+  int selectedPoPalletId = 0;
 
   @override
   Future pickOrderViewLineItem() async {
@@ -224,25 +229,26 @@ class PalletProviderImpl extends PalletProvider {
   }
 
   @override
-  Future getScanPartList({required int pickOrderId,
-    required String palletNo,
-    required int pickOrderSODetailID,
-    required int itemID,
-    required String itemName,
-    required int requestedQty,
-    required int actualPicked,
-    required int year,
-    required String month,
-    required int boxQty,
-    required int companyId,
-    required String customCode,
-    required int locationID,
-    required String locationTypeTerm,
-    required int numberOfBoxes,
-    required String pONumber,
-    required int pOPalletID,
-    required int sODetailID,
-    required int warehouseID}) async {
+  Future getScanPartList(
+      {required int pickOrderId,
+      required String palletNo,
+      required int pickOrderSODetailID,
+      required int itemID,
+      required String itemName,
+      required int requestedQty,
+      required int actualPicked,
+      required int year,
+      required String month,
+      required int boxQty,
+      required int companyId,
+      required String customCode,
+      required int locationID,
+      required String locationTypeTerm,
+      required int numberOfBoxes,
+      required String pONumber,
+      required int pOPalletID,
+      required int sODetailID,
+      required int warehouseID}) async {
     try {
       apiResIsLoading(_scanPartList!);
       final res = await repo.getScanPartList(
@@ -250,9 +256,9 @@ class PalletProviderImpl extends PalletProvider {
               pickOrderId: pickOrderId,
               palletNo: palletNo,
               pickOrderSODetailID: pickOrderSODetailID,
-              itemID:itemID,
-              itemName:itemName,
-              requestedQty:requestedQty,
+              itemID: itemID,
+              itemName: itemName,
+              requestedQty: requestedQty,
               actualPicked: actualPicked,
               year: year,
               month: month,
@@ -270,9 +276,8 @@ class PalletProviderImpl extends PalletProvider {
         apiResIsSuccess(_scanPartList!, res);
         pickOrderViewLineItem();
         getPallets(addPallet: false);
-      }
-      else {
-        throw res.message ?? "Something" ;
+      } else {
+        throw res.message ?? "Something";
       }
     } catch (e) {
       apiResIsFailed(_scanPartList!, e);
@@ -302,19 +307,19 @@ class PalletProviderImpl extends PalletProvider {
   }
 
   @override
-  Future updatePOPalletBindLocation(
-      {required int pOPalletId, required int warehouseId, required String locationTitle, required}) async {
+  Future updatePOPalletBindLocation({required String locationTitle}) async {
     try {
       apiResIsLoading(_updateBindLocation!);
 
       final res = await repo.updatePOPalletBindLocation(
-          pOPalletId: pOPalletId,
+          pOPalletId: selectedPoPalletId,
           pickOrderID: selectedPickOrderID,
           pickOrderSODetailID: selectedPickOrderSODetailID,
-          warehouseId: warehouseId,
+          warehouseId: warehouseID,
           locationTitle: locationTitle);
       if (res.success == true) {
         apiResIsSuccess(_updateBindLocation!, res);
+        getPallets(addPallet: false);
       } else {
         throw res.message ?? 'Something went wrong';
       }
@@ -324,14 +329,17 @@ class PalletProviderImpl extends PalletProvider {
   }
 
   @override
-  Future resetLastScannedItemData({required int pOPalletID}) async {
+  Future resetLastScannedItemData() async {
     try {
       apiResIsLoading(_resetPallet!);
 
       final res = await repo.resetLastScannedItemData(
-          pOPalletId: pOPalletID, pickOrderID: selectedPickOrderID, pickOrderSODetailID: selectedPickOrderSODetailID);
+          pOPalletId: selectedPoPalletId,
+          pickOrderID: selectedPickOrderID,
+          pickOrderSODetailID: selectedPickOrderSODetailID);
       if (res.success == true) {
         apiResIsSuccess(_resetPallet!, res);
+        getPallets(addPallet: false);
       } else {
         throw res.message ?? 'Something went wrong';
       }
@@ -345,8 +353,7 @@ class PalletProviderImpl extends PalletProvider {
     try {
       apiResIsLoading(_bindLocation!);
 
-      final res = await repo.bindLocationToPickedPallet(
-          pOPalletId: pOPalletID, pickOrderID: selectedPickOrderID);
+      final res = await repo.bindLocationToPickedPallet(pOPalletId: pOPalletID, pickOrderID: selectedPickOrderID);
       if (res.success == true) {
         apiResIsSuccess(_bindLocation!, res);
       } else {

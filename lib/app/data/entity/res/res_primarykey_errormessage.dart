@@ -14,12 +14,12 @@ class ResWithPrimaryKeyAndErrorMessage {
   int? statusValueCode;
 
   factory ResWithPrimaryKeyAndErrorMessage.fromJson(Map<String, dynamic> json) => ResWithPrimaryKeyAndErrorMessage(
-    success: json["success"] == null ? null : json["success"],
-    message: json["message"] == null ? null : json["message"],
-    data: json["data"] == null ? null : List<Data>.from(json["data"].map((x) => Data.fromJson(x))),
-    statusCode: json["statusCode"] == null ? null : json["statusCode"],
-    statusValueCode: json["statusValueCode"] == null ? null : json["statusValueCode"],
-  );
+        success: json["success"] == null ? null : json["success"],
+        message: json["message"] == null ? null : json["message"],
+        data: json["data"] == null ? null : List<Data>.from(json["data"].map((x) => Data.fromJson(x))),
+        statusCode: json["statusCode"] == null ? null : json["statusCode"],
+        statusValueCode: json["statusValueCode"] == null ? null : json["statusValueCode"],
+      );
 }
 
 class Data {
@@ -32,7 +32,7 @@ class Data {
   String? errorMessage;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    primaryKey: json["primaryKey"] == null ? null : json["primaryKey"],
-    errorMessage: json["errorMessage"] == null ? null : json["errorMessage"],
-  );
+        primaryKey: json["primaryKey"] == null ? null : json["primaryKey"],
+        errorMessage: json["errorMessage"] == null ? "Something went wrong" : json["errorMessage"],
+      );
 }

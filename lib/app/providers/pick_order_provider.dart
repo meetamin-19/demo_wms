@@ -9,13 +9,10 @@ import 'package:demo_win_wms/app/utils/api_response.dart';
 
 import '../data/entity/res/res_pick_order_list_get.dart';
 
-abstract class PickOrderProvider extends BaseNotifier {
-}
+abstract class PickOrderProvider extends BaseNotifier {}
 
 class PickOrderProviderImpl extends PickOrderProvider {
-
   final PickOrderRepository repo;
-
 
   PickOrderProviderImpl({required this.repo}) {
     _getPickOrder = ApiResponse();
@@ -23,7 +20,6 @@ class PickOrderProviderImpl extends PickOrderProvider {
     _getSalesOrderList = ApiResponse();
     _completePickOrder = ApiResponse();
   }
-
 
   int pickOrderID = 0;
   int salesOrderID = 0;
@@ -47,31 +43,28 @@ class PickOrderProviderImpl extends PickOrderProvider {
 
   List<SalesOrderList>? filteredSalesOrderDetailList;
 
-
   searchFromSalesOderList({required String str}) {
+    filteredSalesOrderDetailList = [];
     final searchString = str.toLowerCase();
-    if (searchString
-        .replaceAll(' ', '')
-        .isEmpty) {
+    if (searchString.replaceAll(' ', '').isEmpty) {
       filteredSalesOrderDetailList = salesOrderList?.data?.data;
       notifyListeners();
     } else {
       filteredSalesOrderDetailList = salesOrderList?.data?.data?.where((element) {
-        final doesContains = (element.itemName ?? '').toLowerCase().contains(searchString)
-            || (element.poNumber ?? '').toLowerCase().contains(searchString)
-            || (element.palletNo ?? '').toLowerCase().contains(searchString)
-            || (element.availableQty ?? 0).toString().toLowerCase().contains(searchString)
-            || (element.qty ?? 0).toString().toLowerCase().contains(searchString)
-            || (element.actualPicked ?? 0).toString().toLowerCase().contains(searchString)
-            || (element.uom ?? '').toLowerCase().contains(searchString)
-            || (element.oldestStockSuggestedLocation ?? '').toLowerCase().contains(searchString)
-            || (element.currentPartStatusTerm ?? '').toLowerCase().contains(searchString);
+        final doesContains = (element.itemName ?? '').toLowerCase().contains(searchString) ||
+            (element.poNumber ?? '').toLowerCase().contains(searchString) ||
+            (element.palletNo ?? '').toLowerCase().contains(searchString) ||
+            (element.availableQty ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.qty ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.actualPicked ?? 0).toString().toLowerCase().contains(searchString) ||
+            (element.uom ?? '').toLowerCase().contains(searchString) ||
+            (element.oldestStockSuggestedLocation ?? '').toLowerCase().contains(searchString) ||
+            (element.currentPartStatusTerm ?? '').toLowerCase().contains(searchString);
         return doesContains;
       }).toList();
       notifyListeners();
     }
   }
-
 
   Future getPickOrderData() async {
     try {
@@ -90,11 +83,11 @@ class PickOrderProviderImpl extends PickOrderProvider {
     }
   }
 
-  Future getSalesOrderList() async {
-
+  Future getSalesOrderList({required int numOfData, required int startPoint}) async {
     apiResIsLoading(_getSalesOrderList!);
     try {
-      final res = await repo.getSalesOrderList(pickOrderID: pickOrderID, salesOrderID: salesOrderID);
+      final res = await repo.getSalesOrderList(
+          numOfData: numOfData, startPoint: startPoint, pickOrderID: pickOrderID, salesOrderID: salesOrderID);
 
       if (res.success == true) {
         apiResIsSuccess<ResSalesOrderListGet>(_getSalesOrderList!, res);
@@ -106,25 +99,22 @@ class PickOrderProviderImpl extends PickOrderProvider {
       apiResIsFailed(_getSalesOrderList!, e);
       rethrow;
     }
-
   }
 
   Future completePickOrder() async {
     apiResIsLoading(_completePickOrder!);
 
-    try{
-    final res = await repo.completePickOrder(pickOrderID: pickOrderID);
+    try {
+      final res = await repo.completePickOrder(pickOrderID: pickOrderID);
 
-        if(res.success == true)
-    {
-      apiResIsSuccess<ResWithPrimaryKeyAndErrorMessage>(_completePickOrder!, res);
-    } else {
-    throw '${res.message}';
-    }
-  }catch(e) {
-    apiResIsFailed(_completePickOrder!, e);
-    rethrow;
+      if (res.success == true) {
+        apiResIsSuccess<ResWithPrimaryKeyAndErrorMessage>(_completePickOrder!, res);
+      } else {
+        throw '${res.message}';
+      }
+    } catch (e) {
+      apiResIsFailed(_completePickOrder!, e);
+      rethrow;
     }
   }
-
 }

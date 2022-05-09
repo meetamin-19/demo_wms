@@ -7,7 +7,7 @@ import 'package:demo_win_wms/app/utils/user_prefs.dart';
 
 abstract class PickOrderData{
   Future<ResGetPickOrderDataForView> getPickOrderDataForView({required int pickOrderID, required int salesOrderID});
-  Future<ResSalesOrderListGet> getSalesOrderList({required int pickOrderID, required int salesOrderID});
+  Future<ResSalesOrderListGet> getSalesOrderList({required int numOfData, required int startPoint,required int pickOrderID, required int salesOrderID});
   Future<ResWithPrimaryKeyAndErrorMessage> completePickOrder({required int pickOrderID});
   // Future<>
 
@@ -33,13 +33,13 @@ class PickOrderDataImpl extends PickOrderData{
 
 
   @override
-  Future<ResSalesOrderListGet> getSalesOrderList({required int pickOrderID, required int salesOrderID}) async{
+  Future<ResSalesOrderListGet> getSalesOrderList({required int numOfData, required int startPoint,required int pickOrderID, required int salesOrderID}) async{
 
     final user = await UserPrefs.shared.getUser;
     
     final res = await WebService.shared.postApiDIO(url: kBaseURL + 'pickorder/Get_SalesOrderDetail_List',data: {
-      "length" : 100,
-      "start" : 0,
+      "length" : numOfData,
+      "start" : startPoint,
       "UserID" : user.userID,
       "UserType_Term" : user.userType_Term,
       "DefaultCompanyID" : user.defaultCompanyID,

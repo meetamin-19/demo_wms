@@ -1,8 +1,11 @@
 import 'package:demo_win_wms/app/data/entity/res/res_bind_location_list.dart';
+import 'package:demo_win_wms/app/providers/pallet_provider.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
+import 'package:demo_win_wms/app/utils/enums.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/src/provider.dart';
 import 'colored_bg_text.dart';
 
 class CustomPopUpForLocationBinding {
@@ -11,7 +14,9 @@ class CustomPopUpForLocationBinding {
   final String? primaryBtnTxt;
   final Function? primaryAction;
   bool isFirstCompleted = false;
+  final TextEditingController _scanLocationController = TextEditingController();
   final TextEditingController _scanPalletController = TextEditingController();
+  final FocusNode _focusNode1 = FocusNode();
 
   CustomPopUpForLocationBinding(BuildContext context,
       {required this.list, this.title, this.primaryBtnTxt, this.primaryAction}) {
@@ -20,88 +25,95 @@ class CustomPopUpForLocationBinding {
     showCupertinoDialog(
         context: context,
         builder: (context) {
-          return Scaffold(
-            backgroundColor: Colors.black.withOpacity(0.3),
-            body: Center(
-              child: Container(
-                constraints: BoxConstraints(
-                    minWidth: 100,
-                    maxWidth: size.width > 650 ? 650 : size.width * 0.9,
-                    minHeight: 100,
-                    maxHeight: size.height * 0.9),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Icon(Icons.close,color: Colors.transparent,),
-                        Expanded(
-                          child: Text(
-                            title ?? "",
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        // IconButton(icon: Icon(Icons.close), onPressed: (){
-                        //   Navigator.of(context).pop();
-                        // })
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      height: 1,
-                      color: Colors.black12,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Expanded(child: body(size)),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      height: 1,
-                      color: Colors.black12,
-                    ),
-                    const SizedBox(height: 15),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.blue),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              if (primaryAction != null) {
-                                primaryAction!();
-                              }
-                            },
+          return StatefulBuilder(builder: (context, setState) {
+            return Scaffold(
+              backgroundColor: Colors.black.withOpacity(0.3),
+              body: Center(
+                child: Container(
+                  constraints: BoxConstraints(
+                      minWidth: 100,
+                      maxWidth: size.width > 650 ? 650 : size.width * 0.9,
+                      minHeight: 100,
+                      maxHeight: size.height * 0.9),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Icon(Icons.close,color: Colors.transparent,),
+                          Expanded(
                             child: Text(
-                              primaryBtnTxt ?? "",
-                              style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+                              title ?? "",
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          // IconButton(icon: Icon(Icons.close), onPressed: (){
+                          //   Navigator.of(context).pop();
+                          // })
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        height: 1,
+                        color: Colors.black12,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(child: body(size, context, setState)),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        height: 1,
+                        color: Colors.black12,
+                      ),
+                      const SizedBox(height: 15),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Colors.blue),
+                                borderRadius: BorderRadius.circular(5)),
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                if (primaryAction != null) {
+                                  primaryAction!();
+                                  _scanPalletController.dispose();
+                                  _scanLocationController.dispose();
+                                  _focusNode1.dispose();
+                                }
+                              },
+                              child: Text(
+                                primaryBtnTxt ?? "",
+                                style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
+          });
         });
   }
 
-  Widget body(Size size) {
+  Widget body(Size size, BuildContext context, void Function(void Function()) setState) {
+    int len = (list?.length ?? 0) + 1;
+
     Widget header(String text) => Container(
           child: Text(
             text,
@@ -119,7 +131,6 @@ class CustomPopUpForLocationBinding {
           ),
           padding: const EdgeInsets.all(10),
         );
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
@@ -149,37 +160,14 @@ class CustomPopUpForLocationBinding {
                       height: 40,
                       decoration: BoxDecoration(
                           border: Border.all(color: kBorderColor),
-                          // color: secondDisabled == true ? const Color(0xffeef1f5) : Colors.transparent,
+                          color: isFirstCompleted == true ? const Color(0xffeef1f5) : Colors.transparent,
                           borderRadius: BorderRadius.circular(5)),
                       child: TextField(
-                        // enabled: secondDisabled == true ? false : true,
-                        // focusNode: _focusNode1,
+                        autofocus: true,
+                        enabled: !isFirstCompleted,
                         controller: _scanPalletController,
                         onEditingComplete: () {
-                          // if (_scanPalletController.text !=
-                          //     data?.data?.pickOrderPalletList?.first.palletLocation) {
-                          //   setState(() {
-                          //     _scanLocationController?.text = "";
-                          //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          //       content: Text("Incorrect Pallet Location"),
-                          //     ));
-                          //     return;
-                          //   });
-                          // } else {
-                          //   setState(() {
-                          //     Future.delayed(const Duration(milliseconds: 10), () {
-                          //       FocusScope.of(context).requestFocus(_focusNode2);
-                          //       // print(FocusScope.of(context)
-                          //       //     .focusedChild
-                          //       //     .toString());
-                          //     });
-                          //     secondCompleted = true;
-                          //     if ((firstCompleted == true && secondCompleted == true) ||
-                          //         firstCompleted == true) {
-                          //       secondDisabled = true;
-                          //     }
-                          //   });
-                          // }
+                          checkScanPart(context, setState);
                         },
                         style: const TextStyle(fontSize: 15),
                         decoration: const InputDecoration(
@@ -203,37 +191,20 @@ class CustomPopUpForLocationBinding {
                       height: 40,
                       decoration: BoxDecoration(
                           border: Border.all(color: kBorderColor),
-                          // color: secondDisabled == true ? const Color(0xffeef1f5) : Colors.transparent,
+                          color: isFirstCompleted == false ? const Color(0xffeef1f5) : Colors.transparent,
                           borderRadius: BorderRadius.circular(5)),
                       child: TextField(
-                        // enabled: secondDisabled == true ? false : true,
-                        // focusNode: _focusNode1,
-                        // controller: _scanLocationController,
+                        enabled: isFirstCompleted,
+                        focusNode: _focusNode1,
+                        controller: _scanLocationController,
+                        // autofocus: true,
                         onEditingComplete: () {
-                          // if (_scanLocationController?.text !=
-                          //     data?.data?.pickOrderPalletList?.first.palletLocation) {
-                          //   setState(() {
-                          //     _scanLocationController?.text = "";
-                          //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          //       content: Text("Incorrect Pallet Location"),
-                          //     ));
-                          //     return;
-                          //   });
-                          // } else {
-                          //   setState(() {
-                          //     Future.delayed(const Duration(milliseconds: 10), () {
-                          //       FocusScope.of(context).requestFocus(_focusNode2);
-                          //       // print(FocusScope.of(context)
-                          //       //     .focusedChild
-                          //       //     .toString());
-                          //     });
-                          //     secondCompleted = true;
-                          //     if ((firstCompleted == true && secondCompleted == true) ||
-                          //         firstCompleted == true) {
-                          //       secondDisabled = true;
-                          //     }
-                          //   });
-                          // }
+                          if (_scanLocationController.text != " " && _scanLocationController.text.isNotEmpty) {
+                            checkLocation(context, setState);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                backgroundColor: Colors.red, content: Text("Please Scan/Enter Location")));
+                          }
                         },
                         style: const TextStyle(fontSize: 15),
                         decoration: const InputDecoration(
@@ -258,7 +229,7 @@ class CustomPopUpForLocationBinding {
             Table(
               border: TableBorder.all(color: Colors.black.withOpacity(0.3)),
               columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(10)},
-              children: List.generate(list?.length ?? 0, (index) {
+              children: List.generate(len, (index) {
                 if (index == 0) {
                   return TableRow(children: [
                     header('#'),
@@ -266,7 +237,7 @@ class CustomPopUpForLocationBinding {
                   ]);
                 }
 
-                final data = list?[index - index];
+                final data = list?[index - 1];
 
                 return TableRow(children: [
                   value('$index'),
@@ -294,5 +265,51 @@ class CustomPopUpForLocationBinding {
         )),
       ),
     );
+  }
+
+  checkScanPart(BuildContext context, void Function(void Function()) setState) async {
+    final provider = context.read<PalletProviderImpl>();
+    String txt = _scanPalletController.text;
+    if (txt.contains(provider.selectedSoNumber)) {
+      txt = txt.replaceAll(provider.selectedSoNumber, "");
+      if (txt.isNotEmpty) {
+        if (provider.selectedPallet == txt) {
+          setState(() {
+            isFirstCompleted = true;
+            Future.delayed(const Duration(milliseconds: 10), () {
+              FocusScope.of(context).requestFocus(_focusNode1);
+            });
+            _focusNode1.requestFocus();
+          });
+        }
+      } else {
+        _scanPalletController.text = "";
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(backgroundColor: Colors.red, content: Text("Incorrect Value")));
+      }
+    } else {
+      _scanPalletController.text = "";
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(backgroundColor: Colors.red, content: Text("Incorrect Value")));
+    }
+  }
+
+  checkLocation(BuildContext context, void Function(void Function()) setState) async {
+    final provider = context.read<PalletProviderImpl>();
+    int warehouseID = provider.lineItemRes?.data?.data?.pickOrderSoDetail?.warehouseId ?? 0;
+    provider.warehouseID = warehouseID;
+    await provider.updatePOPalletBindLocation(locationTitle: _scanLocationController.text);
+    if (provider.updateBindLocation?.state == Status.COMPLETED) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text("Successfully updated location"),
+      ));
+      Navigator.pop(context);
+    } else if (provider.updateBindLocation?.state == Status.ERROR) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text("${provider.updateBindLocation?.msg}"),
+      ));
+    }
   }
 }

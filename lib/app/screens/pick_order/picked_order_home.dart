@@ -271,14 +271,13 @@ class _PickedLineItemState extends State<PickedLineItem> {
           pickOrderNote: pickOrderNote, updateLog: data.updatelog, pickOrderId: data.pickOrderId);
 
       if (home.savePickOrderNoteVar?.state == Status.ERROR) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Pick Order note was not saved . Please refresh and try again.")));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Pick Order note was not saved . Please refresh and try again.")));
       }
 
-      if(home.savePickOrderNoteVar?.state == Status.COMPLETED){
+      if (home.savePickOrderNoteVar?.state == Status.COMPLETED) {
         fetchPickList();
       }
-
 
       setState(() {
         isScreenLoading = false;
@@ -296,11 +295,11 @@ class _PickedLineItemState extends State<PickedLineItem> {
   String? selectedRange = "100";
   String? selectedStartPoint = "0";
 
-  BoxDecoration unselectedBox =
-  BoxDecoration(color: const Color(0xffE5E5E5).withOpacity(0.5), borderRadius: const BorderRadius.all(const Radius.circular(3)));
+  BoxDecoration unselectedBox = BoxDecoration(
+      color: const Color(0xffE5E5E5).withOpacity(0.5), borderRadius: const BorderRadius.all(const Radius.circular(3)));
 
   BoxDecoration selectedBox =
-  const BoxDecoration(color: Color(0xff7F849A), borderRadius: BorderRadius.all(Radius.circular(3)));
+      const BoxDecoration(color: Color(0xff7F849A), borderRadius: BorderRadius.all(Radius.circular(3)));
 
   Widget pages(BuildContext context) {
     return Padding(
@@ -315,7 +314,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             height: 30,
-            decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA)),color: Colors.white),
+            decoration: BoxDecoration(border: Border.all(color: const Color(0xffCACACA)), color: Colors.white),
             child: DropdownButton(
                 iconSize: 12,
                 underline: const SizedBox(),
@@ -371,7 +370,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
                         // _scrollController.jumpTo(2);
                       },
                       child: Container(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
                         height: 40,
                         width: 30,
                         child: Icon(
@@ -410,7 +409,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
                       itemBuilder: (BuildContext context, index) {
                         BoxDecoration box = selectedIndex == (startingIndex + index) ? selectedBox : unselectedBox;
 
-                        if (index == 5 && startingIndex != itemCount- 6) {
+                        if (index == 5 && startingIndex != itemCount - 6) {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                             decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(2))),
@@ -447,7 +446,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
                           return InkWell(
                             onTap: () {
                               setState(() {
-                                startingIndex = itemCount- 6;
+                                startingIndex = itemCount - 6;
                                 selectedIndex = startingIndex + index;
                                 getPage();
                               });
@@ -490,30 +489,28 @@ class _PickedLineItemState extends State<PickedLineItem> {
                           ),
                         );
                       },
-                      itemCount: itemCount>= 7 ? 7 : itemCount,
+                      itemCount: itemCount >= 7 ? 7 : itemCount,
                     ),
                     InkWell(
                       onTap: () {
                         setState(() {
-                          if(itemCount <= 7) {
+                          if (itemCount <= 7) {
                             startingIndex = 1;
-                          }
-                          else{
+                          } else {
                             if (startingIndex + 8 < itemCount) {
                               startingIndex += 1;
                             } else {
-                              if (itemCount- 7 > 0) {
-                                startingIndex = itemCount- 6;
+                              if (itemCount - 7 > 0) {
+                                startingIndex = itemCount - 6;
                               } else {
                                 startingIndex = itemCount - 7;
                               }
                             }
                           }
-
                         });
                       },
                       child: Container(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
                         child: Icon(
                           Icons.arrow_right_outlined,
                           color: const Color(0xff263238).withOpacity(0.5),
@@ -801,7 +798,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
               pickOrder.salesOrderID = data?.salesOrderId ?? 0;
 
               pickOrder.getPickOrderData();
-              pickOrder.getSalesOrderList();
+              pickOrder.getSalesOrderList(numOfData: 100, startPoint: 0);
             }
 
             Navigator.of(context).pushNamed(kPickOrderListRoute, arguments: true);
@@ -818,7 +815,7 @@ class _PickedLineItemState extends State<PickedLineItem> {
               pickOrder.salesOrderID = data?.salesOrderId ?? 0;
 
               pickOrder.getPickOrderData();
-              pickOrder.getSalesOrderList();
+              pickOrder.getSalesOrderList(startPoint: 0, numOfData: 100);
             }
 
             Navigator.of(context).pushNamed(kPickOrderListRoute, arguments: false);

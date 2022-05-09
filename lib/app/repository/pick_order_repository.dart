@@ -5,21 +5,23 @@ import 'package:demo_win_wms/app/data/entity/res/res_primarykey_errormessage.dar
 
 import '../data/entity/res/res_pick_order_sales_order_list.dart';
 
-class PickOrderRepository{
+class PickOrderRepository {
   final PickOrderData dataSource;
 
   PickOrderRepository({required this.dataSource});
 
-  Future<ResGetPickOrderDataForView> getPickOrderDataForView({required int pickOrderID, required int salesOrderID}) async {
+  Future<ResGetPickOrderDataForView> getPickOrderDataForView(
+      {required int pickOrderID, required int salesOrderID}) async {
     return dataSource.getPickOrderDataForView(pickOrderID: pickOrderID, salesOrderID: salesOrderID);
   }
 
-  Future<ResSalesOrderListGet> getSalesOrderList({required int pickOrderID, required int salesOrderID}) async {
-    return dataSource.getSalesOrderList(pickOrderID: pickOrderID, salesOrderID: salesOrderID);
+  Future<ResSalesOrderListGet> getSalesOrderList(
+      {required int numOfData, required int startPoint, required int pickOrderID, required int salesOrderID}) async {
+    return dataSource.getSalesOrderList(
+        numOfData: numOfData, startPoint: startPoint, pickOrderID: pickOrderID, salesOrderID: salesOrderID);
   }
 
   Future<ResWithPrimaryKeyAndErrorMessage> completePickOrder({required int pickOrderID}) async {
     return dataSource.completePickOrder(pickOrderID: pickOrderID);
   }
-
 }

@@ -1,6 +1,8 @@
+import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_data_showing_component.dart';
 import 'package:demo_win_wms/app/views/custom_popup_for_location_binding.dart';
 import 'package:demo_win_wms/app/views/custom_popup_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
 import 'package:demo_win_wms/app/providers/pallet_provider.dart';
@@ -57,7 +59,9 @@ class _PalletScreenEditState extends State<PalletScreenEdit> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () {
+                                      completePickOrder(context);
+                                    },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                       decoration: BoxDecoration(
@@ -568,6 +572,36 @@ class _PalletScreenEditState extends State<PalletScreenEdit> {
   }
 }
 
+completePickOrder(BuildContext context) {
+  final pickOrder = context.read<PickOrderProviderImpl>();
+  final pallet = context.read<PalletProviderImpl>();
+  final pickOrderId = pallet.lineItemRes?.data?.data?.pickOrder?.pickOrderID;
+
+  pickOrder.pickOrderID = pickOrderId ?? 0;
+
+  CustomPopup(context,
+      message:
+          "If you click on \"Yes\", all Parts of this Pick Order will also be completed. Are you sure you want to Complete Pick Order?",
+      title: 'Complete Pick Order',
+      primaryBtnTxt: "Yes",
+      secondaryBtnTxt: "No", primaryAction: () async {
+    await context.read<PickOrderProviderImpl>().completePickOrder();
+    if (pickOrder.completePickOrderVar?.data?.data?.first.errorMessage?.toLowerCase() != "update successfully") {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("${pickOrder.completePickOrderVar?.data?.data?.first.errorMessage}")));
+    }
+
+    if (pickOrder.completePickOrderVar?.state == Status.COMPLETED &&
+        pickOrder.completePickOrderVar?.data?.data?.first.errorMessage?.toLowerCase() == "update successfully") {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("${pickOrder.completePickOrderVar?.data?.data?.first.errorMessage}")));
+      Navigator.popAndPushNamed(context, kPickOrderHomeRoute);
+    }
+  });
+}
+
 class PalletEditList extends StatefulWidget {
   const PalletEditList({Key? key, required this.pickOrder, this.pallets}) : super(key: key);
 
@@ -603,6 +637,14 @@ class _PalletEditListState extends State<PalletEditList> {
     _focusNode = FocusNode();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    locationTextController?.dispose();
+    partTextController?.dispose();
+    _focusNode?.dispose();
+  }
+
   showGeneratePDF() {
     if (widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED" ||
         widget.pickOrder.statusTerm?.toUpperCase() == "VERIFIED") {
@@ -614,12 +656,12 @@ class _PalletEditListState extends State<PalletEditList> {
 
   showTextFields() {
     if (widget.pickOrder.statusTerm?.isNotEmpty == true &&
-        (widget.pickOrder.currentPartStatusTerm?.toUpperCase() == "COMPLETED" ||
-            widget.pickOrder.currentPartStatusTerm?.toUpperCase() == "VERIFIED" ||
-            widget.pickOrder.currentPartStatusTerm?.toUpperCase() == "READY FOR DISPATCH" ||
-            widget.pickOrder.currentPartStatusTerm?.toUpperCase() == "COMPLETED / SHORT" ||
-            widget.pickOrder.currentPartStatusTerm?.toUpperCase() == "COMPLETED / OVER" ||
-            widget.pickOrder.currentPartStatusTerm?.toUpperCase() == "COMPLETED / EXACT")) {
+        (widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED" ||
+            widget.pickOrder.statusTerm?.toUpperCase() == "VERIFIED" ||
+            widget.pickOrder.statusTerm?.toUpperCase() == "READY FOR DISPATCH" ||
+            widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED / SHORT" ||
+            widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED / OVER" ||
+            widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED / EXACT")) {
     } else {
       setState(() {
         showTxtFields = true;
@@ -637,7 +679,8 @@ class _PalletEditListState extends State<PalletEditList> {
 
   Widget completePalletButton() {
     if (widget.pickOrder.statusTerm?.toUpperCase() != "COMPLETED" &&
-        widget.pickOrder.statusTerm?.toUpperCase() != "VERIFIED") {
+        widget.pickOrder.statusTerm?.toUpperCase() != "VERIFIED" &&
+        (widget.pallets?.length ?? 0) > 0) {
       if (widget.pickOrder.isPalletBindToLocationOrNot == false) {
         showCompletePalletButtonWithUpdate = true;
         // return InkWell(
@@ -672,6 +715,7 @@ class _PalletEditListState extends State<PalletEditList> {
     }
     if (widget.pickOrder.statusTerm?.toUpperCase() != "VERIFIED" &&
         widget.pickOrder.statusTerm?.toUpperCase() == "COMPLETED" &&
+        (widget.pallets?.length ?? 0) > 0 &&
         widget.pickOrder.isPalletBindToLocationOrNot == false) {
       bindLocationButton = true;
       // InkWell(
@@ -694,6 +738,7 @@ class _PalletEditListState extends State<PalletEditList> {
         widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "READY FOR DISPATCH" &&
         widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "COMPLETED / SHORT" &&
         widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "COMPLETED / OVER" &&
+        (widget.pallets?.length ?? 0) > 0 &&
         widget.pickOrder.currentPartStatusTerm?.toUpperCase() != "COMPLETED / EXACT") {
       showResetButton = true;
     }
@@ -947,6 +992,9 @@ class _PalletEditListState extends State<PalletEditList> {
                                 const SizedBox(width: 10),
                                 showResetButton
                                     ? InkWell(
+                                        onTap: () {
+                                          resetLastScannedItem(context);
+                                        },
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                           decoration: BoxDecoration(
@@ -1177,7 +1225,7 @@ class _PalletEditListState extends State<PalletEditList> {
               pONumber: provider.lineItemRes?.data?.data?.pickOrderSoDetail?.poNumber ?? "",
               pOPalletID: widget.pickOrder.poPalletId ?? 0,
               sODetailID: provider.lineItemRes?.data?.data?.pickOrderSoDetail?.sODetailID ?? 0,
-              warehouseID: provider.locationData?.data?.data?.warehouseId ?? 0);
+              warehouseID: provider.lineItemRes?.data?.data?.pickOrderSoDetail?.warehouseId ?? 0);
           if (provider.scanPartList?.state == Status.COMPLETED) {
             setState(() {
               isLoading = false;
@@ -1338,9 +1386,35 @@ class _PalletEditListState extends State<PalletEditList> {
     }
 
     if (provider.bindLocation?.state == Status.COMPLETED) {
+      final soNumber = provider.lineItemRes?.data?.data?.pickOrder?.soNumber;
+      provider.selectedPallet = "${widget.pickOrder.palletNo}";
+      provider.selectedSoNumber = "$soNumber";
+      provider.selectedPoPalletId = widget.pickOrder.poPalletId ?? 0;
       CustomPopUpForLocationBinding(context,
           list: provider.bindLocation?.data?.data?.bindLocationListData, primaryBtnTxt: 'Close');
+      setState(() {});
     }
+  }
+
+  resetLastScannedItem(BuildContext context) async {
+    final provider = context.read<PalletProviderImpl>();
+
+    setState(() {
+      isLoading = true;
+    });
+    provider.selectedPickOrderID = provider.lineItemRes?.data?.data?.pickOrder?.pickOrderID ?? 0;
+    provider.selectedPickOrderSODetailID =
+        provider.lineItemRes?.data?.data?.pickOrderSoDetail?.pickOrderSODetailID ?? 0;
+    provider.selectedPoPalletId = widget.pickOrder.poPalletId ?? 0;
+
+    await provider.resetLastScannedItemData();
+    if (provider.resetPallet?.state == Status.COMPLETED) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text("Reset Done Successfully")));
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
 // void updatePallet(BuildContext context) {}

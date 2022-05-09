@@ -8,7 +8,6 @@ import 'package:demo_win_wms/app/data/entity/res/res_primarykey_errormessage.dar
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/repository/home_repo.dart';
 import 'package:demo_win_wms/app/utils/api_response.dart';
-
 import 'base_notifier.dart';
 
 class HomeProvider extends BaseNotifier {
@@ -175,6 +174,7 @@ class HomeProvider extends BaseNotifier {
 
       if (res.success == true) {
         apiResIsSuccess<EmptyRes>(_deletePickOrder!, res);
+        getPickerList();
       } else {
         throw '${res.message}';
       }
