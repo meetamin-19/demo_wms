@@ -1,5 +1,6 @@
 import 'package:demo_win_wms/app/data/data_service/web_service.dart';
 import 'package:demo_win_wms/app/data/entity/Res/res_pick_order_list_filter.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_container_list_filter.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list_filter.dart';
 import 'package:demo_win_wms/app/repository/service_repository.dart';
 import 'package:demo_win_wms/app/utils/api_response.dart';
@@ -10,6 +11,7 @@ abstract class ServiceProvider {
 
   Future getPickupFilters();
   Future getShippingVerificationFilters();
+  Future getContainerListFilters();
 }
 
 class ServiceProviderImpl extends BaseNotifier implements ServiceProvider{
@@ -19,6 +21,7 @@ class ServiceProviderImpl extends BaseNotifier implements ServiceProvider{
   ServiceProviderImpl({required this.repo}){
     _pickOrderFilters = ApiResponse();
     _shippingverificationfilters = ApiResponse();
+    _getContainerListFilter = ApiResponse();
   }
 
   ApiResponse<ResPickOrderListFilter>? _pickOrderFilters;
@@ -26,6 +29,9 @@ class ServiceProviderImpl extends BaseNotifier implements ServiceProvider{
 
   ApiResponse<ResShippingVerificationFilter>? _shippingverificationfilters;
   ApiResponse<ResShippingVerificationFilter>? get shippingverificationfilters => _shippingverificationfilters;
+
+  ApiResponse<ResGetContainerListFilter>? _getContainerListFilter;
+  ApiResponse<ResGetContainerListFilter>? get getContainerListFilter => _getContainerListFilter;
 
 
   List<Company>? get companyFilter => _pickOrderFilters?.data?.data?.company;
@@ -39,6 +45,9 @@ class ServiceProviderImpl extends BaseNotifier implements ServiceProvider{
   List<CarrierlistElement>? get customerlocationlist => _shippingverificationfilters?.data?.data?.customerlocationlist;
   List<CarrierlistElement>? get shipvialist => _shippingverificationfilters?.data?.data?.shipvialist;
   List<CarrierlistElement>? get carrierlist => _shippingverificationfilters?.data?.data?.carrierlist;
+
+  List<Warehouselist>? get warehouselist => _getContainerListFilter?.data?.data?.warehouselist;
+
 
 
   @override
@@ -91,6 +100,38 @@ class ServiceProviderImpl extends BaseNotifier implements ServiceProvider{
       apiResIsFailed(_shippingverificationfilters!, e);
       rethrow;
     }
+  }
+
+  @override
+  Future getContainerListFilters() async {
+
+    try{
+
+      if(_getContainerListFilter!=  null){
+
+        apiResIsLoading(_getContainerListFilter!);
+
+        final res = await repo.dataSource.getContainerListFilters();
+
+        if(res.success == true){
+
+          apiResIsSuccess(_getContainerListFilter!, res);
+        } else {
+          throw res.message ?? 'Something went wrong.';
+
+        }
+
+      } else {
+        throw 'Declaration Problem';
+      }
+
+    } catch(e){
+      apiResIsFailed(_getContainerListFilter!, e.toString());
+
+    }
+
+
+
   }
 
 }

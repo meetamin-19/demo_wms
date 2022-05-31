@@ -1,9 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/providers/auth_provider.dart';
 import 'package:demo_win_wms/app/screens/home_screen/home_screen.dart';
-import 'package:demo_win_wms/app/screens/pallet_screen_edit/pallet_screen_edit.dart';
 
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +43,8 @@ class LendingPage extends BaseStateLess{
     final auth = context.watch<AuthProviderImpl>();
 
     final isLogin = auth.isLogin;
+
+    // return ContainerListScreen();
 
     if (isLogin == null){
       return Container(color: Colors.white);

@@ -55,6 +55,10 @@ final Image kShippingEditIcon = Image.asset(kImagePath + 'edit-shiping-verificai
 final Image kShippingInvoiceIcon = Image.asset(kImagePath + 'invoice-shiping-verificaiton-icon.png',fit: BoxFit.contain,color: Colors.white,);
 final Image kCommonAppBarScanImage = Image.asset(kImagePath + 'scan-image.png');
 final Image kImgAddIcon = Image.asset(kImagePath + 'add-icon.png',fit: BoxFit.contain);
+final Image kImgSend = Image.asset(kImagePath + 'send-img.png',fit: BoxFit.contain);
+final Image kImgAttach = Image.asset(kImagePath + 'attach-img.png',fit: BoxFit.contain);
+final Image kImgPopupDeleteWhite = Image.asset(kImagePath + 'delete-popup-icon.png',fit: BoxFit.fitHeight,color: Colors.white,);
+final Image kImgMsg = Image.asset(kImagePath + 'msg-img.png',fit: BoxFit.contain);
 
 double kFontRatio = 1.0;
 

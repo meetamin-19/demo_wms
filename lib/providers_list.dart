@@ -1,3 +1,5 @@
+import 'package:demo_win_wms/app/data/datasource/container_list_data.dart';
+import 'package:demo_win_wms/app/providers/container_list_provider.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/data/datasource/auth_data.dart';
 import 'package:demo_win_wms/app/data/datasource/pallet_data.dart';
@@ -8,6 +10,7 @@ import 'package:demo_win_wms/app/providers/pick_order_provider.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
 import 'package:demo_win_wms/app/repository/auth_repository.dart';
+import 'package:demo_win_wms/app/repository/container_list_repository.dart';
 import 'package:demo_win_wms/app/repository/pallet_repository.dart';
 import 'package:demo_win_wms/app/repository/pick_order_repository.dart';
 import 'package:demo_win_wms/app/repository/shipping_verification_repository.dart';
@@ -38,3 +41,6 @@ PalletProviderImpl get palletProvider =>
 
 ShippingVerificationProvider get shippingverificationProvider =>
     ShippingVerificationProvider(repo: ShippingVerificationRepository(dataSource: ShippingVerificationDataImpl()));
+
+ContainerListProvider get containerListProvider =>
+    ContainerListProvider(repo: ContainerListRepository(dataSource: ContainerListDataImpl()));

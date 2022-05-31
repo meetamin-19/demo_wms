@@ -10,12 +10,29 @@ class UserPrefs{
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    if(user.userType_Term.toUpperCase() == "SUPER ADMIN"){
+
+      prefs.setInt('USER_defaultWarehouseID', 0);
+      prefs.setInt('USER_defaultCompanyID', 0);
+
+    }  else if(user.userType_Term.toUpperCase() == "WAREHOUSE USER"){
+
+      if(user.defaultWarehouseID > 0){
+        prefs.setInt('USER_defaultWarehouseID', user.defaultWarehouseID );
+        // print('true USER_defaultWarehouseID');
+      } else {
+        prefs.setInt('USER_defaultWarehouseID', 0 );
+      }
+
+      prefs.setInt('USER_defaultCompanyID', 0);
+
+    }
+
     prefs.setBool('IS_USER_LOGIN', user.isLogin);
     prefs.setInt('USER_id', user.userID);
     prefs.setString('USER_token', user.access_Token);
     prefs.setString('USER_type', user.userType_Term);
-    prefs.setInt('USER_defaultWarehouseID', user.defaultWarehouseID);
-    prefs.setInt('USER_defaultCompanyID', user.defaultCompanyID);
+
   }
 
   // Clear Local here
