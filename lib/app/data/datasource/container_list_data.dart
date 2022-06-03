@@ -1,8 +1,11 @@
 import 'package:demo_win_wms/app/data/data_service/web_service.dart';
 import 'package:demo_win_wms/app/data/entity/req/req_container_list.dart';
+import 'package:demo_win_wms/app/data/entity/req/req_container_part_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_container_link_location.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_container_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_container_part_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_receiving_data.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/user_prefs.dart';
@@ -13,6 +16,11 @@ abstract class ContainerListData {
   Future<ResContainerLinkLocation> getContainerLinkLocationList({required int id});
 
   Future<EmptyRes> deleteContainer({required int containerID, required String updateLog});
+
+  Future<ResGetReceivingData> getReceivingCompanyData({required int containerId});
+
+  Future<ResGetContainerPartList> getContainerPartList({required ReqGetContainerPartList req});
+
 
 
 }
@@ -63,5 +71,38 @@ class ContainerListDataImpl extends ContainerListData {
     } catch (e) {
       throw kErrorWithRes;
     }
+  }
+
+  @override
+  Future<ResGetReceivingData> getReceivingCompanyData({required int containerId}) async {
+
+
+    final res = await WebService.shared.postApiDIO(
+        url: kBaseURL + 'receiving/Get_ReceivingProcessData', data: {"ContainerID": containerId});
+
+    print(res.toString());
+
+    try {
+      return ResGetReceivingData.fromJson(res!);
+    } catch (e) {
+      throw kErrorWithRes;
+    }
+
+  }
+
+  @override
+  Future<ResGetContainerPartList> getContainerPartList({required ReqGetContainerPartList req}) async {
+    final res = await WebService.shared
+        .postApiDIO(url: kBaseURL + 'receiving/Get_Container_Part_List', data: await req.toJson());
+
+    print(req.toJson());
+
+    try {
+    return ResGetContainerPartList.fromJson(res!);
+    } catch (e) {
+    print(e.toString());
+    throw kErrorWithRes;
+    }
+
   }
 }

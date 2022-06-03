@@ -24,6 +24,7 @@ String kPalletScreenEditRoute = '/PalletScreenEdit';
 String kVerifyShippingHomeScreen = '/ShippingVerificationScreen';
 String kVerifyEditRoute = '/VerifyScreen';
 String kInventoryAudit = '/InventoryAudit';
+String kReceivingRoute = '/ReceivingScreen';
 String kCamera = '/Camera';
 
 const kImagePath = 'assets/images/';

@@ -3,18 +3,15 @@ import 'package:demo_win_wms/app/data/entity/res/res_container_link_location.dar
 import 'package:demo_win_wms/app/data/entity/res/res_get_container_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_container_list_filter.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list.dart';
-import 'package:demo_win_wms/app/data/entity/res/res_shipping_verification_list_filter.dart';
 import 'package:demo_win_wms/app/providers/auth_provider.dart';
 import 'package:demo_win_wms/app/providers/container_list_provider.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
-import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
 import 'package:demo_win_wms/app/screens/base_components/side_drawer.dart';
 import 'package:demo_win_wms/app/screens/base_components/sidemenu_column.dart';
 import 'package:demo_win_wms/app/screens/container_screen/components/container_dropdown_popup.dart';
 import 'package:demo_win_wms/app/screens/container_screen/container_filter_dropdown.dart';
 import 'package:demo_win_wms/app/screens/pick_order/components/pick_order_filter_button.dart';
-import 'package:demo_win_wms/app/screens/pick_order/components/pick_order_link_user_dropdown.dart';
 import 'package:demo_win_wms/app/screens/receiving_screen/receiving_screen.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/enums.dart';
@@ -43,8 +40,6 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
   String? selectedStartPoint = "0";
   int? selectedSortCol = 0;
   Warehouselist? selectedWarehouse;
-  Warehouselist? selectedContainerStatus;
-  Warehouselist? selectedReceivingType;
   DateTime? selectedStartDate;
   bool? loading = false;
   int? itemCount = 1;
@@ -335,185 +330,183 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
                   return TableRow(decoration: BoxDecoration(color: colorForRow), children: [
                     Padding(
                       padding: EdgeInsets.only(left: 8),
-                     child: SizedBox(
-                      child: Wrap(
-                        runSpacing: 3.0,
-                        spacing: 3.0,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                // loading = true;
-                              });
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ReceivingScreen(),
-                              ));
-                              // _openPDF(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: "ASN");
-                            },
-                            child: Container(
-                              width: kFlexibleSize(35),
-                              height: kFlexibleSize(35),
-                              padding: EdgeInsets.all(kFlexibleSize(10)),
-                              decoration: BoxDecoration(color: const Color(0xff337AB7), borderRadius: BorderRadius.circular(2)),
-                              child: kShippingEditIcon,
-                            ),
-                          ),
-                          // selectedStatusValue == 'Transist'?
-                          InkWell(
-                            onTap: () async {
-
-                              WarehouseLocationlist? selectedUser;
-                              final home = context.read<ContainerListProvider>();
-                              await home.getContainerLinkLocationList(id: data?.containerId ?? 0);
-                              if (kDebugMode) {
-                                print(home.linkLocationList?.data?.data?.container);
-                              }
-                              CustomPopUpWithDropDown(context, primaryBtnTxt: 'Save', secondaryBtnTxt: 'Cancel', primaryAction: () {
-                                // if (selectedUser != null) {
-                                //   linkOrder(data: home.filteredPickOrderList![index], assignToId: selectedUser!.value!);
-                                // } else {
-                                //   if (kDebugMode) {
-                                //     print("selected User null");
+                      child: SizedBox(
+                        child: Wrap(
+                          runSpacing: 3.0,
+                          spacing: 3.0,
+                          children: [
+                            if(selectedStatusValue == 'Receiving' && selectedReceivingValue == 'Via Sea')
+                              InkWell(
+                                onTap: () async {
+                                  await home.getReceivingCompanyData(containerId: data?.containerId ?? 0);
+                                  Navigator.pushNamed(context, kReceivingRoute).then((value) {
+                                    if (value == true) {
+                                      fetchList();
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  width: kFlexibleSize(50),
+                                  height: kFlexibleSize(35),
+                                  padding: EdgeInsets.all(kFlexibleSize(10)),
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xff36C6D3), borderRadius: BorderRadius.circular(2)),
+                                  child: Center(
+                                    child: Text('WIP',style: TextStyle(
+                                      color: Colors.white,
+                                    ),),
+                                  ),
+                                ),
+                              ),
+                            InkWell(
+                              onTap: () async {
+                                // await home.getReceivingCompanyData(containerId: data?.containerId ?? 0);
+                                // Navigator.pushNamed(context, kReceivingRoute).then((value) {
+                                //   if (value == true) {
+                                //     fetchList();
                                 //   }
-                                // }
+                                // });
                               },
-                                  title: 'Link Location',
-                                  message: 'Select Location',
-                                  dropdownWidget:
-                                  ContainerLinkLocationDropDown(
-                                    data: home.linkLocationList!.data!.data!.warehouseLocationlist!,
-                                    onChange: (user) {
-                                      setState(() {
-                                        selectedUser = user;
-                                        if (kDebugMode) {
-                                          print(selectedUser?.value);
-                                        }
-                                      });
-                                    },
-                                    hint: 'Select Location',
-                                  ));
-                              //    : const Text("Something went wrong in getting user list"));
-                            },
-                            child: Container(
-                              width: kFlexibleSize(35),
-                              height: kFlexibleSize(35),
-                              padding: EdgeInsets.all(kFlexibleSize(10)),
-                              decoration: BoxDecoration(color: const Color(0xff36C6D3), borderRadius: BorderRadius.circular(2)),
-                              child: kImgSend,
+                              child: Container(
+                                width: kFlexibleSize(35),
+                                height: kFlexibleSize(35),
+                                padding: EdgeInsets.all(kFlexibleSize(10)),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xff337AB7), borderRadius: BorderRadius.circular(2)),
+                                child: kShippingEditIcon,
+                              ),
                             ),
-                          ) ,
-                          // : Container(),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                // loading = true;
-                              });
-                              // _openPDF(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: "ASN");
-                            },
-                            child: Container(
-                              width: kFlexibleSize(35),
-                              height: kFlexibleSize(35),
-                              padding: EdgeInsets.all(kFlexibleSize(10)),
-                              decoration: BoxDecoration(color: const Color(0xff26C281), borderRadius: BorderRadius.circular(2)),
-                              child: kImgAttach,
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                // loading = true;
-                              });
-                              // _openPDF(invoiceID: invoiceID, invoiceNo: invoiceNo, msg: "ASN");
-                            },
-                            child: Container(
-                              width: kFlexibleSize(35),
-                              height: kFlexibleSize(35),
-                              padding: EdgeInsets.all(kFlexibleSize(10)),
-                              decoration: BoxDecoration(color: const Color(0xffED6B75), borderRadius: BorderRadius.circular(2)),
-                              child: kImgPopupDeleteWhite,
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              CustomPopup(context, title: 'Delete', message: 'Are you sure you want to delete ?', primaryBtnTxt: 'Yes',
-                                  primaryAction: () async {
-
+                            if( selectedStatusValue == 'Transist')
+                            InkWell(
+                              onTap: () async {
+                                WarehouseLocationlist? selectedUser;
                                 final home = context.read<ContainerListProvider>();
-                                    await home.deleteEmptyContainer(containerId: data?.containerId, updatelog: data?.updatelog);
-
-                                  }, secondaryBtnTxt: 'Close');
-                            },
-                            child: Container(
-                              width: kFlexibleSize(35),
-                              height: kFlexibleSize(35),
-                              padding: EdgeInsets.all(kFlexibleSize(10)),
-                              decoration: BoxDecoration(color: const Color(0xffE87E04), borderRadius: BorderRadius.circular(2)),
-                              child: kImgPopupDeleteWhite,
+                                await home.getContainerLinkLocationList(id: data?.containerId ?? 0);
+                                if (kDebugMode) {
+                                  print(home.linkLocationList?.data?.data?.container);
+                                }
+                                CustomPopUpWithDropDown(context, primaryBtnTxt: 'Save', secondaryBtnTxt: 'Cancel',
+                                    primaryAction: () {
+                                  // if (selectedUser != null) {
+                                  //   linkOrder(data: home.filteredPickOrderList![index], assignToId: selectedUser!.value!);
+                                  // } else {
+                                  //   if (kDebugMode) {
+                                  //     print("selected User null");
+                                  //   }
+                                  // }
+                                },
+                                    title: 'Link Location',
+                                    message: 'Select Location',
+                                    dropdownWidget: ContainerLinkLocationDropDown(
+                                      data: home.linkLocationList!.data!.data!.warehouseLocationlist!,
+                                      onChange: (user) {
+                                        setState(() {
+                                          selectedUser = user;
+                                          if (kDebugMode) {
+                                            print(selectedUser?.value);
+                                          }
+                                        });
+                                      },
+                                      hint: 'Select Location',
+                                    ));
+                                //    : const Text("Something went wrong in getting user list"));
+                              },
+                              child: Container(
+                                width: kFlexibleSize(35),
+                                height: kFlexibleSize(35),
+                                padding: EdgeInsets.all(kFlexibleSize(10)),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xff36C6D3), borderRadius: BorderRadius.circular(2)),
+                                child: kImgSend,
+                              ),
                             ),
-                          ),
+                            InkWell(
+                              onTap: () {
 
-                          // isBolAttachment == true
-                          //     ? InkWell(
-                          //     onTap: () {
-                          //       setState(() {
-                          //         loading = true;
-                          //       });
-                          //     //  _openBolAttachment(salesOrderID: salesOrderID);
-                          //     },
-                          //     child: Container(
-                          //       padding: EdgeInsets.all(kFlexibleSize(10)),
-                          //       decoration: BoxDecoration(color: Colors.blueAccent, borderRadius: BorderRadius.circular(2)),
-                          //       child: SizedBox(
-                          //         child: kShippingInvoiceIcon,
-                          //         width: kFlexibleSize(20),
-                          //       ),
-                          //     ))
-                          //     : const SizedBox()
-                        ],
+                              },
+                              child: Container(
+                                width: kFlexibleSize(35),
+                                height: kFlexibleSize(35),
+                                padding: EdgeInsets.all(kFlexibleSize(10)),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xff26C281), borderRadius: BorderRadius.circular(2)),
+                                child: kImgAttach,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+
+                              },
+                              child: Container(
+                                width: kFlexibleSize(35),
+                                height: kFlexibleSize(35),
+                                padding: EdgeInsets.all(kFlexibleSize(10)),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xffED6B75), borderRadius: BorderRadius.circular(2)),
+                                child: kImgPopupDeleteWhite,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                CustomPopup(context,
+                                    title: 'Delete',
+                                    message: 'Are you sure you want to delete ?',
+                                    primaryBtnTxt: 'Yes', primaryAction: () async {
+                                  final home = context.read<ContainerListProvider>();
+                                  await home.deleteEmptyContainer(
+                                      containerId: data?.containerId, updatelog: data?.updatelog);
+                                }, secondaryBtnTxt: 'Close');
+                              },
+                              child: Container(
+                                width: kFlexibleSize(35),
+                                height: kFlexibleSize(35),
+                                padding: EdgeInsets.all(kFlexibleSize(10)),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xffE87E04), borderRadius: BorderRadius.circular(2)),
+                                child: kImgPopupDeleteWhite,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                     ),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8, bottom: 8),
-                        child: childText('${data?.receivingTypeTerm} ', Colors.black),
+                        child: childText('${data?.receivingTypeTerm ?? '-'} ', Colors.black),
                       ),
                     ),
                     Center(
                         child: Padding(
                       padding: const EdgeInsets.only(left: 3, right: 3, top: 8, bottom: 8),
-                      child: childText('${data?.containerCode} ', Colors.black),
+                      child: childText('${data?.containerCode ?? '-'} ', Colors.black),
                     )),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 3, right: 3, top: 8, bottom: 8),
-                        child: childText('${data?.containerName}', Colors.black),
+                        child: childText('${data?.containerName ?? '-'}', Colors.black),
                       ),
                     ),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 3, right: 3, top: 8, bottom: 8),
-                        child: childText('${data?.warehouseName}', Colors.black),
+                        child: childText('${data?.warehouseName ?? '-'}', Colors.black),
                       ),
                     ),
                     Center(
                         child: Padding(
                       padding: const EdgeInsets.only(left: 3, right: 3, top: 8, bottom: 8),
-                      child: childText('${data?.eta?.day}/${data?.eta?.month}/${data?.eta?.year}', Colors.black),
+                      child: childText('${data?.etaDate ?? '-'}', Colors.black),
                     )),
                     Center(
                         child: Padding(
                       padding: const EdgeInsets.only(left: 3, right: 3, top: 8, bottom: 8),
-                      child: childText(
-                          '${data?.receivedDate?.day}/${data?.receivedDate?.month}/${data?.receivedDate?.year}',
-                          Colors.black),
+                      child: childText('${data?.receivedDateStr ?? '-'}', Colors.black),
                     )),
                     Center(
                         child: Padding(
                       padding: const EdgeInsets.only(left: 3, right: 3, top: 8, bottom: 8),
-                      child: childText(
-                          '${data?.completedDate?.day}/${data?.completedDate?.month}/${data?.completedDate?.year}',
-                          Colors.black),
+                      child: childText('${data?.completedDateStr ?? '-'} ', Colors.black),
                     )),
                     Center(
                       child: Padding(
@@ -522,7 +515,7 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
                       ),
                     ),
                     Center(
-                      child: containerPart('${data?.containerPartCount}', Colors.white),
+                      child: containerPart('${data?.containerPartCount ?? '-'}', Colors.white),
                     ),
                   ]);
                 }),
@@ -535,7 +528,12 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
   }
 
   Widget secondActionBTNs(
-      {bool? isCreditMemoGen, int? containerId, String? invoiceNo, bool? isBolAttachment, int? salesOrderID,ResGetContainerListData? e}) {
+      {bool? isCreditMemoGen,
+      int? containerId,
+      String? invoiceNo,
+      bool? isBolAttachment,
+      int? salesOrderID,
+      ResGetContainerListData? e}) {
     final home = context.watch<ContainerListProvider>();
     final isLoading = home.getContainerList?.state == Status.LOADING;
     final hasError = home.getContainerList?.state == Status.ERROR;
@@ -582,9 +580,8 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
               ),
             ),
             // selectedStatusValue == 'Transist'?
-        InkWell(
+            InkWell(
               onTap: () async {
-
                 WarehouseLocationlist? selectedUser;
                 final home = context.read<ContainerListProvider>();
                 await home.getContainerLinkLocationList(id: containerId ?? 0);
@@ -602,8 +599,7 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
                 },
                     title: 'Link Location',
                     message: 'Select Location',
-                    dropdownWidget:
-                         ContainerLinkLocationDropDown(
+                    dropdownWidget: ContainerLinkLocationDropDown(
                       data: home.linkLocationList!.data!.data!.warehouseLocationlist!,
                       onChange: (user) {
                         setState(() {
@@ -615,7 +611,7 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
                       },
                       hint: 'Select Location',
                     ));
-                   //    : const Text("Something went wrong in getting user list"));
+                //    : const Text("Something went wrong in getting user list"));
               },
               child: Container(
                 width: kFlexibleSize(35),
@@ -624,7 +620,7 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
                 decoration: BoxDecoration(color: const Color(0xff36C6D3), borderRadius: BorderRadius.circular(2)),
                 child: kImgSend,
               ),
-            ) ,
+            ),
             // : Container(),
             InkWell(
               onTap: () {
@@ -1017,7 +1013,6 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
                               }
                             }
                           });
-                          // _scrollController.jumpTo(2);
                         },
                         child: Container(
                           decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
@@ -1301,23 +1296,4 @@ class _ContainerListScreenState extends State<ContainerListScreen> {
       ),
     );
   }
-
-  // deletePickOrder({required ResGetContainerListData data}) async {
-  //   setState(() {
-  //     isScreenLoading = true;
-  //   });
-  //
-  //   try {
-  //     final home = context.read<ContainerListProvider>();
-  //     await home.deleteEmptyContainer(data: data);
-  //
-  //     setState(() {
-  //       isScreenLoading = false;
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       isScreenLoading = false;
-  //     });
-  //   }
-  // }
 }

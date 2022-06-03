@@ -29,7 +29,8 @@ Widget multiProvider(){
       ChangeNotifierProvider(create: (_) => pickOrder),
       ChangeNotifierProvider(create: (_) => palletProvider),
       ChangeNotifierProvider(create: (_) => shippingverificationProvider),
-      ChangeNotifierProvider(create: (context) => containerListProvider,)
+      ChangeNotifierProvider(create: (context) => containerListProvider,),
+      ChangeNotifierProvider(create: (context) => receiveProcessProvider,)
     ],
     child: app(),
   );

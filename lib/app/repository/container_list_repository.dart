@@ -1,8 +1,11 @@
 import 'package:demo_win_wms/app/data/datasource/container_list_data.dart';
 import 'package:demo_win_wms/app/data/entity/req/req_container_list.dart';
+import 'package:demo_win_wms/app/data/entity/req/req_container_part_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_container_link_location.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_container_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_container_part_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_receiving_data.dart';
 
 class ContainerListRepository {
 
@@ -23,6 +26,16 @@ class ContainerListRepository {
   Future<EmptyRes> deleteContainer({required int containerID, required String updateLog}) async {
     return dataSource.deleteContainer(containerID : containerID, updateLog: updateLog);
   }
+
+  Future<ResGetReceivingData> getReceivingCompanyData({required int containerId}) async {
+    return await dataSource.getReceivingCompanyData(containerId : containerId);
+  }
+
+  Future<ResGetContainerPartList> getContainerPartList(
+      {required ReqGetContainerPartList req}) async {
+    return await dataSource.getContainerPartList(req: req);
+  }
+
 
 
 

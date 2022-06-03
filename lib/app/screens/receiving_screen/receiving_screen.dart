@@ -1,17 +1,19 @@
-import 'package:demo_win_wms/app/data/entity/res/res_get_pallet_list_data_by_id.dart';
-import 'package:demo_win_wms/app/providers/service_provider.dart';
-import 'package:demo_win_wms/app/providers/shipping_verification_provider.dart';
+import 'package:demo_win_wms/app/data/data_service/web_service.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_receiving_data.dart';
+import 'package:demo_win_wms/app/providers/auth_provider.dart';
+import 'package:demo_win_wms/app/providers/container_list_provider.dart';
 import 'package:demo_win_wms/app/screens/base_components/common_app_bar.dart';
 import 'package:demo_win_wms/app/screens/base_components/sidemenu_column.dart';
 import 'package:demo_win_wms/app/screens/receiving_screen/components/receive_data_component.dart';
 import 'package:demo_win_wms/app/utils/constants.dart';
 import 'package:demo_win_wms/app/utils/enums.dart';
+import 'package:demo_win_wms/app/views/loading_small.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-
 
 class ReceivingScreen extends StatefulWidget {
   const ReceivingScreen({Key? key}) : super(key: key);
@@ -23,27 +25,48 @@ class ReceivingScreen extends StatefulWidget {
 class _ReceivingScreenState extends State<ReceivingScreen> {
   FocusNode? _focusNode;
   TextEditingController? _scanPartController;
+  ResGetReceivingData? receivingData;
   bool state = false;
   List<bool> _isSelected = [false, true];
+  List<String> name = ['ON', 'OFF'];
   int pageLimit = 100;
+  int? selectedSortCol = 0;
   String? selectedRange = "100";
   String? selectedStartPoint = "0";
   int? itemCount = 1;
+  int? totalCount;
   bool? loading = false;
   int startingIndex = 1;
   int selectedIndex = 1;
   int length = 20;
+  bool? selectValue = false;
+  bool? isButtonEnabled = true;
+  int? LastSelectedCompany;
+  String? UnlinkLocationContainerPartNo;
 
-  BoxDecoration unselectedBox =
-  BoxDecoration(color: const Color(0xffE5E5E5).withOpacity(0.5), borderRadius: const BorderRadius.all(const Radius.circular(3)));
+  String? UnlinkLocationContainerPartID;
+
+  String? partNo;
+
+  String? qty;
+  String? boxQty;
+  String? totalBox;
+  String? month;
+  String? year;
+  String? ScanningProcessType;
+  String? CurrentScannedPartNo;
+
+  BoxDecoration unselectedBox = BoxDecoration(
+      color: const Color(0xffE5E5E5).withOpacity(0.5), borderRadius: const BorderRadius.all(const Radius.circular(3)));
 
   BoxDecoration selectedBox =
-  const BoxDecoration(color: Color(0xff7F849A), borderRadius: BorderRadius.all(Radius.circular(3)));
+      const BoxDecoration(color: Color(0xff7F849A), borderRadius: BorderRadius.all(Radius.circular(3)));
 
   @override
   void initState() {
     super.initState();
-
+    final home = context.read<ContainerListProvider>();
+    receivingData = home.getReceivingCompanyRes?.data;
     _focusNode = FocusNode();
     _scanPartController = TextEditingController();
   }
@@ -51,13 +74,34 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
   @override
   void dispose() {
     super.dispose();
-
     _focusNode?.dispose();
     _scanPartController?.dispose();
   }
 
+  fetchList() async {
+    try {
+      final list = context.read<ContainerListProvider>();
+      await list.getContainerPartList(
+          numOfResults: pageLimit.toString(),
+          sortCol: selectedSortCol,
+          listStartAt: selectedStartPoint,
+          containerId: receivingData?.data?.container?.containerId);
+      getTotalCount();
+    } on UnAuthorised {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Something went wrong')));
+      final auth = context.read<AuthProviderImpl>();
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      auth.unAuthorizeUser();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Something went wrong')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final home = context.read<ContainerListProvider>();
+    final list = home.getReceivingCompanyRes?.data?.data?.companyList;
+
     return Scaffold(
       appBar: CommonAppBar(hasLeading: true),
       body: Scaffold(
@@ -87,7 +131,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                         child: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                             crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             // mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               LayoutBuilder(
@@ -126,13 +170,13 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                                               },
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: const [
+                                                children: [
                                                   Text(
-                                                    "Container : HLBU1605217",
+                                                    "Container : ${receivingData?.data?.container?.containerName}",
                                                     style: TextStyle(color: Colors.white, fontSize: 20),
                                                   ),
                                                   Text(
-                                                    "Receiving Location : REC1",
+                                                    "Receiving Location : ${receivingData?.data?.container?.receivingLocationName}",
                                                     style: TextStyle(color: Colors.white, fontSize: 20),
                                                   ),
                                                 ],
@@ -172,7 +216,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                                                               color: const Color(0xffeef1f5),
                                                               borderRadius: BorderRadius.circular(2)),
                                                           child: TextField(
-                                                            // enabled: (secondDisabled == true && secondCompleted == true) ? true : false,
+                                                            enabled: _isSelected.elementAt(0) == true ? true : false,
                                                             focusNode: _focusNode,
                                                             controller: _scanPartController,
                                                             onEditingComplete: () {},
@@ -201,7 +245,8 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                                                           ),
                                                         ),
                                                         Padding(
-                                                          padding: EdgeInsets.only(left: kFlexibleSize(8),),
+                                                          padding: EdgeInsets.only(
+                                                              left: kFlexibleSize(8), bottom: kFlexibleSize(5)),
                                                           child: Container(
                                                               width: kFlexibleSize(101),
                                                               height: kFlexibleSize(40),
@@ -242,8 +287,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                                                     width: 300,
                                                     decoration: BoxDecoration(
                                                         borderRadius: BorderRadius.circular(2),
-                                                        border: Border.all(color: Colors.black.withOpacity(0.1))
-                                                    ),
+                                                        border: Border.all(color: Colors.black.withOpacity(0.1))),
                                                     // margin: const EdgeInsets.all(20),
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,41 +299,48 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                                                           children: [
                                                             ReceiveDataViewComponent(
                                                               title: 'Part No:',
-                                                              value: '25368',
+                                                              value:
+                                                                  '${receivingData?.data?.container?.partQty ?? '-'}',
                                                             ),
                                                             ReceiveDataViewComponent(
                                                               title: 'Month:',
-                                                              value: 'December',
+                                                              value:
+                                                                  '${receivingData?.data?.container?.monthYearDisplay ?? '-'}',
                                                             ),
                                                             ReceiveDataViewComponent(
                                                               title: 'Year:',
-                                                              value: '2022',
+                                                              value:
+                                                                  '${receivingData?.data?.container?.monthYearDisplay ?? '-'}',
                                                             ),
                                                             ReceiveDataViewComponent(
                                                               title: 'Qty:',
-                                                              value: '253',
+                                                              value:
+                                                                  '${receivingData?.data?.container?.partQty ?? '-'}',
                                                             )
                                                           ],
                                                         ),
                                                         Padding(
-                                                          padding:  EdgeInsets.only(top: kFlexibleSize(8),left: kFlexibleSize(10)),
+                                                          padding: EdgeInsets.only(
+                                                              top: kFlexibleSize(8), left: kFlexibleSize(10)),
                                                           child: Row(
                                                             //crossAxisAlignment: CrossAxisAlignment.start,
                                                             mainAxisAlignment: MainAxisAlignment.start,
                                                             children: [
                                                               Padding(
-                                                                padding:  EdgeInsets.only(left: kFlexibleSize(10)),
+                                                                padding: EdgeInsets.only(left: kFlexibleSize(10)),
                                                                 child: ReceiveDataViewComponent(
                                                                   title: 'Box Qty:',
-                                                                  value: '253',
+                                                                  value:
+                                                                      '${receivingData?.data?.container?.partQty ?? '-'}',
                                                                 ),
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 width: 15,
                                                               ),
                                                               ReceiveDataViewComponent(
                                                                 title: 'Total Box:',
-                                                                value: '253',
+                                                                value:
+                                                                    '${receivingData?.data?.container?.totalCount ?? '-'}',
                                                               ),
                                                             ],
                                                           ),
@@ -307,7 +358,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                                               width: 10,
                                             ),
                                             Expanded(
-                                              child: dataTable(context, dataRow([])),
+                                              child: dataTable(context, dataRow((list))),
                                             ),
                                           ],
                                         ),
@@ -335,7 +386,6 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
     );
   }
 
-
   Widget dataTable(BuildContext context, List<DataRow> dataRowList) {
     Widget headerWidget(String text, {Widget? leading}) {
       return Expanded(
@@ -349,6 +399,21 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
       );
     }
 
+    Color _getDataRowColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+        MaterialState.selected,
+      };
+
+      if (states.any(interactiveStates.contains)) {
+        return Colors.lightBlueAccent;
+      }
+      //return Colors.green; // Use the default value.
+      return Colors.transparent;
+    }
+
     return Padding(
       padding: EdgeInsets.only(top: kFlexibleSize(5)),
       child: Container(
@@ -359,6 +424,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         child: DataTable(
             border: TableBorder.all(color: Colors.transparent),
             columnSpacing: 0,
+            dataRowColor: MaterialStateProperty.resolveWith(_getDataRowColor),
             horizontalMargin: 0,
             // showBottomBorder: false,
             headingRowHeight: 40,
@@ -400,8 +466,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
     );
   }
 
-  List<DataRow> dataRow(List<PickOrderPalletList>? list) {
-    int len = 5;
+  List<DataRow> dataRow(List<CompanyList>? list) {
+    final home = context.watch<ContainerListProvider>();
+
+    int len = list?.length ?? 0;
     Color? color;
     // int lenByHalf = (len / 2).round();
     List<DataRow> d = [];
@@ -412,12 +480,48 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         color = const Color(0xffF9F9F9);
       }
 
-      d.add(DataRow(color: MaterialStateProperty.all(color), cells: [
-        DataCell(Container( child: childText('Imperial Auto Industries Ltd', Color(0xff337AB7)))),
-        DataCell(childText('60', Colors.black)),
-        DataCell(childText('45', Colors.black)),
-        DataCell(childText('15', Colors.black)),
-      ]));
+      /*  Color _getDataRowColor(Set<MaterialState> states) {
+    const Set<MaterialState> interactiveStates = <MaterialState>{
+    MaterialState.pressed,
+    MaterialState.hovered,
+    MaterialState.focused,
+    };
+
+    if (states.any(interactiveStates.contains)) {
+    return Colors.blue;
+    }
+    //return Colors.green; // Use the default value.
+    return Colors.transparent;
+    }*/
+
+      Widget childTextCompany(String text, Color col) {
+        return ConstrainedBox(
+          child: Center(
+              child: Text(
+            text,
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: col),
+          )),
+          constraints: BoxConstraints(minHeight: kFlexibleSize(50)),
+        );
+      }
+
+      d.add(DataRow(
+          cells: [
+            DataCell(childTextCompany('${receivingData?.data?.companyList?[i].companyName}', Color(0xff337AB7))),
+            DataCell(childTextCompany('${receivingData?.data?.companyList?[i].totalParts}', Colors.black)),
+            DataCell(childTextCompany('${receivingData?.data?.companyList?[i].scannedParts}', Colors.black)),
+            DataCell(childTextCompany('${receivingData?.data?.companyList?[i].notScannedParts}', Colors.black)),
+          ],
+          onLongPress: () {
+            // select = i;
+            home.companyId = receivingData?.data?.companyList?[i].companyId;
+            fetchList();
+          }
+          /*onSelectChanged: (value){
+        fetchList(14*/ /*data?.data?.companyList?[i].companyId*/ /*);
+
+          }*/
+          ));
     }
     return d;
   }
@@ -466,7 +570,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                 onChanged: (int? val) {
                   setState(() {
                     pageLimit = val!;
-                    // fetchList();
+                    fetchList();
                   });
                 }),
           ),
@@ -491,7 +595,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                         // _scrollController.jumpTo(2);
                       },
                       child: Container(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
                         height: 40,
                         width: 30,
                         child: Icon(
@@ -615,10 +719,9 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     InkWell(
                       onTap: () {
                         setState(() {
-                          if(itemCount! < 7) {
+                          if (itemCount! < 7) {
                             startingIndex = 1;
-                          }
-                          else{
+                          } else {
                             if (startingIndex + 7 < itemCount!) {
                               startingIndex += 1;
                             } else {
@@ -629,11 +732,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                               }
                             }
                           }
-
                         });
                       },
                       child: Container(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.all( Radius.circular(3))),
+                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3))),
                         child: Icon(
                           Icons.arrow_right_outlined,
                           color: const Color(0xff263238).withOpacity(0.5),
@@ -671,6 +773,21 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         ],
       ),
     );
+  }
+
+  void getTotalCount() async {
+    final home = context.read<ContainerListProvider>();
+
+    try {
+      setState(() {
+        totalCount = home.getContainerPartListRes?.data?.data?.first.totalCount ?? 0;
+        itemCount = (totalCount == null || totalCount == 0) ? 1 : (totalCount! / pageLimit).ceil();
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   _setPageNumber(int index) {
@@ -719,39 +836,26 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
 
   getPage() {
     selectedStartPoint = (pageLimit * (selectedIndex - 1)).toString();
-    //fetchList();
+    fetchList();
   }
 
   Widget bindDataTable(BuildContext context) {
-    final home = context.watch<ShippingVerificationProvider>();
-    final filters = context.watch<ServiceProviderImpl>();
-    final filtersLoaded = filters.shippingverificationfilters?.state == Status.COMPLETED;
-    final listloading = home.shippingVerificationList?.state == Status.COMPLETED;
+    final home = context.watch<ContainerListProvider>();
+    final emptyList = home.getContainerPartListRes?.data?.data?.length;
+    final hasError = home.getContainerPartListRes?.state == Status.ERROR;
+    final isLoading = home.getContainerPartListRes?.state == Status.LOADING;
 
-
-    if (filtersLoaded) {
-      // if (!listloading) {
-      //   return Container(
-      //       margin: const EdgeInsets.symmetric(vertical: 20),
-      //       height: 50,
-      //       color: Colors.white,
-      //       child: Center(child: LoadingSmall()));
-      // } else {
-      return Container(
-          width: MediaQuery.of(context).size.width ,
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5), /*border: Border.all(color: Colors.black.withOpacity(0.1))*/
-          ),
-          child: table());
-      // }
+    if (isLoading) {
+      return Center(child: LoadingSmall());
     }
+
     // else {
     return Container(
-        width: MediaQuery.of(context).size.width ,
+        width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5), /*border: Border.all(color: Colors.black.withOpacity(0.1))*/
+          borderRadius: BorderRadius.circular(5),
+          /*border: Border.all(color: Colors.black.withOpacity(0.1))*/
         ),
         child: table());
     // }
@@ -769,16 +873,21 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
       );
     }
 
-    final home = context.watch<ShippingVerificationProvider>();
-    final emptyList = home.shippingVerificationList?.data?.data?.length;
-    final hasError = home.shippingVerificationList?.state == Status.ERROR;
+    final home = context.watch<ContainerListProvider>();
+    final emptyList = home.getContainerPartListRes?.data?.data?.length;
+    final hasError = home.getContainerPartListRes?.state == Status.ERROR;
+    final isLoading = home.getContainerPartListRes?.state == Status.LOADING;
 
     // if (hasError) {
     //   return NoDataFoundView(
     //     retryCall: () {
-    //       context.read<ShippingVerificationProvider>().getShippingVerificationList();
+    //       context.read<ContainerListProvider>().getContainerPartList();
     //     },
     //   );
+    // }
+    //
+    // if (isLoading) {
+    //   return LoadingSmall();
     // }
     //
     // if (emptyList == 0) {
@@ -787,8 +896,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
     //   );
     // }
 
-    final list = home.filteredShippingVerificationData;
-
+    final list = home.containerPartList;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -798,7 +906,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 5),
             decoration:
-            BoxDecoration(border: Border.all(style: BorderStyle.solid, color: Colors.black.withOpacity(0.1))),
+                BoxDecoration(border: Border.all(style: BorderStyle.solid, color: Colors.black.withOpacity(0.1))),
             child: Table(
               // border: TableBorder.all(),
               columnWidths: const {
@@ -810,13 +918,13 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                 5: FlexColumnWidth(4),
                 6: FlexColumnWidth(4),
                 7: FlexColumnWidth(4),
-                8: FlexColumnWidth(5),
+                8: FlexColumnWidth(4),
                 9: FlexColumnWidth(5),
                 10: FlexColumnWidth(5),
                 11: FlexColumnWidth(5),
                 12: FlexColumnWidth(5),
                 13: FlexColumnWidth(5),
-
+                14: FlexColumnWidth(5),
               },
               children: [
                 TableRow(children: [
@@ -825,6 +933,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                   headerWidget('Bind Location'),
                   headerWidget('Count'),
                   headerWidget('Invoice No'),
+                  headerWidget('Part Number'),
                   headerWidget('Box Qty'),
                   headerWidget('Qty'),
                   headerWidget('Location'),
@@ -838,6 +947,8 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
             ),
           ),
           Table(
+            border:
+                TableBorder(horizontalInside: BorderSide(width: 1, color: Color(0x1a000000), style: BorderStyle.solid)),
             columnWidths: const {
               0: FlexColumnWidth(2),
               1: FlexColumnWidth(4),
@@ -847,103 +958,123 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
               5: FlexColumnWidth(4),
               6: FlexColumnWidth(4),
               7: FlexColumnWidth(4),
-              8: FlexColumnWidth(5),
+              8: FlexColumnWidth(4),
               9: FlexColumnWidth(5),
               10: FlexColumnWidth(5),
               11: FlexColumnWidth(5),
               12: FlexColumnWidth(5),
               13: FlexColumnWidth(5),
+              14: FlexColumnWidth(5),
             },
             // border: TableBorder.all(color: kBorderColor),
-            children: List.generate((10), (index) {
+            children: List.generate((list?.length ?? 0), (index) {
+              final data = list?[index];
+
               Color? colorForRow = Colors.white;
 
               if (index % 2 == 0) {
                 colorForRow = const Color(0xffF9F9F9);
               }
 
-              final data = list?[index];
+              if (receivingData?.data?.container?.conainerStatusTerm == 'Completed' ||
+                  data?.actualLocationId != '' ||
+                  data?.comment != '') {
+                // colorForRow = Colors.blueGrey;
+              }
 
               return TableRow(decoration: BoxDecoration(color: colorForRow), children: [
                 Padding(
                   padding: EdgeInsets.only(left: 8),
-                  child: childText('1 ', Colors.black),
+                  child: childText('${index + 1} ', Colors.black),
                 ),
+                if (data?.boxQty == 0 ||
+                    data?.weight == 0 ||
+                    data?.boxSize == '' ||
+                    data?.isLocationIsBindOrNotInItemMaster == '')
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 3, right: 8, top: 5, bottom: 5),
+                      child: scanPart(
+                          partNo: data?.partNumber,
+                          actualLocationId: data?.actualLocationId,
+                          unlinkContainerPartsID: data?.unlinkContainerPartsId,
+                          containerPartsID: data?.containerPartsId ?? 0,
+                      scanBy: data?.scanBy,
+                      statusTerm: data?.statusTerm),
+                    ),
+                  ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0,right: 8,top: 8,bottom: 8),
+                    padding: const EdgeInsets.only(left: 3, right: 8, top: 5, bottom: 5),
                     child: containerPart(),
                   ),
                 ),
-                Center(child: Padding(
-                  padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                  child: childText('3036 Indiana ', Color(0xff337AB7)),
+                Center(
+                    child: Padding(
+                  padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                  child: childText('${data?.bindLocationName ?? '-'} ', Color(0xff337AB7)),
                 )),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('5', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.totalCount ?? '-'}', Colors.black),
                   ),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('E212502239', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.invoiceNo ?? '-'}', Colors.black),
                   ),
                 ),
                 Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                      child: childText(
-                          '5687213-01', Colors.black),
-                    )),
+                  padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                  child: childText('${data?.partNumber ?? '-'}', Colors.black),
+                )),
                 Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                      child: childText(
-                          '3', Colors.black),
-                    )),
+                  padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                  child: childText('${data?.boxQty ?? '-'}', Colors.black),
+                )),
                 Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                      child: childText(
-                          '20', Colors.black),
-                    )),
+                  padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                  child: childText('${data?.differenceInQty ?? '-'}', Colors.black),
+                )),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('A8A1', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.locationName ?? '-'}', Colors.black),
                   ),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('A8A5', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.suggestedLocation ?? '-'}', Colors.black),
                   ),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('36', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.receivedQty ?? '-'}', Colors.black),
                   ),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('108', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.differenceInQty ?? '-'}', Colors.black),
                   ),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('Lorem', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.comment ?? ' -'}', Colors.black),
                   ),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 3,right: 3,top: 8,bottom: 8),
-                    child: childText('Brian'
-                        '', Colors.black),
+                    padding: const EdgeInsets.only(left: 3, right: 3, top: 5, bottom: 5),
+                    child: childText('${data?.scannedBy ?? '-'}', Colors.black),
                   ),
                 ),
               ]);
@@ -954,16 +1085,30 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
     );
   }
 
+  showPartList() {
+    final list = context.read<ContainerListProvider>();
+
+    if (receivingData?.data?.container?.containerId != '' && list.companyId != '') {
+      LastSelectedCompany = 0;
+      UnlinkLocationContainerPartNo = "";
+      UnlinkLocationContainerPartID = "0";
+      partNo?.contains('');
+      qty?.contains('');
+      boxQty?.contains('');
+      totalBox?.contains('');
+      month?.contains('');
+      year?.contains('');
+      LastSelectedCompany = list.companyId ?? 0;
+    }
+  }
+
   Widget containerPart() {
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0,right: 8,top: 8,bottom: 8),
+      padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8, bottom: 8),
       child: Container(
         width: kFlexibleSize(25),
         height: kFlexibleSize(25),
-        decoration: BoxDecoration(
-            color: Color(0xff26C281),
-            borderRadius: BorderRadius.circular(2)
-        ),
+        decoration: BoxDecoration(color: Color(0xff26C281), borderRadius: BorderRadius.circular(2)),
         child: Center(
           child: kImgMsg,
         ),
@@ -971,5 +1116,57 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
     );
   }
 
+  Widget scanPart({String? partNo, String? actualLocationId, String? unlinkContainerPartsID, int? containerPartsID
+    ,String? statusTerm,int? scanBy}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8, bottom: 8),
+      child: InkWell(
+        onTap: () {
+          if (ScanningProcessType != '' &&
+              ScanningProcessType == "Manual" &&
+              receivingData?.data?.container?.conainerStatusTerm != '' &&
+              receivingData?.data?.container?.conainerStatusTerm != "Completed") {
+          } else {
+            if (CurrentScannedPartNo != '' &&
+                CurrentScannedPartNo.toString().toUpperCase() == partNo.toString().toUpperCase() &&
+                receivingData?.data?.container?.conainerStatusTerm != '' &&
+                receivingData?.data?.container?.conainerStatusTerm == 'Completed' &&
+                actualLocationId != '') {
+              if (UnlinkLocationContainerPartID != '0') {
+                if (unlinkContainerPartsID != '' &&
+                    containerPartsID != '' &&
+                    containerPartsID == unlinkContainerPartsID &&
+                    UnlinkLocationContainerPartID == unlinkContainerPartsID) {
+                  // StartScanProcess(Jsondata.data[key].containerPartsID);
+                }
+              } else {
+                if(statusTerm.toString().toUpperCase() != 'SCANNED'){
+                  if(scanBy == 0){
 
+
+                  }
+
+
+
+                }
+
+
+              }
+            }
+          }
+        },
+        child: Container(
+          width: kFlexibleSize(25),
+          height: kFlexibleSize(25),
+          decoration: BoxDecoration(color: Color(0xff36C6D3), borderRadius: BorderRadius.circular(2)),
+          child: Center(
+            child: Text(
+              'Scan',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

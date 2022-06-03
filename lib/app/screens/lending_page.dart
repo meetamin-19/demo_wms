@@ -9,6 +9,7 @@ import 'package:demo_win_wms/app/utils/enums.dart';
 
 import 'package:demo_win_wms/app/views/loading_small.dart';
 import 'base_screens/base_state_less.dart';
+import 'container_screen/container_list_screen.dart';
 import 'login/login_screen.dart';
 
 class LendingPage extends BaseStateLess{
@@ -44,7 +45,7 @@ class LendingPage extends BaseStateLess{
 
     final isLogin = auth.isLogin;
 
-    // return ContainerListScreen();
+    return ContainerListScreen();
 
     if (isLogin == null){
       return Container(color: Colors.white);

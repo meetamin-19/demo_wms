@@ -1,5 +1,7 @@
 import 'package:demo_win_wms/app/data/datasource/container_list_data.dart';
+import 'package:demo_win_wms/app/data/datasource/receive_data.dart';
 import 'package:demo_win_wms/app/providers/container_list_provider.dart';
+import 'package:demo_win_wms/app/providers/receive_provider.dart';
 import 'package:demo_win_wms/app/providers/service_provider.dart';
 import 'package:demo_win_wms/app/data/datasource/auth_data.dart';
 import 'package:demo_win_wms/app/data/datasource/pallet_data.dart';
@@ -13,6 +15,7 @@ import 'package:demo_win_wms/app/repository/auth_repository.dart';
 import 'package:demo_win_wms/app/repository/container_list_repository.dart';
 import 'package:demo_win_wms/app/repository/pallet_repository.dart';
 import 'package:demo_win_wms/app/repository/pick_order_repository.dart';
+import 'package:demo_win_wms/app/repository/receive_repository.dart';
 import 'package:demo_win_wms/app/repository/shipping_verification_repository.dart';
 
 import 'app/data/datasource/home_data.dart';
@@ -44,3 +47,6 @@ ShippingVerificationProvider get shippingverificationProvider =>
 
 ContainerListProvider get containerListProvider =>
     ContainerListProvider(repo: ContainerListRepository(dataSource: ContainerListDataImpl()));
+
+ReceiveProcessProvider get receiveProcessProvider =>
+    ReceiveProcessProvider(repo: ReceiveProcessRepository(dataSource: ReceiveProcessDataImpl()));

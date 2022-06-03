@@ -1,4 +1,5 @@
 
+import 'package:demo_win_wms/app/screens/receiving_screen/receiving_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:demo_win_wms/app/screens/inventory_audit/inventory_audit_screen.dart';
 import 'package:demo_win_wms/app/screens/pick_order/picked_order_home.dart';
@@ -45,6 +46,7 @@ Widget app(){
       kVerifyShippingHomeScreen: (context) => ShippingVerificationScreen(),
       kVerifyEditRoute: (context) => ShippingVerifyEditScreen(),
       kInventoryAudit : (context) => InventoryAuditScreen(),
+      kReceivingRoute : (context) => ReceivingScreen(),
       kCamera : (context) => CameraScreen(),
     },
   );

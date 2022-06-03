@@ -1,9 +1,12 @@
 
 import 'package:demo_win_wms/app/data/entity/req/req_container_list.dart';
+import 'package:demo_win_wms/app/data/entity/req/req_container_part_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/empty_res.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_container_link_location.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_container_list.dart';
 import 'package:demo_win_wms/app/data/entity/res/res_get_container_list_filter.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_container_part_list.dart';
+import 'package:demo_win_wms/app/data/entity/res/res_get_receiving_data.dart';
 import 'package:demo_win_wms/app/providers/base_notifier.dart';
 import 'package:demo_win_wms/app/repository/container_list_repository.dart';
 import 'package:demo_win_wms/app/utils/api_response.dart';
@@ -27,17 +30,32 @@ class ContainerListProvider extends BaseNotifier {
 
   ApiResponse<EmptyRes>? get deleteContainer => _deleteContainer;
 
+  ApiResponse<ResGetReceivingData>? _getReceivingCompanyRes;
+
+  ApiResponse<ResGetReceivingData>? get getReceivingCompanyRes => _getReceivingCompanyRes;
+
+  ApiResponse<ResGetContainerPartList>? _getContainerPartListRes;
+
+  ApiResponse<ResGetContainerPartList>? get getContainerPartListRes =>
+      _getContainerPartListRes;
+
+  List<ResGetContainerPartListData>? containerPartList;
+
 
   ContainerListProvider({required this.repo}) {
     _GetContainerList = ApiResponse();
     _linkLocationList = ApiResponse();
     _deleteContainer = ApiResponse();
+    _getReceivingCompanyRes = ApiResponse();
+    _getContainerPartListRes = ApiResponse();
 
   }
 
   List<ResGetContainerListData>? filteredContainerListData;
 
   List<ResContainerLinkLocationData>? filteredLocationList;
+
+  int? companyId;
 
 
   //
@@ -142,5 +160,58 @@ class ContainerListProvider extends BaseNotifier {
       rethrow;
       }
   }
+
+  Future getReceivingCompanyData({required int containerId}) async {
+    try {
+      apiResIsLoading(_getReceivingCompanyRes!);
+
+      final res = await repo.getReceivingCompanyData(containerId : containerId);
+
+      if (res.success == true) {
+        apiResIsSuccess<ResGetReceivingData>(_getReceivingCompanyRes!, res);
+      } else {
+        throw res.message ?? "Something Went Wrong";
+      }
+    } catch (e) {
+      apiResIsFailed(_getReceivingCompanyRes!, e);
+      rethrow;
+    }
+  }
+
+
+  Future getContainerPartList(
+      {String? listStartAt,
+        String? numOfResults,
+        int? sortCol,
+        int? containerId,
+        }) async {
+    try {
+      apiResIsLoading(_getContainerPartListRes!);
+
+      final res = await repo.getContainerPartList(
+          req: ReqGetContainerPartList(
+              start: listStartAt,
+              length: numOfResults,
+              sortcol: sortCol ?? 0,
+            companyId: companyId,
+            containerId: containerId,
+          ));
+      if (res.success == true) {
+        if (res.data != null) {
+          containerPartList = [];
+          containerPartList?.addAll(res.data!);
+        }
+        apiResIsSuccess<ResGetContainerPartList>(
+            _getContainerPartListRes!, res);
+      } else {
+        throw res.message ?? "Something Went Wrong";
+      }
+    } catch (e) {
+      print(e);
+      apiResIsFailed(_getContainerPartListRes!, e);
+      rethrow;
+    }
+  }
+
 
 }
